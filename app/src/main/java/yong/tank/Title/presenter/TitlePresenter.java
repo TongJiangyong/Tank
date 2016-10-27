@@ -19,7 +19,7 @@ public class TitlePresenter implements ITitlePresenter {
     }
     @Override
     public void toComputer(){
-        titleView.showToast("开始人机大战");
+        //titleView.showToast("开始人机大战");
         Intent intent = new Intent(context,SelectActivity.class);
         context.startActivity(intent);
     }
