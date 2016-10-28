@@ -3,8 +3,8 @@ package yong.tank.Title.View;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 import yong.tank.R;
 import yong.tank.Title.presenter.ITitlePresenter;
 import yong.tank.Title.presenter.TitlePresenter;
+import yong.tank.tool.StaticVariable;
 
 public class MainActivity extends AppCompatActivity implements ITitleView, View.OnClickListener{
     private static String TAG = "MainActivity";
@@ -30,6 +31,10 @@ public class MainActivity extends AppCompatActivity implements ITitleView, View.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置成全屏模式
         setContentView(R.layout.activity_main);  //注意，这一句话一定要在initButton之前，否则，会找不到button，即findViewById会找不到....
+        DisplayMetrics metric = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(metric);
+        StaticVariable.SCREEN_WIDTH = metric.widthPixels;  // 屏幕宽度（像素）
+        StaticVariable.SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
         initButton();
         titlePresenter =new TitlePresenter(this,this);
         Log.d(TAG, "Test in company");

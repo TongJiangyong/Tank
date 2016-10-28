@@ -6,6 +6,48 @@
     android:layout_height="match_parent"
     android:background="@mipmap/bg_select"
     android:orientation="vertical">
-
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100px">
+        <TextView
+            android:id="@+id/selectTank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="选择坦克"/>
+        <TextView
+            android:id="@+id/selectMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="选择地图"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="进入战场"
+            android:background="#65594b"
+            android:focusable="true" />
+        <Button
+            android:id="@+id/backTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#65594b"
+            android:text="返回标题"
+            android:focusable="false" />
+    </LinearLayout>
 </RelativeLayout>
