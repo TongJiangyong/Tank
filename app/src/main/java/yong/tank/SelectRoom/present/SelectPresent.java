@@ -30,6 +30,24 @@ public class SelectPresent {
     }
 
     public void setSelect(MotionEvent event) {
+        for(int i=0;i<selectView.getMapPictures().length;i++)
+        {
+            if(selectView.getMapPictures()[i].isContainPoint((int)event.getX(),(int)event.getY())){
+                //Toast.makeText(this.context, "picture", Toast.LENGTH_SHORT).show();
+                this.showTankSelected(i);
+            }
+        }
+            for(int j =0;j<selectView.getTankPictures().length;j++){
+            if(selectView.getTankPictures()[j].isContainPoint((int)event.getX(),(int)event.getY())){
+                this.showMapSelected(j);
+            }
+        }
+    }
+    public void showTankSelected(int i){
+        selectView.showTankSelected(i);
 
+    }
+    public void showMapSelected(int i){
+        selectView.showMapSelected(i);
     }
 }

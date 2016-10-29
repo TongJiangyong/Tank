@@ -1,6 +1,7 @@
 package yong.tank.SelectRoom.modal;
 
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.Rect;
 
 /**
@@ -29,6 +30,20 @@ public  abstract class PictureInfo{
         this.rect = rect;
     }
 
-//判断是否点击到图片
+    //判断picture是否包括点......
+    public  boolean isContainPoint(int x,int y){
+        if(this.getRect()==null){
+            return false;
+        }
+        return this.getRect().contains(x,y);
+    }
+    //获取图片的中心店
+    public Point getCentralPoint(){
+        if(this.getRect()==null){
+            return new Point(this.getRect().centerX(),this.getRect().centerY());
+        }
+        return null;
+    }
+
     abstract public void test();
 }

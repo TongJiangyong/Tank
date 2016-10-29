@@ -75,11 +75,12 @@ public class SelectActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.backTitle:
-                this.finish();
+                selectPresent.returnToTitle();
                 break;
             case R.id.confirmButton:
-                selectPresent.returnToTitle();
                 showToast("go to game");
+                //进入战场后，毁掉自身.....
+                this.finish();
                 break;
         }
 

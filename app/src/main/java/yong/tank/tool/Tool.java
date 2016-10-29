@@ -2,6 +2,9 @@ package yong.tank.tool;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+
+import yong.tank.SelectRoom.modal.PictureInfo;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -51,6 +54,14 @@ public class Tool {
         return a ;
     }
 
+    //设置每一个选择图片的Rect，rect有类判断是否点在rect中contain....
+    public static void setRect(PictureInfo mapPicture, int x, int y) {
+        if(mapPicture.getRect()==null){
+            Rect rect =new Rect(x,y,x+mapPicture.getPicture().getWidth(),y+mapPicture.getPicture().getHeight());
+            mapPicture.setRect(rect);
+        }
+
+    }
 
     //******************************************************************************************************************************
     //获取每张小图片的宽度

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/help_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="yong.tank.Title.View.MainActivity">
+
+    <ImageView
+        android:id="@+id/help_bg"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+    </ImageView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/helpText"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/help_backTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_green_light"
+        android:layout_weight="1"
+        android:text="返回标题"
+        android:layout_alignBottom="@+id/help_bg"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/arrowLeftButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/arrow_left"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/help_bg"
+        android:layout_alignStart="@+id/help_bg">
+        android:layout_alignStart="@+id/help_backTitle">
+    </Button>
+
+    <Button
+        android:id="@+id/arrowRightButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/arrow_right"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/help_bg"
+        android:layout_alignEnd="@+id/help_bg">
+        android:layout_alignStart="@+id/help_backTitle">
+    </Button>
+
+</RelativeLayout>

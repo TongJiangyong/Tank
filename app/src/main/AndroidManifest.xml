@@ -16,6 +16,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".SelectRoom.View.SelectActivity" ></activity>
+        <activity android:name=".Help.View.HelpActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >>
+
+        </activity>
     </application>
 
 </manifest>

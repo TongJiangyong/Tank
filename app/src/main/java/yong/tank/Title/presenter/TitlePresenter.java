@@ -3,6 +3,7 @@ package yong.tank.Title.presenter;
 import android.content.Context;
 import android.content.Intent;
 
+import yong.tank.Help.View.HelpActivity;
 import yong.tank.SelectRoom.View.SelectActivity;
 import yong.tank.Title.View.ITitleView;
 import yong.tank.tool.StaticVariable;
@@ -36,6 +37,9 @@ public class TitlePresenter implements ITitlePresenter {
     }
     @Override
     public void tohelp(){
-        titleView.showToast("帮助模块开发中..");
+        //titleView.showToast("帮助模块开发中..");
+        Intent intent = new Intent(context,HelpActivity.class);
+        intent.putExtra("type", StaticVariable.GAMEMODE[0]);
+        context.startActivity(intent);
     }
 }

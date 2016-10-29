@@ -1,8 +1,8 @@
 package yong.tank.Title.View;
 
+import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +16,7 @@ import yong.tank.Title.presenter.ITitlePresenter;
 import yong.tank.Title.presenter.TitlePresenter;
 import yong.tank.tool.StaticVariable;
 
-public class MainActivity extends AppCompatActivity implements ITitleView, View.OnClickListener{
+public class MainActivity extends Activity implements ITitleView, View.OnClickListener{
     private static String TAG = "MainActivity";
     private Button battleCom;
     private Button battleBlue;
