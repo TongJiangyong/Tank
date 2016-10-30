@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import yong.tank.Help.View.HelpActivity;
-import yong.tank.SelectRoom.View.SelectActivity;
+import yong.tank.SelectTank.View.SelectActivity;
 import yong.tank.Title.View.ITitleView;
 import yong.tank.tool.StaticVariable;
 

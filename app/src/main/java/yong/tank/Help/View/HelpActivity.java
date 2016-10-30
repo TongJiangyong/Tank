@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import yong.tank.R;
 import yong.tank.Title.View.MainActivity;
+import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
 /**
@@ -63,7 +64,7 @@ public class HelpActivity extends Activity implements View.OnClickListener{
         backButton.setOnClickListener(this);
         //帮助信息
         textView = (TextView)findViewById(R.id.helpText);
-        textView.setText("这是预备一些帮助信息");
+        textView.setText(StaticVariable.HELPINFO);
     }
 
     @Override
@@ -76,12 +77,12 @@ public class HelpActivity extends Activity implements View.OnClickListener{
             case R.id.arrowRightButton:
                 directionButton_right.setVisibility(View.INVISIBLE);
                 directionButton_left.setVisibility(View.VISIBLE);
-                textView.setText("这是预备一些代码公开信息");
+                textView.setText(StaticVariable.STATEMENTINFO);
                 break;
             case R.id.arrowLeftButton:
                 directionButton_left.setVisibility(View.INVISIBLE);
                 directionButton_right.setVisibility(View.VISIBLE);
-                textView.setText("这是预备一些帮助信息");
+                textView.setText(StaticVariable.HELPINFO);
                 break;
         }
 

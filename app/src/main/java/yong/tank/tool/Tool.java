@@ -1,10 +1,11 @@
 package yong.tank.tool;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
-import yong.tank.SelectRoom.modal.PictureInfo;
+import yong.tank.SelectTank.modal.PictureInfo;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -55,13 +56,35 @@ public class Tool {
     }
 
     //设置每一个选择图片的Rect，rect有类判断是否点在rect中contain....
-    public static void setRect(PictureInfo mapPicture, int x, int y) {
+
+
+    /**
+     *
+     * @param mapPicture  图片
+     * @param x      图片左上角横坐标
+     * @param y        图片左上角纵坐标
+     */
+    public static  void  setRect(PictureInfo mapPicture, int x, int y) {
         if(mapPicture.getRect()==null){
             Rect rect =new Rect(x,y,x+mapPicture.getPicture().getWidth(),y+mapPicture.getPicture().getHeight());
             mapPicture.setRect(rect);
         }
 
     }
+
+    //绘制同一中心的图像
+    /**
+     *
+     * @param canvas
+     * @param originPicture
+     * @param laterPicture
+     */
+    public static void drawCentral(Canvas canvas, PictureInfo originPicture, Bitmap laterPicture){
+        float picture_x =originPicture.getRect().centerX()-laterPicture.getWidth()/2;
+        float picture_y = originPicture.getRect().centerY()-laterPicture.getHeight()/2;
+        canvas.drawBitmap(laterPicture,picture_x ,picture_y , null);
+    }
+
 
     //******************************************************************************************************************************
     //获取每张小图片的宽度

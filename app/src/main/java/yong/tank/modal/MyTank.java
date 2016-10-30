@@ -9,4 +9,5 @@ import android.graphics.Bitmap;
 public class MyTank implements Tank{
     private Bitmap[] tankPicture;
     private int tankType;
+    private TankBascInfo tankBascInfo;
 }

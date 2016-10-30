@@ -15,7 +15,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SelectRoom.View.SelectActivity" ></activity>
+        <activity android:name=".SelectTank.View.SelectActivity" ></activity>
+        <activity android:name=".Game.GameActivity" ></activity>
+        <activity android:name=".Result.view.ResultActivity" ></activity>
         <activity android:name=".Help.View.HelpActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >>
 
