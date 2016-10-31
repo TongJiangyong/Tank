@@ -21,7 +21,7 @@ public class MyTank implements Tank{
 
     public void drawSelf(Canvas canvas){
 
-
+        canvas.drawBitmap(this.getTankPicture(),200,200,null);
     }
 
 

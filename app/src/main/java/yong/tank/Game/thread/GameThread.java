@@ -1,9 +1,15 @@
 package yong.tank.Game.thread;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
+
+import static android.graphics.PorterDuff.Mode.CLEAR;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -14,6 +20,7 @@ public class GameThread implements Runnable {
     private GameDto gameDto;
     private SurfaceHolder holder;
     private Canvas canvas;
+    private static String TAG = "GameThread";
     public GameThread(GameDto gameDto,SurfaceHolder holder) {
         this.flag =true;
         this.holder = holder;
@@ -25,14 +32,15 @@ public class GameThread implements Runnable {
     }
 
     public void run() {
-        //这里对canvas的使用有误
+        //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
         while(flag){
             try {
                 synchronized (holder){
-                System.out.println(gameDto.getMyTank().getTankBascInfo().getTankName());
-                canvas=this.holder.lockCanvas();
-                canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
-                gameDto.getMyTank().drawSelf(canvas);
+                    //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
+                    canvas=this.holder.lockCanvas();
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
+                    canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
+                    gameDto.getMyTank().drawSelf(canvas);
                 }
                 }
             catch (Exception e) {

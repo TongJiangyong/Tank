@@ -6,10 +6,12 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.View.GameBase;
@@ -26,6 +28,7 @@ import yong.tank.tool.StaticVariable;
 public class GameActivity extends Activity {
     private int tankType ;
     private int mapType ;
+    private static String TAG = "GameActivity";
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -41,15 +44,18 @@ public class GameActivity extends Activity {
         MyTank myTank =initTank(tankType);
         gameDto.setMyTank(myTank);
         //TODO 可以用反射处理
-        GameBase gameView =new GameView(this,gameDto);
+        Log.d(TAG,"testActivity");
+        GameView gameView =new GameView(this);
+        gameView.setGameDto(gameDto);
+        gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         activity_game.addView(gameView);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // Toast.makeText(this, "event.getX() "+event.getX(), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, ResultActivity.class);
-        this.startActivity(intent);
+        Toast.makeText(this, "event.getX() "+event.getX(), Toast.LENGTH_SHORT).show();
+        //Intent intent = new Intent(this, ResultActivity.class);
+        //this.startActivity(intent);
         return false;
     }
 

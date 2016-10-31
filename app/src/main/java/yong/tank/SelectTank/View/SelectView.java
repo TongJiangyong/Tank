@@ -221,10 +221,10 @@ public class SelectView extends View {
     public void drawDramticInfo(Canvas canvas ,int num,int y){
         int circle = num/10;
         int measureInterval = 20;
-        Log.d(TAG,"************************");
+        //Log.d(TAG,"************************");
         for(int i=0;i<circle;i++)
         {
-            Log.d(TAG,"CESHI :"+measureInterval*i);
+            //Log.d(TAG,"CESHI :"+measureInterval*i);
             canvas.drawBitmap(bascMeasure,blood_X+measureInterval*i,y, null);
         }
 
