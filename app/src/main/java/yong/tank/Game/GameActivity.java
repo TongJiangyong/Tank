@@ -1,12 +1,10 @@
 package yong.tank.Game;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,12 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game.View.GameBase;
 import yong.tank.Game.View.GameView;
+import yong.tank.Game.View.PlayerView;
 import yong.tank.R;
-import yong.tank.Result.view.ResultActivity;
 import yong.tank.modal.MyTank;
 import yong.tank.tool.StaticVariable;
+import yong.tank.tool.Tool;
 
 /**
  * Created by hasee on 2016/10/30.
@@ -43,12 +41,15 @@ public class GameActivity extends Activity {
         mapType=this.getIntent().getIntExtra("mapType", 0);
         MyTank myTank =initTank(tankType);
         gameDto.setMyTank(myTank);
-        //TODO 可以用反射处理
-        Log.d(TAG,"testActivity");
+        //TODO 考虑可否用反射处理这个问题
         GameView gameView =new GameView(this);
-        gameView.setGameDto(gameDto);
+        gameView.setGameDto(gameDto); //没办法，要加在后面
         gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        PlayerView playerView =new PlayerView(this);
+        playerView.setGameDto(gameDto); //没办法，要加在后面
+        playerView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         activity_game.addView(gameView);
+        activity_game.addView(playerView);
     }
 
     @Override
@@ -60,8 +61,10 @@ public class GameActivity extends Activity {
     }
 
     private MyTank initTank(int tankType){
-        Bitmap tankPicture = BitmapFactory.decodeResource(getResources(), StaticVariable.TANKBASCINFO[tankType].getPicture());
-        MyTank tank = new MyTank(tankPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
+        Bitmap tankPicture_temp = BitmapFactory.decodeResource(getResources(), StaticVariable.TANKBASCINFO[tankType].getPicture());
+        Bitmap tankPicture = Tool.reBuildImg(tankPicture_temp,0,1,1,false,true);
+        Bitmap armPicture = BitmapFactory.decodeResource(getResources(), R.mipmap.gun);
+        MyTank tank = new MyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
         return tank;
     }
 

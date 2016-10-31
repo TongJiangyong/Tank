@@ -6,33 +6,30 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game.thread.GameThread;
+import yong.tank.Game.thread.PlayerThread;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
  */
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback{
+public class PlayerView extends SurfaceView implements SurfaceHolder.Callback{
 
     private GameDto gameDto;
-    private GameThread gameThread;
+    private PlayerThread playerThread;
     private SurfaceHolder holder;
-    private static String TAG = "GameView";
-    public GameView(Context context) {
+    private static String TAG = "PlayerView";
+    public PlayerView(Context context) {
         super(context);
-        holder=this.getHolder(); //不加这个surfacecread不能启动....
+        this.holder=this.getHolder();
         this.getHolder().setFormat(PixelFormat.TRANSLUCENT);  //设置holder为透明必须要加
         getHolder().addCallback(this); //不加的话，surfacehold会默认不启动，比较麻烦
     }
 
-    public GameView(Context context,GameDto gameDto) {
-        super(context);
-        this.gameDto = gameDto;
-    }
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        this.gameThread = new GameThread(this.gameDto,this.holder);
-        new Thread(this.gameThread).start();
+
+        this.playerThread = new PlayerThread(this.gameDto,this.holder);
+        new Thread(this.playerThread).start();
 
     }
 
@@ -43,7 +40,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        this.gameThread.stopThread();
+        this.playerThread.stopThread();
     }
 
 

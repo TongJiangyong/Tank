@@ -2,14 +2,11 @@ package yong.tank.Game.thread;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
-
-import static android.graphics.PorterDuff.Mode.CLEAR;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -36,10 +33,10 @@ public class GameThread implements Runnable {
         while(flag){
             try {
                 synchronized (holder){
-                    //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
+                    Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
                     canvas=this.holder.lockCanvas();
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
+                    //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
                     gameDto.getMyTank().drawSelf(canvas);
                 }
                 }
