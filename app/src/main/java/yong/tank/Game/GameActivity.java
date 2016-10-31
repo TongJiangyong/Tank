@@ -14,6 +14,7 @@ import android.widget.Toast;
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.View.GameView;
 import yong.tank.Game.View.PlayerView;
+import yong.tank.Game.View.ViewBase;
 import yong.tank.R;
 import yong.tank.modal.MyTank;
 import yong.tank.tool.StaticVariable;
@@ -36,17 +37,15 @@ public class GameActivity extends Activity {
         setContentView(R.layout.activity_game); //一般放在super后面比较好,但是这里，因为要横屏，所以放在后面
         RelativeLayout activity_game = (RelativeLayout) findViewById(R.id.activity_game);
         GameDto gameDto = new GameDto();
-        //TODO 测试tank
         tankType=this.getIntent().getIntExtra("tankType", 0);
         mapType=this.getIntent().getIntExtra("mapType", 0);
+        //TODO 测试tank
         MyTank myTank =initTank(tankType);
         gameDto.setMyTank(myTank);
         //TODO 考虑可否用反射处理这个问题
-        GameView gameView =new GameView(this);
-        gameView.setGameDto(gameDto); //没办法，要加在后面
+        ViewBase gameView =new GameView(this,gameDto);
         gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
-        PlayerView playerView =new PlayerView(this);
-        playerView.setGameDto(gameDto); //没办法，要加在后面
+        ViewBase playerView =new PlayerView(this,gameDto);
         playerView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         activity_game.addView(gameView);
         activity_game.addView(playerView);
