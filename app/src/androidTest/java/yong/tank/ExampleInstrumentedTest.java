@@ -1,13 +1,11 @@
 package yong.tank;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.InstrumentationTestCase;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -15,12 +13,14 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
+public class ExampleInstrumentedTest extends InstrumentationTestCase {
 
-        assertEquals("yong.tank", appContext.getPackageName());
+    private static String TAG ="TEST";
+    @Test
+    public void test() throws Exception{
+        Log.d(TAG,"TESTIS OK********123*****");
+        assertEquals(2, 3);
+        Log.d(TAG,"TEST");
+        Log.d(TAG,"TESTIS OK*************");
     }
 }

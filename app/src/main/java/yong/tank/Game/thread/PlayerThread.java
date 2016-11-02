@@ -4,10 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -22,12 +22,12 @@ public class PlayerThread implements Runnable {
 
     /***************/
     private Paint paint;
-    private int RockerCircleX = 100;
-     private int RockerCircleY = 100;
-     private int RockerCircleR = 50;
-    private float SmallRockerCircleX = 100;
-    private float SmallRockerCircleY = 100;
-    private float SmallRockerCircleR = 20;
+    private int outsideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
+    private int outsideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
+    private int outsideCircle_r = StaticVariable.SCREEN_WIDTH*1/10;
+    private float insideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
+    private float insideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
+    private float insideCircle_r = StaticVariable.SCREEN_WIDTH*1/20;
     /***************/
 
     public PlayerThread(GameDto gameDto, SurfaceHolder holder) {
@@ -45,27 +45,22 @@ public class PlayerThread implements Runnable {
     public void run() {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
         while(flag){
-/*            try {
-                synchronized (holder){
-                    //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
-                    canvas=this.holder.lockCanvas();
-                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
-                    gameDto.getMyTank().drawSelf(canvas);
-                }
-                }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally{
-                if(canvas!= null){
-                    holder.unlockCanvasAndPost(canvas);//结束锁定画图，并提交改变。
-                }
-            }*/
-            draw();
-            Log.d(TAG,"just a test");
             try {
-                Thread.sleep(50);
+                canvas=this.holder.lockCanvas();
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
+                this.gameDto.getPlayerPain().drawSelf(canvas);
+                //Log.d(TAG,"test player....");
+            } catch (Exception e) {
+                // TODO: handle exception
+            } finally {
+                try {
+                    if (canvas != null)
+                        this.holder.unlockCanvasAndPost(canvas);
+                } catch (Exception e2) {
+                }
+            }
+            try {
+                Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -82,11 +77,11 @@ public class PlayerThread implements Runnable {
             //设置透明度
             paint.setColor(0x70000000);
             //绘制摇杆背景
-            canvas.drawCircle(RockerCircleX, RockerCircleY, RockerCircleR, paint);
+            canvas.drawCircle(outsideCircle_x, outsideCircle_y, outsideCircle_r, paint);
             paint.setColor(0x70ff0000);
             //绘制摇杆
-            canvas.drawCircle(SmallRockerCircleX, SmallRockerCircleY,
-                    SmallRockerCircleR, paint);
+            canvas.drawCircle(insideCircle_x, insideCircle_y,
+                    insideCircle_r, paint);
         } catch (Exception e) {
             // TODO: handle exception
         } finally {

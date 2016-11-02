@@ -47,5 +47,8 @@ public class StaticVariable {
     public static int selectDescribeSize=60;
     //设置程序画笔的统一宽度
     public static int STROKEWIDTH=3;
+    public static int BLOOD =  R.mipmap.blood;
+    public static int POWERR =  R.mipmap.power;
+    public static int BLOODBLOCK =  R.mipmap.bloodbox_3;
 
 }
