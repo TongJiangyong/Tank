@@ -51,4 +51,15 @@ public class PlayerPain {
     public void setInsideCircle_y(float insideCircle_y) {
         this.insideCircle_y = insideCircle_y;
     }
+
+    public int setTankDirectiron(float insideCircle_x) {
+        if(insideCircle_x>this.outsideCircle_x){
+            return StaticVariable.MYTANKEFORWARD;
+        }else if(insideCircle_x==this.outsideCircle_x){
+            return StaticVariable.TANKESTOP;
+        }else{
+            return StaticVariable.MYTANKEBACK;
+        }
+
+    }
 }

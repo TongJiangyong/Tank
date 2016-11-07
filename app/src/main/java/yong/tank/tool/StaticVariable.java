@@ -51,4 +51,9 @@ public class StaticVariable {
     public static int POWERR =  R.mipmap.power;
     public static int BLOODBLOCK =  R.mipmap.bloodbox_3;
 
+    public static int MYTANKEFORWARD = 1;
+    public static int MYTANKEBACK = -1;
+    public static int TANKESTOP = 0;
+    public static int ENTANKEFORWARD = 1;
+    public static int ENTANKEBACK = -1;
 }
