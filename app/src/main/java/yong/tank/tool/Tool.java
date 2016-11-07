@@ -42,7 +42,9 @@ public class Tool {
         }
         // 这里为平移的方法.....matrix.postTranslate
         //旋转
-        matrix.setRotate(degrees,0,0);
+        //matrix.setTranslate(0,orginBitmap.getHeight()/2);
+
+        matrix.setRotate(degrees,orginBitmap.getWidth()/2,orginBitmap.getHeight()/2);
         //缩放
         matrix.postScale(src_x,sc_y);
         reBuildImg = Bitmap.createBitmap(orginBitmap, 0, 0, orginBitmap.getWidth(), orginBitmap.getHeight(), matrix, true);

@@ -25,6 +25,7 @@ public class MyTank implements Tank{
     private int tankSpeed=5;
     private int tankDirectrion=0;
     private static String TAG = "MyTank";
+    private int armDegree=-10; //armpicture为内置的.....
     public MyTank(Bitmap tankPicture,Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
         this.tankPicture = tankPicture;
         this.tankType = tankType;
@@ -43,10 +44,14 @@ public class MyTank implements Tank{
         }
         Log.w(TAG,"tank position:"+this.tankPosition_x);
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
-        Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.armDegree,(float)1.5,(float)1.5,false,false);
+        Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.armDegree,1,1,false,false);
+        //Bitmap armPicture_tmp_2 = Tool.reBuildImg(armPicture_tmp,0,1,1,true,false);
+
         canvas.drawBitmap(armPicture_tmp,
                 this.tankPosition_x+110,
-                this.tankPosition_y+27,
+                //0,0,
+                //注意这种角度的变化方法.....一定要加上图片本身的宽度....
+                this.tankPosition_y-armPicture_tmp.getHeight()+65,
                 null);
     }
 
