@@ -6,9 +6,8 @@ import android.view.MotionEvent;
 
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.control.GameControler;
+import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
-
-import static android.icu.text.RelativeDateTimeFormatter.Direction.THIS;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -19,6 +18,13 @@ public class ControlPresent {
     private static String TAG ="ControlPresent";
     private GameDto gameDto;
     private GameControler gameControler;
+    private Point startPoint=new Point();
+    private Point releasePoint=new Point();
+    //坦克的角度
+    private int tankDegree=0;
+    //距离
+    private int distance = 0;
+
     //TODO 定义一个最好去定义一个view，而不是这个.....
     public ControlPresent(Context context, GameDto gameDto, GameControler gameControler){
         this.context= context;
@@ -35,7 +41,16 @@ public class ControlPresent {
                     //Log.w(TAG,"ACTION_DOWN "+pointerCount_1);
                  /**测试发现，所有的down，都会触发这个**/
                 case MotionEvent.ACTION_POINTER_DOWN:
-                    int pointerCount_2 = event.getPointerCount();
+                    int index_3=event.getActionIndex();
+                    //TODO 设置发射按下
+                    int dx_tmp =(int)event.getX(index_3);
+                    int dy_tmp = (int)event.getY(index_3);
+                        if(this.gameDto.getMyTank().isInCircle(dx_tmp,dy_tmp)){
+                            startPoint.setX(dx_tmp);
+                            startPoint.setX(dy_tmp);
+                            startPoint.setPointNotNull();
+                            Log.w(TAG,"TEST_setStartPoint");
+                        }
                     //Log.w(TAG,"ACTION_POINTER_DOWN "+pointerCount_2);
                 case MotionEvent.ACTION_MOVE:
                     //TODO 这里的move以后做一个做一个技巧性设定，即，在坦克周围一定范围内的，才能被选中，然后预备弹射.....
@@ -55,22 +70,14 @@ public class ControlPresent {
                             this.gameDto.getPlayerPain().setInsideCircle_y(dy);
                             //TODO 坦克移动 坦克移动即传递方向即可
                             this.gameDto.getMyTank().move(this.gameDto.getPlayerPain().setTankDirectiron(dx));
+
                             //Log.w(TAG,"tankmove");
                         }else{
                             //Log.w(TAG,"TEST1");
                         }
-                        //TODO 这里是坦克的发子弹，发子弹的基本原理是：捕捉在坦克周围一定半径内的移动即可.....并捕捉在坦克周围一定半径的释放动作
-                        //首先设置
-                        if(this.gameDto.getMyTank().isInCircle(dx,dy)){
-                            //TODO 传递Fire的位置和角度，enableFire可不在这儿
-                            //this.gameDto.getMyTank().enableFire();
-                            //this.gameDto.getMyTank().myTankFire();
-                            //Log.w(TAG,"TEST");
-                        }else{
-                           // Log.w(TAG,"TEST1");
-                        }
                     }
-                    //TODO 这里设置坦克的弹出
+
+                    //停止坦克
                     int testFlag=0;
                     for (int i = 0; i < pointerCount_3; i++) {
                         int id = event.getPointerId(i); //同一点的id值保持不变
@@ -83,22 +90,47 @@ public class ControlPresent {
                             break;
                         }
                         if(this.gameDto.getPlayerPain().isInCircle(dx,dy)){
-                           // Log.w(TAG,"ACTION_MOVE pointerCount_3_1:"+pointerCount_3);
+                            // Log.w(TAG,"ACTION_MOVE pointerCount_3_1:"+pointerCount_3);
                             //Log.w(TAG,"ACTION_MOVE testFlag_1:"+testFlag);
                         }else{
                             testFlag++;
-                           // Log.w(TAG,"ACTION_MOVE pointerCount_3:"+pointerCount_3);
+                            // Log.w(TAG,"ACTION_MOVE pointerCount_3:"+pointerCount_3);
                             //Log.w(TAG,"ACTION_MOVE testFlag:"+testFlag);
                             if(testFlag==pointerCount_3){
                                 this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH*4/5);
                                 this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
                                 this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
                             }
-
                         }
-
-
                     }
+                    //TODO 设置炮管的方向
+                    for (int i = 0; i < pointerCount_3; i++) {
+                        int id = event.getPointerId(i); //同一点的id值保持不变
+                        int dx=0;
+                        int dy=0;
+                        if(id<pointerCount_3){
+                            dx = (int) event.getX(id);
+                            dy = (int) event.getY(id);
+                        }else{break;}
+                        //这里判断是否处于开火区域
+                        if(this.gameDto.getMyTank().isInFireCircle(dx,dy)&&!startPoint.isPointNull()){
+                            releasePoint.setX(dx);
+                            releasePoint.setX(dy);
+                            releasePoint.setPointNotNull();
+                            //TODO 计算角度和距离，用于设计炮弹曲线
+                            countBulletPath(this.gameDto.getMyTank().getTankCenter(),dx,dy);
+                            //没办法，传入负值才行...
+                            this.gameDto.getMyTank().weaponMove(-tankDegree);
+                            //Log.w(TAG,"tankmove");
+                        }
+                        //这里判断是否处于释放区域
+                        if(this.gameDto.getMyTank().isOutFireCircle(dx,dy)){
+                            releasePoint.setPointNull();
+                            startPoint.setPointNull();
+                        }
+                    }
+
+
                     break;
                 case MotionEvent.ACTION_CANCEL:
                     /**测试发现，只有最后一个手指的up，才会触发这个**/
@@ -115,6 +147,16 @@ public class ControlPresent {
                         this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
                         this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
                     }
+                    //TODO 这里设置坦克释放炮弹的方法....
+                    //这里判断是否处于开火区域
+                    if(this.gameDto.getMyTank().isInFireCircle(dx,dy)&&!startPoint.isPointNull()&&!releasePoint.isPointNull()){
+                        //this.gameDto.getMyTank().tankFire();
+                        startPoint.setPointNull();
+                        releasePoint.setPointNull();
+                        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+                    }
+
+
                     break;
             /**测试发现，只有除了最后一个手指的up，都会会触发这个**/
                 case MotionEvent.ACTION_POINTER_UP:
@@ -130,8 +172,15 @@ public class ControlPresent {
                         this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
                         this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
                     }
+                    //TODO 这里设置坦克释放炮弹的方法....
+                    //这里判断是否处于开火区域
+                    if(this.gameDto.getMyTank().isInFireCircle(dx_x,dy_y)&&!startPoint.isPointNull()&&!releasePoint.isPointNull()){
+                        //this.gameDto.getMyTank().tankFire();
+                        startPoint.setPointNull();
+                        releasePoint.setPointNull();
+                        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+                    }
 
-                    //TODO 这里的逻辑还要想一下......
                     break;
                 default:
                     break;
@@ -139,6 +188,14 @@ public class ControlPresent {
 
         }
 
+    private void countBulletPath(Point tankCenter, int dx, int dy) {
+        double test = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
+        Log.w(TAG,"test:"+test);
+        tankDegree=(int)Math.toDegrees(test);
+
+        distance=(int)Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()));
+        Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+    }
 
 
 }
