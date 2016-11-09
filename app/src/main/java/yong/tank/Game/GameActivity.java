@@ -15,7 +15,7 @@ import yong.tank.Game.View.GameView;
 import yong.tank.Game.View.PlayerView;
 import yong.tank.Game.View.ViewBase;
 import yong.tank.Game.control.GameControler;
-import yong.tank.Game.presenter.ControlPresent;
+import yong.tank.Game.control.PlayControler;
 import yong.tank.R;
 import yong.tank.modal.Blood;
 import yong.tank.modal.MyTank;
@@ -31,7 +31,7 @@ public class GameActivity extends Activity {
     private int tankType ;
     private int mapType ;
     private static String TAG = "GameActivity";
-    private ControlPresent controlPresent;
+    private PlayControler playControler;
     private GameControler gameControler;
     @Override
     public void onCreate(Bundle bundle) {
@@ -61,14 +61,14 @@ public class GameActivity extends Activity {
         /*********程序控制器**********/
         gameControler = new GameControler(gameDto);
         /*********设置玩家控制器**********/
-        controlPresent= new ControlPresent(this,gameDto,gameControler);
+        playControler = new PlayControler(this,gameDto,gameControler);
 
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //Toast.makeText(this, "event.getX() "+event.getX(), Toast.LENGTH_SHORT).show();
-        controlPresent.setMotion(event);
+        playControler.setMotion(event);
         return false;
     }
 

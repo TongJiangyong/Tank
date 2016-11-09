@@ -65,6 +65,8 @@ public class MyTank implements Tank{
 
         //测试绘制一个圆环：
         Paint paint = new Paint();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
         paint.setColor(0x80000000);
         canvas.drawCircle(this.tankCenter.getX(),this.tankCenter.getY(), (int)(this.getTankPicture().getWidth()*1.4),paint);
         paint.setColor(0x60000000);

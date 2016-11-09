@@ -1,11 +1,9 @@
-package yong.tank.Game.presenter;
+package yong.tank.Game.control;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game.control.GameControler;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
 
@@ -13,9 +11,9 @@ import yong.tank.tool.StaticVariable;
  * Created by hasee on 2016/11/1.
  */
 
-public class ControlPresent {
+public class PlayControler {
     private Context context;
-    private static String TAG ="ControlPresent";
+    private static String TAG ="PlayControler";
     private GameDto gameDto;
     private GameControler gameControler;
     private Point startPoint=new Point();
@@ -26,7 +24,7 @@ public class ControlPresent {
     private int distance = 0;
 
     //TODO 定义一个最好去定义一个view，而不是这个.....
-    public ControlPresent(Context context, GameDto gameDto, GameControler gameControler){
+    public PlayControler(Context context, GameDto gameDto, GameControler gameControler){
         this.context= context;
         this.gameDto=gameDto;
         this.gameControler=gameControler;
@@ -37,7 +35,7 @@ public class ControlPresent {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             /**测试发现，只有最后第一个手指的down，才会触发这个**/
                 case MotionEvent.ACTION_DOWN:
-                    int pointerCount_1 = event.getPointerCount();
+                    //int pointerCount_1 = event.getPointerCount();
                     //Log.w(TAG,"ACTION_DOWN "+pointerCount_1);
                  /**测试发现，所有的down，都会触发这个**/
                 case MotionEvent.ACTION_POINTER_DOWN:
@@ -49,7 +47,7 @@ public class ControlPresent {
                             startPoint.setX(dx_tmp);
                             startPoint.setX(dy_tmp);
                             startPoint.setPointNotNull();
-                            Log.w(TAG,"TEST_setStartPoint");
+                            //Log.w(TAG,"TEST_setStartPoint");
                         }
                     //Log.w(TAG,"ACTION_POINTER_DOWN "+pointerCount_2);
                 case MotionEvent.ACTION_MOVE:
@@ -70,13 +68,8 @@ public class ControlPresent {
                             this.gameDto.getPlayerPain().setInsideCircle_y(dy);
                             //TODO 坦克移动 坦克移动即传递方向即可
                             this.gameDto.getMyTank().move(this.gameDto.getPlayerPain().setTankDirectiron(dx));
-
-                            //Log.w(TAG,"tankmove");
-                        }else{
-                            //Log.w(TAG,"TEST1");
                         }
                     }
-
                     //停止坦克
                     int testFlag=0;
                     for (int i = 0; i < pointerCount_3; i++) {
@@ -90,12 +83,10 @@ public class ControlPresent {
                             break;
                         }
                         if(this.gameDto.getPlayerPain().isInCircle(dx,dy)){
-                            // Log.w(TAG,"ACTION_MOVE pointerCount_3_1:"+pointerCount_3);
-                            //Log.w(TAG,"ACTION_MOVE testFlag_1:"+testFlag);
+                            //Log.w(TAG,"ACTION_MOVE pointerCount_3_1:"+pointerCount_3);
                         }else{
                             testFlag++;
-                            // Log.w(TAG,"ACTION_MOVE pointerCount_3:"+pointerCount_3);
-                            //Log.w(TAG,"ACTION_MOVE testFlag:"+testFlag);
+                            //Log.w(TAG,"ACTION_MOVE pointerCount_3:"+pointerCount_3);
                             if(testFlag==pointerCount_3){
                                 this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH*4/5);
                                 this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
@@ -111,7 +102,9 @@ public class ControlPresent {
                         if(id<pointerCount_3){
                             dx = (int) event.getX(id);
                             dy = (int) event.getY(id);
-                        }else{break;}
+                        }else{
+                            break;
+                        }
                         //这里判断是否处于开火区域
                         if(this.gameDto.getMyTank().isInFireCircle(dx,dy)&&!startPoint.isPointNull()){
                             releasePoint.setX(dx);
@@ -129,8 +122,6 @@ public class ControlPresent {
                             startPoint.setPointNull();
                         }
                     }
-
-
                     break;
                 case MotionEvent.ACTION_CANCEL:
                     /**测试发现，只有最后一个手指的up，才会触发这个**/
@@ -155,8 +146,6 @@ public class ControlPresent {
                         releasePoint.setPointNull();
                         this.gameDto.getMyTank().bulletFire(tankDegree,distance);
                     }
-
-
                     break;
             /**测试发现，只有除了最后一个手指的up，都会会触发这个**/
                 case MotionEvent.ACTION_POINTER_UP:
@@ -180,22 +169,16 @@ public class ControlPresent {
                         releasePoint.setPointNull();
                         this.gameDto.getMyTank().bulletFire(tankDegree,distance);
                     }
-
                     break;
                 default:
                     break;
             }
-
         }
 
     private void countBulletPath(Point tankCenter, int dx, int dy) {
         double test = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
-        Log.w(TAG,"test:"+test);
         tankDegree=(int)Math.toDegrees(test);
-
         distance=(int)Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()));
-        Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+        //Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
-
-
 }
