@@ -1,6 +1,7 @@
 package yong.tank.tool;
 
 import yong.tank.R;
+import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
 
 /**
@@ -32,10 +33,10 @@ public class StaticVariable {
     };
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     public static TankBascInfo[] TANKBASCINFO = {
-            new TankBascInfo(0,30,30,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A,有多牛呢？"),
+            new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A,有多牛呢？"),
             new TankBascInfo(1,30,40,50,StaticVariable.TANKPICTURE_NO_ARM[1],"M4谢尔曼","简介：很牛B的坦克B，比上面牛"),
-            new TankBascInfo(2,30,50,40,StaticVariable.TANKPICTURE_NO_ARM[2],"虎式-1","简介：很牛B的坦克C，上五楼不费劲"),
-            new TankBascInfo(3,30,20,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D，最后的，总是最好的"),
+            new TankBascInfo(2,30,30,40,StaticVariable.TANKPICTURE_NO_ARM[2],"虎式-1","简介：很牛B的坦克C，上五楼不费劲"),
+            new TankBascInfo(3,30,50,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D，最后的，总是最好的"),
     };
     public static String HELPINFO = "这里加一些帮助信息";
     public static String STATEMENTINFO =
@@ -56,4 +57,14 @@ public class StaticVariable {
     public static int TANKESTOP = 0;
     public static int ENTANKEFORWARD = 1;
     public static int ENTANKEBACK = -1;
+
+//初始化子弹的变量
+//public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
+    public static BulletBascInfo[] bulletBascInfos = {
+            new BulletBascInfo(0,10,50,R.mipmap.origin,"普通弹"),
+            new BulletBascInfo(0,10,50,R.mipmap.armor,"穿甲弹"),
+            new BulletBascInfo(0,10,50,R.mipmap.ice,"冰弹"),
+            new BulletBascInfo(0,10,50,R.mipmap.s,"子母弹_母"),
+            new BulletBascInfo(0,10,50,R.mipmap.s_s,"子母弹_子"),
+    };
 }

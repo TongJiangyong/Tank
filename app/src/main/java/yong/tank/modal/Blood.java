@@ -10,31 +10,48 @@ public class Blood {
     private Bitmap blood;
     private Bitmap power;
     private Bitmap bloodBlock;
-    private int blood_num;
-    private int power_num;
+    private int bloodNum;
+    private int powerNum;
+    private Boolean enableFire = false;     //允许发射使能（总开关）
+    private Boolean allowFire = false;       //子弹装填时间使能 （时间开关）
 
-    public Blood(Bitmap blood, Bitmap power, Bitmap bloodBlock, int blood_num, int power_num) {
+    public Blood(Bitmap blood, Bitmap power, Bitmap bloodBlock, int bloodNum,int powerNum) {
+        this.powerNum = powerNum;
         this.blood = blood;
         this.power = power;
         this.bloodBlock = bloodBlock;
-        this.blood_num = blood_num;
-        this.power_num = power_num;
+        this.bloodNum = bloodNum;
     }
 
-
-    public int getBlood_num() {
-        return blood_num;
+    public int getBloodNum() {
+        return bloodNum;
     }
 
-    public void setBlood_num(int blood_num) {
-        this.blood_num = blood_num;
+    public void setBloodNum(int bloodNum) {
+        this.bloodNum = bloodNum;
     }
 
-    public int getPower_num() {
-        return power_num;
+    public int getPowerNum() {
+        return powerNum;
     }
 
-    public void setPower_num(int power_num) {
-        this.power_num = power_num;
+    public void setPowerNum(int powerNum) {
+        this.powerNum = powerNum;
+    }
+
+    public Boolean getEnableFire() {
+        return enableFire;
+    }
+
+    public void setEnableFire(Boolean enableFire) {
+        this.enableFire = enableFire;
+    }
+
+    public Boolean getAllowFire() {
+        return allowFire;
+    }
+
+    public void setAllowFire(Boolean allowFire) {
+        this.allowFire = allowFire;
     }
 }

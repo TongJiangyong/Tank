@@ -1,6 +1,6 @@
 package yong.tank.Game.control;
 
-import yong.tank.Dto.GameDto;
+import yong.tank.Game.service.GameService;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -8,9 +8,17 @@ import yong.tank.Dto.GameDto;
  */
 
 public class GameControler {
-    private GameDto gameDto;
-
-    public GameControler(GameDto gameDto) {
-        this.gameDto = gameDto;
+    private GameService gameService;
+    private static String TAG ="GameControler";
+    public GameControler(GameService gameService) {
+        this.gameService = gameService;
     }
+
+    //开启gameService的线程
+    public void startGame(){
+        this.gameService.gameStart();
+    }
+
+
+
 }

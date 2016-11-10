@@ -16,6 +16,7 @@ import yong.tank.Game.View.PlayerView;
 import yong.tank.Game.View.ViewBase;
 import yong.tank.Game.control.GameControler;
 import yong.tank.Game.control.PlayControler;
+import yong.tank.Game.service.GameService;
 import yong.tank.R;
 import yong.tank.modal.Blood;
 import yong.tank.modal.MyTank;
@@ -33,6 +34,7 @@ public class GameActivity extends Activity {
     private static String TAG = "GameActivity";
     private PlayControler playControler;
     private GameControler gameControler;
+    private GameService gameService;
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -59,10 +61,12 @@ public class GameActivity extends Activity {
         activity_game.addView(gameView);
         activity_game.addView(playerView);
         /*********程序控制器**********/
-        gameControler = new GameControler(gameDto);
+        gameService = new GameService(gameDto);
+        gameControler = new GameControler(gameService);
         /*********设置玩家控制器**********/
         playControler = new PlayControler(this,gameDto,gameControler);
-
+        //TODO 所有初始化等工作完成以后，就开始游戏：
+        gameControler.startGame();
     }
 
     @Override

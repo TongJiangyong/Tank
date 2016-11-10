@@ -22,12 +22,30 @@ public class MyTank implements Tank{
     private TankBascInfo tankBascInfo;
     private int tankPosition_x = 0;
     private int tankPosition_y =0;
-    private int tankSpeed=5;
     private int tankDirectrion=0;
     private Point tankCenter = new Point();
     private static String TAG = "MyTank";
     private int armDegree=-10; //armpicture为内置的.....
-    private List<Bullet> bullets;
+    private Boolean fireAction = false;      //tank发射动作使能 （动作开关）
+    //已经发射的子弹
+    private List<Bullet> bulletsFire;
+    //坦克拥有的子弹类型和每种类型的数量
+    /**  类型   数量
+     *  0       10000
+     *  1        10
+     *  2        10
+     *  3        10
+     *  4        10
+     * **/
+    private int[][] bulletsType={
+            {0,1000},
+            {1,0},
+            {2,0},
+            {3,0},
+            {4,0},
+    };;
+    //坦克的发射子弹类型
+    private int selectedBullets=0;
     public MyTank(Bitmap tankPicture,Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
         this.tankPicture = tankPicture;
         this.tankType = tankType;
@@ -37,7 +55,7 @@ public class MyTank implements Tank{
         //this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
         this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/5;
-        bullets = new ArrayList<>(5);//暂时定子弹数为5？
+        bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？
     }
 
     public void drawSelf(Canvas canvas){
@@ -48,7 +66,7 @@ public class MyTank implements Tank{
         }else if((tankPosition_x+this.tankPicture.getWidth())>StaticVariable.SCREEN_WIDTH*3/7){
             this.tankPosition_x=(StaticVariable.SCREEN_WIDTH*3/7-this.tankPicture.getWidth());
         }else{
-            this.tankPosition_x+=(tankSpeed*tankDirectrion);
+            this.tankPosition_x+=((tankBascInfo.getSpeed()/10)*tankDirectrion);
         }
         //Log.w(TAG,"tank position:"+this.tankPosition_x);
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
@@ -62,6 +80,18 @@ public class MyTank implements Tank{
                 this.tankPosition_y-armPicture_tmp.getHeight()+65,
                 null);
 
+        //绘制所有的子弹
+        if(bulletsFire.size()==0){
+
+        }else{
+            for (int i = bulletsFire.size() -1; i >= 0; i--)
+            {
+                Log.w(TAG,"bullet size:"+bulletsFire.size());
+                //System.out.println(bullets.get(i));
+
+                bulletsFire.remove(i);
+            }
+        }
 
         //测试绘制一个圆环：
         Paint paint = new Paint();
@@ -123,7 +153,31 @@ public class MyTank implements Tank{
         this.armDegree = armDegree;
     }
 
-    public boolean isInCircle(int x,int y){
+    public List<Bullet> getBulletsFire() {
+        return bulletsFire;
+    }
+
+    public void setBulletsFire(List<Bullet> bulletsFire) {
+        this.bulletsFire = bulletsFire;
+    }
+
+    public int[][] getBulletsType() {
+        return bulletsType;
+    }
+
+    public void setBulletsType(int[][] bulletsType) {
+        this.bulletsType = bulletsType;
+    }
+
+    public int getSelectedBullets() {
+        return selectedBullets;
+    }
+
+    public void setSelectedBullets(int selectedBullets) {
+        this.selectedBullets = selectedBullets;
+    }
+
+    public boolean isInCircle(int x, int y){
         if(this.tankPosition_x<x&&
                 x<(this.tankPosition_x+this.tankPicture.getWidth())&&
                 this.tankPosition_y<y&&
@@ -171,7 +225,15 @@ public class MyTank implements Tank{
     public void bulletFire(int tankDegree, int distance) {
         //TODO 计算子弹的发射路劲......
         //具体子弹的绘制在子弹中，但是在tank的绘制中，对其进行调用即可.....
+        this.fireAction=true;
         Log.w(TAG,"FIRE IN TANK");
     }
 
+    public void addBuleetFire(Bullet bullet) {
+        //TODO 修改这些参数
+        bullet.setBulletDegree(this.armDegree);
+        bullet.setBulletPosition_x(this.tankPosition_x+100);
+        bullet.setBulletPosition_y(this.tankPosition_x+200);
+        this.getBulletsFire().add(bullet);
+    }
 }

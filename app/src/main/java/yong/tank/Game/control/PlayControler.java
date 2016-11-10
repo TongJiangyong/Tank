@@ -1,11 +1,15 @@
 package yong.tank.Game.control;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.MotionEvent;
 
 import yong.tank.Dto.GameDto;
+import yong.tank.modal.Bullet;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
+import yong.tank.tool.Tool;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -144,7 +148,7 @@ public class PlayControler {
                         //this.gameDto.getMyTank().tankFire();
                         startPoint.setPointNull();
                         releasePoint.setPointNull();
-                        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+                        this.tankOnFire();
                     }
                     break;
             /**测试发现，只有除了最后一个手指的up，都会会触发这个**/
@@ -167,7 +171,7 @@ public class PlayControler {
                         //this.gameDto.getMyTank().tankFire();
                         startPoint.setPointNull();
                         releasePoint.setPointNull();
-                        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+                        this.tankOnFire();
                     }
                     break;
                 default:
@@ -181,4 +185,23 @@ public class PlayControler {
         distance=(int)Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()));
         //Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
+
+    public void tankOnFire(){
+        //增加新的子弹
+        Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
+        //在tank中初始化子弹
+        this.gameDto.getMyTank().addBuleetFire(bullet);
+        //发射炮弹
+        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+    }
+
+    private Bullet initBullet(int bulletType){
+        Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.bulletBascInfos[bulletType].getPicture());
+        Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
+        Bullet bullet = new Bullet(bulletPicture,StaticVariable.bulletBascInfos[bulletType]);
+        return bullet;
+    }
+
+
+
 }
