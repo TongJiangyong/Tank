@@ -103,12 +103,14 @@ public class Bullet {
         this.bulletDistance = bulletDistance;
     }
 
+    //将这个抽象为函数，然后调用....
     double t=1;
     double interval = 1;
+    //路径计算好以后，怎么给子弹
+    //写成一个函数，然后计算返回多少个点
     private void bulletPosition(){
         //这里关联speed和distance，暂时不处理
         if(countContinueFlag){
-
             double g=0.15;
             bulletV_x=bulletV_x;
             bulletV_y=bulletV_y+g*t;
