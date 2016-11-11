@@ -107,7 +107,7 @@ public class Bullet {
     double t=1;
     double interval = 1;
     //路径计算好以后，怎么给子弹
-    //写成一个函数，然后计算返回多少个点
+    //写成一个函数，然后计算返回一系列的点和角度即可.....List<Map<Point,int>>
     private void bulletPosition(){
         //这里关联speed和distance，暂时不处理
         if(countContinueFlag){

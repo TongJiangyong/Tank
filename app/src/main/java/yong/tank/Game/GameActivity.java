@@ -12,8 +12,10 @@ import android.widget.RelativeLayout;
 
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.View.BloodView;
+import yong.tank.Game.View.BonusView;
 import yong.tank.Game.View.GameView;
 import yong.tank.Game.View.PlayerView;
+import yong.tank.Game.View.SelectView;
 import yong.tank.Game.View.ViewBase;
 import yong.tank.Game.control.GameControler;
 import yong.tank.Game.control.PlayControler;
@@ -57,7 +59,7 @@ public class GameActivity extends Activity {
         //TODO 测试装载血条的视图
         Blood blood = initBlood(true);
         gameDto.setBlood(blood);
-        //TODO 考虑可否用反射处理这个问题
+        //TODO 考虑可否用反射处理这个问题,最后考虑用spring处理这个问题
         //绘制gameView
         ViewBase gameView =new GameView(this,gameDto);
         gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
@@ -67,9 +69,17 @@ public class GameActivity extends Activity {
         //绘制bloodView
         ViewBase bloodView =new BloodView(this,gameDto);
         bloodView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制selectView
+        ViewBase selectView = new SelectView(this,gameDto);
+        selectView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制bonuxView
+        ViewBase bonuxView = new BonusView(this,gameDto);
+        bonuxView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         activity_game.addView(gameView);
         activity_game.addView(playerView);
         activity_game.addView(bloodView);
+        activity_game.addView(selectView);
+        activity_game.addView(bonuxView);
         /*********程序控制器**********/
         gameService = new GameService(gameDto);
         gameControler = new GameControler(gameService);
