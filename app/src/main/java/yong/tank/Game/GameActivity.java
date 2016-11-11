@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
 import yong.tank.Dto.GameDto;
+import yong.tank.Game.View.BloodView;
 import yong.tank.Game.View.GameView;
 import yong.tank.Game.View.PlayerView;
 import yong.tank.Game.View.ViewBase;
@@ -53,13 +54,22 @@ public class GameActivity extends Activity {
         PlayerPain playerPain = new PlayerPain();
         gameDto.setMyTank(myTank);
         gameDto.setPlayerPain(playerPain);
+        //TODO 测试装载血条的视图
+        Blood blood = initBlood(true);
+        gameDto.setBlood(blood);
         //TODO 考虑可否用反射处理这个问题
+        //绘制gameView
         ViewBase gameView =new GameView(this,gameDto);
         gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制playerView
         ViewBase playerView =new PlayerView(this,gameDto);
         playerView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制bloodView
+        ViewBase bloodView =new BloodView(this,gameDto);
+        bloodView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         activity_game.addView(gameView);
         activity_game.addView(playerView);
+        activity_game.addView(bloodView);
         /*********程序控制器**********/
         gameService = new GameService(gameDto);
         gameControler = new GameControler(gameService);

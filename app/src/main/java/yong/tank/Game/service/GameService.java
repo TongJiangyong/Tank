@@ -44,6 +44,7 @@ public class GameService {
         public void run() {
             while(threadFlag){
                 Log.w(TAG,"gameThread。。。。RUNNING");
+                gameDto.getMyTank().setEnableFire(true);
                 try {
                     Thread.sleep(40);
                 } catch (InterruptedException e) {

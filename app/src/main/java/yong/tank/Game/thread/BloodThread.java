@@ -1,6 +1,8 @@
 package yong.tank.Game.thread;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -30,10 +32,9 @@ public class BloodThread implements Runnable {
         while(flag){
             try {
                 synchronized (holder){
-                    //canvas=this.holder.lockCanvas();
-                    //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
-                    //gameDto.getMyTank().drawSelf(canvas);
+                    canvas=this.holder.lockCanvas();
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
+                    gameDto.getBlood().drawSelf(canvas);
                 }
                 }
             catch (Exception e) {

@@ -3,7 +3,6 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,9 @@ public class MyTank implements Tank{
     private Point tankCenter = new Point();
     private static String TAG = "MyTank";
     private int armDegree=-10; //armpicture为内置的.....
+    private Boolean enableFire = false;     //允许发射使能（总开关）
     private Boolean fireAction = false;      //tank发射动作使能 （动作开关）
-    //已经发射的子弹
+    //已经发射的子弹，严格控制子弹加入
     private List<Bullet> bulletsFire;
     //坦克拥有的子弹类型和每种类型的数量
     /**  类型   数量
@@ -82,14 +82,11 @@ public class MyTank implements Tank{
 
         //绘制所有的子弹
         if(bulletsFire.size()==0){
-
         }else{
             for (int i = bulletsFire.size() -1; i >= 0; i--)
             {
-                Log.w(TAG,"bullet size:"+bulletsFire.size());
-                //System.out.println(bullets.get(i));
-
-                bulletsFire.remove(i);
+                //绘制子弹
+                bulletsFire.get(i).drawSelf(canvas);
             }
         }
 
@@ -177,6 +174,22 @@ public class MyTank implements Tank{
         this.selectedBullets = selectedBullets;
     }
 
+    public Boolean getEnableFire() {
+        return enableFire;
+    }
+
+    public void setEnableFire(Boolean enableFire) {
+        this.enableFire = enableFire;
+    }
+
+    public Boolean getFireAction() {
+        return fireAction;
+    }
+
+    public void setFireAction(Boolean fireAction) {
+        this.fireAction = fireAction;
+    }
+
     public boolean isInCircle(int x, int y){
         if(this.tankPosition_x<x&&
                 x<(this.tankPosition_x+this.tankPicture.getWidth())&&
@@ -222,16 +235,9 @@ public class MyTank implements Tank{
         this.armDegree=tankDegree;
     }
 
-    public void bulletFire(int tankDegree, int distance) {
-        //TODO 计算子弹的发射路劲......
-        //具体子弹的绘制在子弹中，但是在tank的绘制中，对其进行调用即可.....
-        this.fireAction=true;
-        Log.w(TAG,"FIRE IN TANK");
-    }
 
     public void addBuleetFire(Bullet bullet) {
         //TODO 修改这些参数
-        bullet.setBulletDegree(this.armDegree);
         bullet.setBulletPosition_x(this.tankPosition_x+100);
         bullet.setBulletPosition_y(this.tankPosition_x+200);
         this.getBulletsFire().add(bullet);

@@ -3,6 +3,7 @@ package yong.tank.Game.control;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import yong.tank.Dto.GameDto;
@@ -130,49 +131,11 @@ public class PlayControler {
                 case MotionEvent.ACTION_CANCEL:
                     /**测试发现，只有最后一个手指的up，才会触发这个**/
                 case MotionEvent.ACTION_UP:
-                    int pointerCount_4 = event.getPointerCount();
-                    int index_1=event.getActionIndex();
-                    //Log.w(TAG,"ACTION_UP getX:"+event.getX(index_1));
-                    //Log.w(TAG,"ACTION_UP "+pointerCount_4);
-                    int dx=(int)event.getX(index_1);
-                    int dy=(int)event.getY(index_1);
-                    //TODO 这里的逻辑还要想一下......
-                    if(this.gameDto.getPlayerPain().isInCircle(dx,dy)){
-                        this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH*4/5);
-                        this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
-                        this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
-                    }
-                    //TODO 这里设置坦克释放炮弹的方法....
-                    //这里判断是否处于开火区域
-                    if(this.gameDto.getMyTank().isInFireCircle(dx,dy)&&!startPoint.isPointNull()&&!releasePoint.isPointNull()){
-                        //this.gameDto.getMyTank().tankFire();
-                        startPoint.setPointNull();
-                        releasePoint.setPointNull();
-                        this.tankOnFire();
-                    }
+                    this.playerRelease(event);
                     break;
             /**测试发现，只有除了最后一个手指的up，都会会触发这个**/
                 case MotionEvent.ACTION_POINTER_UP:
-                    int pointerCount_5 = event.getPointerCount();
-                    int index_2=event.getActionIndex();
-                   // Log.w(TAG,"ACTION_POINTER_UP getX:"+event.getX(index_2));
-                    //Log.w(TAG,"ACTION_POINTER_UP "+pointerCount_5);
-                    int dx_x=(int)event.getX(index_2);
-                    int dy_y=(int)event.getY(index_2);
-                    //TODO 如果up的那个手指在圆圈内，则跳出
-                    if(this.gameDto.getPlayerPain().isInCircle(dx_x,dy_y)){
-                        this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH*4/5);
-                        this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
-                        this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
-                    }
-                    //TODO 这里设置坦克释放炮弹的方法....
-                    //这里判断是否处于开火区域
-                    if(this.gameDto.getMyTank().isInFireCircle(dx_x,dy_y)&&!startPoint.isPointNull()&&!releasePoint.isPointNull()){
-                        //this.gameDto.getMyTank().tankFire();
-                        startPoint.setPointNull();
-                        releasePoint.setPointNull();
-                        this.tankOnFire();
-                    }
+                    this.playerRelease(event);
                     break;
                 default:
                     break;
@@ -181,27 +144,59 @@ public class PlayControler {
 
     private void countBulletPath(Point tankCenter, int dx, int dy) {
         double test = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
-        tankDegree=(int)Math.toDegrees(test);
+        tankDegree=(int)Math.toDegrees(Math.atan (test));
         distance=(int)Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()));
-        //Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+        Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
 
-    public void tankOnFire(){
-        //增加新的子弹
-        Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
-        //在tank中初始化子弹
-        this.gameDto.getMyTank().addBuleetFire(bullet);
-        //发射炮弹
-        this.gameDto.getMyTank().bulletFire(tankDegree,distance);
+
+
+
+    //手指释放调用的方法
+    private void playerRelease(MotionEvent event) {
+        int index_2 = event.getActionIndex();
+        int dx = (int) event.getX(index_2);
+        int dy = (int) event.getY(index_2);
+        //TODO 如果up的那个手指在圆圈内，则跳出
+        if (this.gameDto.getPlayerPain().isInCircle(dx, dy)) {
+            this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH * 4 / 5);
+            this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT * 3 / 4);
+            this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
+        }
+        //TODO 这里设置坦克释放炮弹的方法....
+        //这里判断是否处于开火区域
+        if (this.gameDto.getMyTank().isInFireCircle(dx, dy) && !startPoint.isPointNull() && !releasePoint.isPointNull()) {
+            //this.gameDto.getMyTank().tankFire();
+            startPoint.setPointNull();
+            releasePoint.setPointNull();
+            //TODO 在palyerControler中加入逻辑，然后进行判断.....
+            //设置使能发射
+            this.gameDto.getMyTank().setFireAction(true);
+            //装载子弹并发射
+            if(this.gameDto.getMyTank().getEnableFire()&& this.gameDto.getBlood().getAllowFire()){
+                tankOnFire();
+            }
+            this.gameDto.getMyTank().setFireAction(false);
+        }
     }
 
+        //发射子弹
+        public void tankOnFire(){
+            //增加新的子弹
+            Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
+            //在tank中初始化子弹
+            this.gameDto.getMyTank().addBuleetFire(bullet);
+        }
+
+
+    //初始化子弹
     private Bullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.bulletBascInfos[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
         Bullet bullet = new Bullet(bulletPicture,StaticVariable.bulletBascInfos[bulletType]);
+        bullet.setBulletDegree(tankDegree);
+        bullet.setBulletDistance(distance);
         return bullet;
     }
-
-
 
 }

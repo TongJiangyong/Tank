@@ -1,6 +1,7 @@
 package yong.tank.modal;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -12,8 +13,7 @@ public class Blood {
     private Bitmap bloodBlock;
     private int bloodNum;
     private int powerNum;
-    private Boolean enableFire = false;     //允许发射使能（总开关）
-    private Boolean allowFire = false;       //子弹装填时间使能 （时间开关）
+    private Boolean allowFire = true;       //子弹装填时间使能 （时间开关）
 
     public Blood(Bitmap blood, Bitmap power, Bitmap bloodBlock, int bloodNum,int powerNum) {
         this.powerNum = powerNum;
@@ -21,6 +21,14 @@ public class Blood {
         this.power = power;
         this.bloodBlock = bloodBlock;
         this.bloodNum = bloodNum;
+    }
+
+    public void drawSelf(Canvas canvas) {
+        //绘制框
+
+        //绘制血条
+
+        //绘制子弹条
     }
 
     public int getBloodNum() {
@@ -39,13 +47,6 @@ public class Blood {
         this.powerNum = powerNum;
     }
 
-    public Boolean getEnableFire() {
-        return enableFire;
-    }
-
-    public void setEnableFire(Boolean enableFire) {
-        this.enableFire = enableFire;
-    }
 
     public Boolean getAllowFire() {
         return allowFire;
@@ -54,4 +55,6 @@ public class Blood {
     public void setAllowFire(Boolean allowFire) {
         this.allowFire = allowFire;
     }
+
+
 }
