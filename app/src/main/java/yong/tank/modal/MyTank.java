@@ -96,6 +96,7 @@ public class MyTank implements Tank{
         paint.setStrokeWidth(5);
         paint.setColor(0x80000000);
         canvas.drawCircle(this.getTankCenter().getX(),this.getTankCenter().getY(), (int)(this.getTankPicture().getWidth()*1.4),paint);
+        //Log.w(TAG,"distance :"+this.getTankPicture().getWidth()*1.4);
     }
 
 
@@ -205,6 +206,7 @@ public class MyTank implements Tank{
     public boolean isInFireCircle(int x, int y) {
         int distance = (x-this.getTankCenter().getX())*(x-this.getTankCenter().getX())+(y-this.getTankCenter().getY())*(y-this.getTankCenter().getY());
         int distance_scope=this.getTankPicture().getWidth()*this.getTankPicture().getWidth();
+        //TODO 这里需要将tank的distance设为一个定值
         if(distance>0&&distance<distance_scope*2){
             return true;
         }else{
@@ -235,8 +237,8 @@ public class MyTank implements Tank{
 
     public void addBuleetFire(Bullet bullet) {
         //TODO 修改这些参数
-        bullet.setBulletPosition_x(this.tankPosition_x+100);
-        bullet.setBulletPosition_y(this.tankPosition_x+200);
+        bullet.setBulletPosition_x(this.tankPosition_x+200);
+        bullet.setBulletPosition_y(this.tankPosition_y);
         this.getBulletsFire().add(bullet);
     }
 }

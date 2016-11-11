@@ -61,10 +61,10 @@ public class StaticVariable {
 //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     public static BulletBascInfo[] bulletBascInfos = {
-            new BulletBascInfo(0,10,50,R.mipmap.origin,"普通弹"),
-            new BulletBascInfo(0,10,50,R.mipmap.armor,"穿甲弹"),
-            new BulletBascInfo(0,10,50,R.mipmap.ice,"冰弹"),
-            new BulletBascInfo(0,10,50,R.mipmap.s,"子母弹_母"),
-            new BulletBascInfo(0,10,50,R.mipmap.s_s,"子母弹_子"),
+            new BulletBascInfo(0,20,50,R.mipmap.origin,"普通弹"),
+            new BulletBascInfo(0,20,50,R.mipmap.armor,"穿甲弹"),
+            new BulletBascInfo(0,20,50,R.mipmap.ice,"冰弹"),
+            new BulletBascInfo(0,20,50,R.mipmap.s,"子母弹_母"),
+            new BulletBascInfo(0,20,50,R.mipmap.s_s,"子母弹_子"),
     };
 }

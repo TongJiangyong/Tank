@@ -20,7 +20,7 @@ public class Bullet {
     private int bulletPosition_x;
     private int bulletPosition_y;
     //用来决定距离的....
-    private int bulletDistance;
+    private double bulletDistance;
     private int bulletDegree; //armpicture为内置的.....
     private Bitmap bulletPicture;
     private static String TAG = "Bullet";
@@ -28,13 +28,15 @@ public class Bullet {
     private boolean countContinueFlag = true;
     //测试绘制路径
     private Path path = new Path();
+    double bulletV_x=0;
+    double bulletV_y=0;
     public Bullet(Bitmap bulletPicture,BulletBascInfo bulletBascInfo) {
         this.bulletPicture = bulletPicture;
         this.bulletBascInfo = bulletBascInfo;
     }
 
     public void drawSelf(Canvas canvas){
-        Log.w(TAG,"draw Bullet");
+        //Log.w(TAG,"draw Bullet");
         //matrix.setTranslate(bulletPosition_x, bulletPosition_x);//坐标
         //matrix.postRotate(angle, x, y+6);//设置旋转角度 以及旋转中
         //canvas.drawBitmap(this.bulletPicture, matrix, null);//炮筒
@@ -46,7 +48,10 @@ public class Bullet {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(3);
         canvas.drawPath(path, paint);
-        if(bulletPosition_x> StaticVariable.SCREEN_WIDTH){
+        if(bulletPosition_x> StaticVariable.SCREEN_WIDTH||
+                bulletPosition_y>StaticVariable.SCREEN_HEIGHT||
+                bulletPosition_y<0||
+                bulletPosition_x<0){
             countContinueFlag=false;
         }
     }
@@ -76,6 +81,8 @@ public class Bullet {
         this.bulletPosition_y = bulletPosition_y;
         //设置轨迹起点
         path.moveTo(this.bulletPosition_x, this.bulletPosition_y);
+        bulletV_x=bulletBascInfo.getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
+        bulletV_y=-(bulletBascInfo.getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
     }
 
 
@@ -88,33 +95,35 @@ public class Bullet {
         this.bulletDegree = bulletDegree;
     }
 
-    public int getBulletDistance() {
+    public double getBulletDistance() {
         return bulletDistance;
     }
 
-    public void setBulletDistance(int bulletDistance) {
+    public void setBulletDistance(double bulletDistance) {
         this.bulletDistance = bulletDistance;
     }
 
+    double t=1;
+    double interval = 1;
     private void bulletPosition(){
         //这里关联speed和distance，暂时不处理
         if(countContinueFlag){
 
-            int t=2;
-            int g=-5;
-            double v_x=bulletBascInfo.getSpeed()*Math.cos(Math.toRadians(bulletDegree));
-            double v_y=(bulletBascInfo.getSpeed()*Math.sin(Math.toRadians(bulletDegree))+g*t);
-            int  newPosition_x = bulletPosition_x+(int)v_x*t;
+            double g=0.15;
+            bulletV_x=bulletV_x;
+            bulletV_y=bulletV_y+g*t;
+            int  newPosition_x = (int)(bulletPosition_x+bulletV_x*t);
             //bulletPosition_x+=v_x*t;
-            int newPosition_y=bulletPosition_y+(int)(v_y*t-g*t*t/2);
+            int newPosition_y=(int)(bulletPosition_y+(bulletV_y*t+g*t*t/2));
             //bulletPosition_y+=v_y*t-g*t*t/2;
-            double test = Math.abs(v_y)/Math.abs(v_x);
+            double test = Math.abs(bulletV_y)/Math.abs(bulletV_x);
             bulletDegree=(int)Math.toDegrees(Math.atan (test));
             path.quadTo(bulletPosition_x, bulletPosition_y, newPosition_x, newPosition_y);
             bulletPosition_x=newPosition_x;
             bulletPosition_y=newPosition_y;
-            Log.w(TAG,"bulletDegree:"+bulletDegree+" bulletPosition_x:"+bulletPosition_x+" bulletPosition_y:"+bulletPosition_y);
-
+            Log.w(TAG,"bulletV_x:"+bulletV_x+" bulletV_y:"+bulletV_y);
+            Log.w(TAG,"bulletDegree:"+bulletDegree+"bulletDistance:"+bulletDistance+" bulletPosition_x:"+bulletPosition_x+" bulletPosition_y:"+bulletPosition_y);
+            t=t+interval;
             }
         }
 

@@ -26,7 +26,7 @@ public class PlayControler {
     //坦克的角度
     private int tankDegree=0;
     //距离
-    private int distance = 0;
+    private double distance = 0;
 
     //TODO 定义一个最好去定义一个view，而不是这个.....
     public PlayControler(Context context, GameDto gameDto, GameControler gameControler){
@@ -145,7 +145,8 @@ public class PlayControler {
     private void countBulletPath(Point tankCenter, int dx, int dy) {
         double test = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
         tankDegree=(int)Math.toDegrees(Math.atan (test));
-        distance=(int)Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()));
+        distance=Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()))/
+                (this.gameDto.getMyTank().getTankPicture().getWidth()*1.4);
         Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
 
