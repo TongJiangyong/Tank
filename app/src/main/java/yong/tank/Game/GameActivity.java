@@ -102,7 +102,7 @@ public class GameActivity extends Activity {
         power_picture = BitmapFactory.decodeResource(getResources(), StaticVariable.POWERR);
         Bitmap bloodBlock_picture=null;
         bloodBlock_picture = BitmapFactory.decodeResource(getResources(), StaticVariable.BLOODBLOCK);
-        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,20,20);
+        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,(float)0.7,(float)0.7);
         return blood;
     }
 

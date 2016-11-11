@@ -95,10 +95,7 @@ public class MyTank implements Tank{
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
         paint.setColor(0x80000000);
-        canvas.drawCircle(this.tankCenter.getX(),this.tankCenter.getY(), (int)(this.getTankPicture().getWidth()*1.4),paint);
-        paint.setColor(0x60000000);
-        int test=(int)(this.getTankPicture().getWidth()*1.5);
-        canvas.drawCircle(this.tankCenter.getX(),this.tankCenter.getY(), test, paint);
+        canvas.drawCircle(this.getTankCenter().getX(),this.getTankCenter().getY(), (int)(this.getTankPicture().getWidth()*1.4),paint);
     }
 
 

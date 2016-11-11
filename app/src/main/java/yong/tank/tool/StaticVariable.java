@@ -50,7 +50,7 @@ public class StaticVariable {
     public static int STROKEWIDTH=3;
     public static int BLOOD =  R.mipmap.blood;
     public static int POWERR =  R.mipmap.power;
-    public static int BLOODBLOCK =  R.mipmap.bloodbox_3;
+    public static int BLOODBLOCK =  R.mipmap.bloodbox_2;
 
     public static int MYTANKEFORWARD = 1;
     public static int MYTANKEBACK = -1;
