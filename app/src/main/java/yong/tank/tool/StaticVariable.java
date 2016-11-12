@@ -4,6 +4,8 @@ import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
 
+import static yong.tank.R.mipmap.s;
+
 /**
  * Created by hasee on 2016/10/28.
  */
@@ -64,7 +66,12 @@ public class StaticVariable {
             new BulletBascInfo(0,20,50,R.mipmap.origin,"普通弹"),
             new BulletBascInfo(0,20,50,R.mipmap.armor,"穿甲弹"),
             new BulletBascInfo(0,20,50,R.mipmap.ice,"冰弹"),
-            new BulletBascInfo(0,20,50,R.mipmap.s,"子母弹_母"),
+            new BulletBascInfo(0,20,50, s,"子母弹_母"),
             new BulletBascInfo(0,20,50,R.mipmap.s_s,"子母弹_子"),
     };
+    //初始化物理场
+    public static double GRAVITY=0.15;
+    public static double INTERVAL = 1;    //初始化与路径相关参数
+    public static  int PREVIEWPATHLENGTH = 12; //priewpath有8个点
+    public static int PATHLENGTH  = 50; //path有40个点
 }

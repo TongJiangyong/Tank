@@ -65,32 +65,5 @@ public class PlayerThread implements Runnable {
                 e.printStackTrace();
             }
         }
-
     }
-
-
-    public void draw() {
-        try {
-            canvas=this.holder.lockCanvas();
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-            Paint paint =new Paint();
-            //设置透明度
-            paint.setColor(0x70000000);
-            //绘制摇杆背景
-            canvas.drawCircle(outsideCircle_x, outsideCircle_y, outsideCircle_r, paint);
-            paint.setColor(0x70ff0000);
-            //绘制摇杆
-            canvas.drawCircle(insideCircle_x, insideCircle_y,
-                    insideCircle_r, paint);
-        } catch (Exception e) {
-            // TODO: handle exception
-        } finally {
-            try {
-                if (canvas != null)
-                    this.holder.unlockCanvasAndPost(canvas);
-            } catch (Exception e2) {
-            }
-        }
-    }
-
 }

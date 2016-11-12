@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import yong.tank.Dto.GameDto;
 import yong.tank.modal.Bullet;
 import yong.tank.modal.Point;
@@ -117,14 +120,20 @@ public class PlayControler {
                             releasePoint.setPointNotNull();
                             //TODO 计算角度和距离，用于设计炮弹曲线
                             countBulletPath(this.gameDto.getMyTank().getTankCenter(),dx,dy);
-                            //没办法，传入负值才行...
-                            this.gameDto.getMyTank().weaponMove(-tankDegree);
-                            //Log.w(TAG,"tankmove");
+                            //TODO 没办法，传入负值才行...,所以在setting函数中设为负数了
+                            this.gameDto.getMyTank().weaponMove(tankDegree);
+                            this.gameDto.getMyTank().setPreFirePath(this.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+                                                                                        this.gameDto.getMyTank().getWeaponPoxition_y(),
+                                                                                        distance,
+                                                                                        tankDegree,
+                                                                                        true));
                         }
                         //这里判断是否处于释放区域
                         if(this.gameDto.getMyTank().isOutFireCircle(dx,dy)){
                             releasePoint.setPointNull();
                             startPoint.setPointNull();
+                            //停止prePath的绘制
+                            this.gameDto.getMyTank().setPreFirePath(null);
                         }
                     }
                     break;
@@ -167,14 +176,18 @@ public class PlayControler {
         //TODO 这里设置坦克释放炮弹的方法....
         //这里判断是否处于开火区域
         if (this.gameDto.getMyTank().isInFireCircle(dx, dy) && !startPoint.isPointNull() && !releasePoint.isPointNull()) {
-            //this.gameDto.getMyTank().tankFire();
+            //释放各个point
             startPoint.setPointNull();
             releasePoint.setPointNull();
+            //释放previewPath
+            this.gameDto.getMyTank().setPreFirePath(null);
             //TODO 在palyerControler中加入逻辑，然后进行判断.....
             //设置使能发射
             this.gameDto.getMyTank().setFireAction(true);
             //装载子弹并发射
             if(this.gameDto.getMyTank().getEnableFire()&& this.gameDto.getBlood().getAllowFire()){
+                //停止prePath的绘制
+                this.gameDto.getMyTank().setPreFirePath(null);
                 tankOnFire();
             }
             this.gameDto.getMyTank().setFireAction(false);
@@ -185,7 +198,7 @@ public class PlayControler {
         public void tankOnFire(){
             //增加新的子弹
             Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
-            //在tank中初始化子弹
+            //在tank中加入子弹
             this.gameDto.getMyTank().addBuleetFire(bullet);
         }
 
@@ -195,9 +208,57 @@ public class PlayControler {
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.bulletBascInfos[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
         Bullet bullet = new Bullet(bulletPicture,StaticVariable.bulletBascInfos[bulletType]);
+        //初始化坦克的性能
         bullet.setBulletDegree(tankDegree);
         bullet.setBulletDistance(distance);
+        //计算并初始化子弹的路径
+        bullet.setFirePath(this.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+                                            this.gameDto.getMyTank().getWeaponPoxition_y(),
+                                            distance,
+                                            tankDegree,
+                                            false));
+        //允许绘制路径
+        bullet.setDrawFlag(true);
+        //初始化坦克的位置
+        //bullet.setBulletPosition_x(this.gameDto.getMyTank().getWeaponPoxition_x());
+        //bullet.setBulletPosition_y(this.gameDto.getMyTank().getWeaponPoxition_y());
         return bullet;
+    }
+
+
+
+    //将这个抽象为函数，然后调用....
+    //路径计算好以后，怎么给子弹
+    //写成一个函数，然后计算返回一系列的点和角度即可.....List<Point>
+    private List<Point> getBulletPath(int init_x,int init_y,double bulletDistance,int bulletDegree,boolean isPreView) {
+        //这里关联speed和distance，暂时不处理
+        List<Point> bulletPath = new ArrayList<Point>();
+        double time=1;
+        double bulletV_x=StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
+        double bulletV_y=-(StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
+        int pathNum = 0;
+        if (isPreView) {
+            pathNum = StaticVariable.PREVIEWPATHLENGTH;
+        } else {
+            pathNum = StaticVariable.PATHLENGTH;
+        }
+        for (int i = 0; i < pathNum; i++) {
+            bulletV_y = bulletV_y + StaticVariable.GRAVITY * time;
+            int newPosition_x = (int) (init_x + bulletV_x * time);
+            //bulletPosition_x+=v_x*t;
+            int newPosition_y = (int) (init_y + (bulletV_y * time + StaticVariable.GRAVITY * time * time / 2));
+            //bulletPosition_y+=v_y*t-g*t*t/2;
+            double test = Math.abs(bulletV_y) / Math.abs(bulletV_x);
+            bulletDegree = (int) Math.toDegrees(Math.atan(test));
+            Point point = new Point(init_x,init_y, bulletDegree,false);
+            bulletPath.add(point);
+            init_x=newPosition_x;
+            init_y=newPosition_y;
+            Log.w(TAG, "bulletV_x:" + bulletV_x + " bulletV_y:" + bulletV_y);
+            Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            time = time + StaticVariable.INTERVAL;
+        }
+        return bulletPath;
     }
 
 }

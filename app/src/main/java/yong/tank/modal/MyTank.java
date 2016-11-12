@@ -24,9 +24,13 @@ public class MyTank implements Tank{
     private int tankDirectrion=0;
     private Point tankCenter = new Point();
     private static String TAG = "MyTank";
-    private int armDegree=-10; //armpicture为内置的.....
+    private int weaponDegree =-10; //armpicture为内置的.....
+    private int weaponPoxition_x =0;
+    private int weaponPoxition_y =0;
     private Boolean enableFire = false;     //允许发射使能（总开关）
     private Boolean fireAction = false;      //tank发射动作使能 （动作开关）
+    //预发射路径点
+    private List<Point> preFirePath;
     //已经发射的子弹，严格控制子弹加入
     private List<Bullet> bulletsFire;
     //坦克拥有的子弹类型和每种类型的数量
@@ -70,15 +74,30 @@ public class MyTank implements Tank{
         }
         //Log.w(TAG,"tank position:"+this.tankPosition_x);
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
-        Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.armDegree,1,1,false,false);
+        Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         //Bitmap armPicture_tmp_2 = Tool.reBuildImg(armPicture_tmp,0,1,1,true,false);
-
+        //TODO 武器位置的硬编码
+        int weaponPoxitionTemp_x = this.tankPosition_x+110;
+        int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+65;
         canvas.drawBitmap(armPicture_tmp,
-                this.tankPosition_x+110,
+                weaponPoxitionTemp_x,
                 //0,0,
                 //注意这种角度的变化方法.....一定要加上图片本身的宽度....
-                this.tankPosition_y-armPicture_tmp.getHeight()+65,
+                weaponPoxitionTemp_y,
                 null);
+        // TODO 这里weapon的点要更精细一点
+        this.weaponPoxition_x = weaponPoxitionTemp_x+armPicture_tmp.getWidth();
+        this.weaponPoxition_y = weaponPoxitionTemp_y;
+
+        //TODO 绘制预发射的子弹路径 绘制点的方法即可
+        if(preFirePath!=null){
+            Paint preFirePathPaint = new Paint();
+            preFirePathPaint.setStrokeWidth(5);
+            for(int i=0;i<preFirePath.size();i++)
+            {
+                canvas.drawPoint(preFirePath.get(i).getX(), preFirePath.get(i).getY(), preFirePathPaint);
+            }
+        }
 
         //绘制所有的子弹
         if(bulletsFire.size()==0){
@@ -140,12 +159,12 @@ public class MyTank implements Tank{
         this.tankPosition_y = tankPosition_y;
     }
 
-    public int getArmDegree() {
-        return armDegree;
+    public int getWeaponDegree() {
+        return weaponDegree;
     }
 
-    public void setArmDegree(int armDegree) {
-        this.armDegree = armDegree;
+    public void setWeaponDegree(int weaponDegree) {
+        this.weaponDegree = weaponDegree;
     }
 
     public List<Bullet> getBulletsFire() {
@@ -187,6 +206,16 @@ public class MyTank implements Tank{
     public void setFireAction(Boolean fireAction) {
         this.fireAction = fireAction;
     }
+
+    public int getWeaponPoxition_x() {
+        return weaponPoxition_x;
+    }
+
+
+    public int getWeaponPoxition_y() {
+        return weaponPoxition_y;
+    }
+
 
     public boolean isInCircle(int x, int y){
         if(this.tankPosition_x<x&&
@@ -231,14 +260,19 @@ public class MyTank implements Tank{
     }
 
     public void weaponMove(int tankDegree) {
-        this.armDegree=tankDegree;
+        this.weaponDegree = -tankDegree;
     }
 
 
+    public List<Point> getPreFirePath() {
+        return preFirePath;
+    }
+
+    public void setPreFirePath(List<Point> preFirePath) {
+        this.preFirePath = preFirePath;
+    }
+
     public void addBuleetFire(Bullet bullet) {
-        //TODO 修改这些参数
-        bullet.setBulletPosition_x(this.tankPosition_x+200);
-        bullet.setBulletPosition_y(this.tankPosition_y);
         this.getBulletsFire().add(bullet);
     }
 }

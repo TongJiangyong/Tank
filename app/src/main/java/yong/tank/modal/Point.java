@@ -11,8 +11,17 @@ public class Point {
         this.flag=true;
     }
 
+    public Point(int x, int y, int degree, boolean flag) {
+        this.x = x;
+        this.y = y;
+        this.degree = degree;
+        this.flag = flag;
+    }
+
     private int x;
     private int y;
+    //点此时的斜率 有的可以没有
+    private int degree;
     private boolean flag;
 
     public int getX() {
@@ -39,5 +48,13 @@ public class Point {
     }
     public void setPointNotNull(){
         this.flag=false;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
     }
 }
