@@ -50,7 +50,7 @@ public class GameThread implements Runnable {
                 }
             }
             try {
-                Thread.sleep(50);
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

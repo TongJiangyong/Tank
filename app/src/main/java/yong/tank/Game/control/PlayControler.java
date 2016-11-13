@@ -3,7 +3,6 @@ package yong.tank.Game.control;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -156,7 +155,7 @@ public class PlayControler {
         tankDegree=(int)Math.toDegrees(Math.atan (test));
         distance=Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()))/
                 (this.gameDto.getMyTank().getTankPicture().getWidth()*1.4);
-        Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+        //Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
 
 
@@ -206,7 +205,7 @@ public class PlayControler {
     //初始化子弹
     private Bullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.bulletBascInfos[bulletType].getPicture());
-        Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
+        Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
         Bullet bullet = new Bullet(bulletPicture,StaticVariable.bulletBascInfos[bulletType]);
         //初始化坦克的性能
         bullet.setBulletDegree(tankDegree);
@@ -233,7 +232,7 @@ public class PlayControler {
     private List<Point> getBulletPath(int init_x,int init_y,double bulletDistance,int bulletDegree,boolean isPreView) {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<Point>();
-        double time=1;
+
         double bulletV_x=StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
         double bulletV_y=-(StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
         int pathNum = 0;
@@ -243,20 +242,21 @@ public class PlayControler {
             pathNum = StaticVariable.PATHLENGTH;
         }
         for (int i = 0; i < pathNum; i++) {
-            bulletV_y = bulletV_y + StaticVariable.GRAVITY * time;
-            int newPosition_x = (int) (init_x + bulletV_x * time);
+            //这里计算时，采用向下为正，向右为正的方法
+            bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
+            int newPosition_x = (int) (init_x + bulletV_x * StaticVariable.INTERVAL_TIME);
             //bulletPosition_x+=v_x*t;
-            int newPosition_y = (int) (init_y + (bulletV_y * time + StaticVariable.GRAVITY * time * time / 2));
+            int newPosition_y = (int) (init_y + (bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2));
             //bulletPosition_y+=v_y*t-g*t*t/2;
-            double test = Math.abs(bulletV_y) / Math.abs(bulletV_x);
+            double test = bulletV_y / bulletV_x;
             bulletDegree = (int) Math.toDegrees(Math.atan(test));
             Point point = new Point(init_x,init_y, bulletDegree,false);
             bulletPath.add(point);
             init_x=newPosition_x;
             init_y=newPosition_y;
-            Log.w(TAG, "bulletV_x:" + bulletV_x + " bulletV_y:" + bulletV_y);
-            Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
-            time = time + StaticVariable.INTERVAL;
+            //Log.w(TAG, "bulletV_x:" + bulletV_x + " bulletV_y:" + bulletV_y);
+            //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            //time = time + StaticVariable.INTERVAL;
         }
         return bulletPath;
     }

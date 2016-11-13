@@ -4,8 +4,6 @@ import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
 
-import static yong.tank.R.mipmap.s;
-
 /**
  * Created by hasee on 2016/10/28.
  */
@@ -63,15 +61,15 @@ public class StaticVariable {
 //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     public static BulletBascInfo[] bulletBascInfos = {
-            new BulletBascInfo(0,20,50,R.mipmap.origin,"普通弹"),
+            new BulletBascInfo(0,150,50,R.mipmap.origin,"普通弹"),
             new BulletBascInfo(0,20,50,R.mipmap.armor,"穿甲弹"),
             new BulletBascInfo(0,20,50,R.mipmap.ice,"冰弹"),
-            new BulletBascInfo(0,20,50, s,"子母弹_母"),
+            new BulletBascInfo(0,20,50, R.mipmap.s,"子母弹_母"),
             new BulletBascInfo(0,20,50,R.mipmap.s_s,"子母弹_子"),
     };
     //初始化物理场
-    public static double GRAVITY=0.15;
-    public static double INTERVAL = 1;    //初始化与路径相关参数
-    public static  int PREVIEWPATHLENGTH = 12; //priewpath有8个点
+    public static double GRAVITY=11;
+    public static double INTERVAL_TIME = 0.5;    //初始化与路径相关参数
+    public static  int PREVIEWPATHLENGTH = 50; //priewpath有12个点,测试使用50个
     public static int PATHLENGTH  = 50; //path有40个点
 }

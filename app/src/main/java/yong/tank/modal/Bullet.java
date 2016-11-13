@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Path;
-import android.util.Log;
 
 import java.util.List;
 
@@ -15,7 +14,6 @@ import yong.tank.tool.StaticVariable;
  */
 
 public class Bullet {
-    //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     private  BulletBascInfo bulletBascInfo;
     private int bulletPosition_x;
     private int bulletPosition_y;
@@ -26,7 +24,7 @@ public class Bullet {
     private static String TAG = "Bullet";
     private Matrix matrix = new Matrix(); // 预备用作旋转的类
     private boolean drawFlag=false;
-
+    private int pathPosition = 0;
 
     //测试绘制路径
     private Path path = new Path();
@@ -40,20 +38,17 @@ public class Bullet {
     }
 
     public void drawSelf(Canvas canvas){
-        //Log.w(TAG,"draw Bullet");
-        //matrix.setTranslate(bulletPosition_x, bulletPosition_x);//坐标
-        //matrix.postRotate(angle, x, y+6);//设置旋转角度 以及旋转中
-        //canvas.drawBitmap(this.bulletPicture, matrix, null);//炮筒
         //TODO 绘制子弹 如果路径存在
-        if(firePath!=null&&drawFlag){
-            for(int i =0;i<firePath.size();i++){
-                matrix.setTranslate(firePath.get(i).getX(), firePath.get(i).getY());//子弹坐标
-                matrix.postRotate(firePath.get(i).getDegree());//子弹的旋转
-                bulletPosition_x=firePath.get(i).getX();
-                bulletPosition_y=firePath.get(i).getY();
-                canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
-            }
-
+        if(firePath!=null&&drawFlag&&pathPosition<firePath.size()){
+            //for(int i =0;i<firePath.size();i++){
+            matrix.setTranslate(firePath.get(pathPosition).getX(), firePath.get(pathPosition).getY());//子弹坐标
+            matrix.postRotate(firePath.get(pathPosition).getDegree(),firePath.get(pathPosition).getX(),firePath.get(pathPosition).getY());//子弹的旋转
+            bulletPosition_x=firePath.get(pathPosition).getX();
+            bulletPosition_y=firePath.get(pathPosition).getY();
+            canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
+            //Log.w(TAG, "X:" + firePath.get(pathPosition).getX() +" Y:" + firePath.get(pathPosition).getY() + " Degree:" + firePath.get(pathPosition).getDegree());
+            pathPosition++;
+            //}
         }
         //TODO 计算位置
 /*        bulletPosition();
@@ -65,7 +60,6 @@ public class Bullet {
         canvas.drawPath(path, paint);*/
         if(bulletPosition_x> StaticVariable.SCREEN_WIDTH||
                 bulletPosition_y>StaticVariable.SCREEN_HEIGHT||
-                bulletPosition_y<0||
                 bulletPosition_x<0){
             this.setDrawFlag(false);
         }
@@ -133,32 +127,5 @@ public class Bullet {
     public void setBulletDistance(double bulletDistance) {
         this.bulletDistance = bulletDistance;
     }
-
-    //将这个抽象为函数，然后调用....
-    double t=1;
-    //路径计算好以后，怎么给子弹
-    //写成一个函数，然后计算返回一系列的点和角度即可.....List<Map<Point,int>>
-    private void bulletPosition(){
-        //这里关联speed和distance，暂时不处理
-        if(drawFlag){
-            bulletV_x=bulletV_x;
-            bulletV_y=bulletV_y+StaticVariable.GRAVITY*t;
-            int  newPosition_x = (int)(bulletPosition_x+bulletV_x*t);
-            //bulletPosition_x+=v_x*t;
-            int newPosition_y=(int)(bulletPosition_y+(bulletV_y*t+StaticVariable.GRAVITY*t*t/2));
-            //bulletPosition_y+=v_y*t-g*t*t/2;
-            double test = Math.abs(bulletV_y)/Math.abs(bulletV_x);
-            bulletDegree=(int)Math.toDegrees(Math.atan (test));
-            path.quadTo(bulletPosition_x, bulletPosition_y, newPosition_x, newPosition_y);
-            bulletPosition_x=newPosition_x;
-            bulletPosition_y=newPosition_y;
-            Log.w(TAG,"bulletV_x:"+bulletV_x+" bulletV_y:"+bulletV_y);
-            Log.w(TAG,"bulletDegree:"+bulletDegree+"bulletDistance:"+bulletDistance+" bulletPosition_x:"+bulletPosition_x+" bulletPosition_y:"+bulletPosition_y);
-            t=t+StaticVariable.INTERVAL;
-            }
-        }
-
-
-
 
 }
