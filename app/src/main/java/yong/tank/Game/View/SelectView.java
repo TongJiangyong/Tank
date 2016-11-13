@@ -6,6 +6,9 @@ import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import yong.tank.R;
 import yong.tank.modal.SelectButton;
 
@@ -18,6 +21,7 @@ public class SelectView extends LinearLayout{
     private static String TAG = "SelectView";
     private SelectButton selectButton_1;
     private SelectButton selectButton_2;
+    private Map<Integer,SelectButton> selectButtons= new HashMap<>();
     //这些方法都需要继承，不知道为什么
     public SelectView(Context context) {
         super(context);
@@ -44,11 +48,16 @@ public class SelectView extends LinearLayout{
         //TODO 也可以通过配置文件设置，这里暂时就用硬编码
         selectButton_1 = (SelectButton)findViewById(R.id.selectButton_1);
         selectButton_1.initSelectButton();
-        selectButton_1.setButtonNoSelected();
+        selectButton_1.setButtonSelected();
+        selectButtons.put(R.id.selectButton_1,selectButton_1);
         selectButton_2 = (SelectButton)findViewById(R.id.selectButton_2);
         selectButton_2.initSelectButton();
-        selectButton_2.setButtonSelected();
-        selectButton_2.setButtonNum("10");
+        //TODO 设置一个为空的图片
+        selectButton_2.setButtonPic(R.mipmap.ice);
+        selectButton_2.setButtonNoSelected();
+        //TODO 设计字体的大小等,或者字的位置
+        selectButton_2.setButtonNum("--");
+        selectButtons.put(R.id.selectButton_1,selectButton_2);
     }
 
     public SelectButton getSelectButton_1() {
@@ -65,5 +74,13 @@ public class SelectView extends LinearLayout{
 
     public void setSelectButton_2(SelectButton selectButton_2) {
         this.selectButton_2 = selectButton_2;
+    }
+
+    public Map<Integer, SelectButton> getSelectButtons() {
+        return selectButtons;
+    }
+
+    public void setSelectButtons(Map<Integer, SelectButton> selectButtons) {
+        this.selectButtons = selectButtons;
     }
 }

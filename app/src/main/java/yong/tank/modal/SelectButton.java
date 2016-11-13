@@ -19,7 +19,7 @@ public class SelectButton extends LinearLayout{
     private ImageView imageView;
     private TextView textView;
     //TODO 这里注意插入其他的属性，将button和选择的子弹联系起来......
-
+    private Integer buttleType;
     //这些方法都需要继承，不知道为什么
     public SelectButton(Context context) {
         super(context);
@@ -63,4 +63,11 @@ public class SelectButton extends LinearLayout{
         this.imageView.setBackgroundResource(R.drawable.no_border);
     }
 
+    public Integer getButtleType() {
+        return buttleType;
+    }
+
+    public void setButtleType(Integer buttleType) {
+        this.buttleType = buttleType;
+    }
 }

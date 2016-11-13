@@ -7,19 +7,21 @@
     android:background="@mipmap/bg_game"
     android:orientation="vertical">
 
-<yong.tank.Game.View.SelectView android:id="@+id/selectView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-    <include android:id="@+id/selectButton_1"
+    <yong.tank.Game.View.SelectView android:id="@+id/selectView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        layout="@layout/select_button" />
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+        <include android:id="@+id/selectButton_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            layout="@layout/select_button" />
 
-    <include android:id="@+id/selectButton_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        layout="@layout/select_button" />
-</yong.tank.Game.View.SelectView>
+        <include android:id="@+id/selectButton_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            layout="@layout/select_button" />
+    </yong.tank.Game.View.SelectView>
 
 </RelativeLayout>

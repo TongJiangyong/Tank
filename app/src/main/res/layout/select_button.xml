@@ -4,12 +4,13 @@ android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:orientation="vertical"
 android:id="@+id/bt">
+    <!--有padding才能显示select的框，没办法-->
     <ImageView
         android:id="@+id/imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="2dp"
-        android:src="@mipmap/ice_picture"
+        android:src="@mipmap/origin"
         android:background="@drawable/with_border"
         />
     <TextView

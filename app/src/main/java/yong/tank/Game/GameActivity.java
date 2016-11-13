@@ -81,7 +81,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         selectView.getSelectButton_2().setOnClickListener(this);
         activity_game.addView(gameView);
         activity_game.addView(playerView);
-        //activity_game.addView(bloodView);
+        activity_game.addView(bloodView);
         activity_game.addView(bonusVew);
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
