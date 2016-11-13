@@ -5,7 +5,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -31,7 +33,7 @@ import yong.tank.tool.Tool;
  * Created by hasee on 2016/10/30.
  */
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements View.OnClickListener {
     private int tankType ;
     private int mapType ;
     private static String TAG = "GameActivity";
@@ -69,17 +71,20 @@ public class GameActivity extends Activity {
         //绘制bloodView
         ViewBase bloodView =new BloodView(this,gameDto);
         bloodView.setZOrderOnTop(true); //设置canves为透明必须要加.....
-        //绘制selectView
-        ViewBase selectView = new SelectView(this,gameDto);
-        selectView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         //绘制bonuxView
-        ViewBase bonuxView = new BonusView(this,gameDto);
-        bonuxView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        ViewBase bonusVew = new BonusView(this,gameDto);
+        bonusVew.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制selectView   这里添加selectView之前，还要设置view的基本位置信息，主要在layout中处理位置
+        SelectView selectView = (SelectView)findViewById(R.id.selectView);
+        selectView.initButton();
+        selectView.getSelectButton_1().setOnClickListener(this);
+        selectView.getSelectButton_2().setOnClickListener(this);
         activity_game.addView(gameView);
         activity_game.addView(playerView);
-        activity_game.addView(bloodView);
-        activity_game.addView(selectView);
-        activity_game.addView(bonuxView);
+        //activity_game.addView(bloodView);
+        activity_game.addView(bonusVew);
+        //activity_game.addView(selectView);  这里不用加，因为已经在里面
+        //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/
         gameService = new GameService(gameDto);
         gameControler = new GameControler(gameService);
@@ -116,4 +121,20 @@ public class GameActivity extends Activity {
         return blood;
     }
 
+    //选择按钮的处理方式
+    @Override
+    public void onClick(View view) {
+        //在这里传入selectView,然后进行逻辑处理即可....
+        Log.w(TAG,"id:"+Integer.toHexString(view.getId()));
+        switch (view.getId()) {
+            case R.id.selectButton_2:
+                Log.w(TAG,"view1:");
+                break;
+            case R.id.selectButton_1:
+                Log.w(TAG,"view2:");
+                break;
+            default:
+                break;
+        }
+    }
 }

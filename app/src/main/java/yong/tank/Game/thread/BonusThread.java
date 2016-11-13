@@ -43,7 +43,7 @@ public class BonusThread implements Runnable  {
                 }
             }
             try {
-                Thread.sleep(300);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
