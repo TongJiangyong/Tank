@@ -98,8 +98,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/
-        gameService = new GameService(gameDto);
-        gameControler = new GameControler(gameService);
+        gameService = new GameService(gameDto,this);
+        gameControler = new GameControler(gameService,this);
         /*********设置玩家控制器**********/
         playControler = new PlayControler(this,gameDto,gameControler);
         //TODO 所有初始化等工作完成以后，就开始游戏：

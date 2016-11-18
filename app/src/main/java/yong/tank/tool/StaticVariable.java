@@ -6,11 +6,14 @@ import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
 
+import static yong.tank.R.mipmap.s;
+
 /**
  * Created by hasee on 2016/10/28.
  */
 
 public class StaticVariable {
+
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public final static int[] GAMEMODE= {1,2,3};
@@ -66,8 +69,8 @@ public class StaticVariable {
             new BulletBascInfo(0,150,50,R.mipmap.origin,"普通弹"),
             new BulletBascInfo(0,20,50,R.mipmap.armor,"穿甲弹"),
             new BulletBascInfo(0,20,50,R.mipmap.ice,"冰弹"),
-            new BulletBascInfo(0,20,50, R.mipmap.s,"子母弹_母"),
-            new BulletBascInfo(0,20,50,R.mipmap.s_s,"子母弹_子"),
+            new BulletBascInfo(0,20,50,R.mipmap.s_s,"加速弹"),
+            new BulletBascInfo(0,20,50, s,"子母弹_母"),
     };
     //初始化物理场  这里的物理场应该和手机屏幕适应，但是没有想到好方法
     public static double GRAVITY=11;
@@ -101,4 +104,14 @@ public class StaticVariable {
     public static Bitmap[]  EXPLODESONTANK =  new Bitmap[EXPLODESPICTURE_TANKE.length];
     public static int EXPLODE_TYPE_GROUND = 0;
     public static int EXPLODE_TYPE_TANK = 1;
+   //设置bonus的图像,注意，和子弹的顺序要对应
+   public static int[] BONUSPICTURE={
+           R.mipmap.armor_1, //F->穿甲弹
+           R.mipmap.ice_1,//F->冰弹
+           R.mipmap.s_1,//F->加速弹
+           // R.mipmap.tank_4,  暂时不加这个，以后再加......
+   };
+    public static int BONUS_SPEED = 10;
+    public static int BONUS_STEP =50 ;
+    public static final int BONUS_Y = 5;
 }

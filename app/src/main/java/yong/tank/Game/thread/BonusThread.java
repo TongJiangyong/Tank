@@ -1,6 +1,8 @@
 package yong.tank.Game.thread;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -39,6 +41,12 @@ public class BonusThread implements Runnable  {
                     //加入bonus的list
                     //在这里遍历这个list,然后绘制bonus，绘制方法与子弹一样，绘制完成后，记得将点的路径制空即可.....
                     //TODO 这里以后想想，交互的话，该怎么办？
+                        //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
+                    canvas=this.holder.lockCanvas();
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
+                    if(this.gameDto.getBonus()!=null){
+                        this.gameDto.getBonus().drawSelf(canvas);
+                    }
                 }
             }
             catch (Exception e) {
@@ -50,7 +58,7 @@ public class BonusThread implements Runnable  {
                 }
             }
             try {
-                Thread.sleep(50);
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

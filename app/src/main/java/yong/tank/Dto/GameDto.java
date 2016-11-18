@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yong.tank.modal.Blood;
+import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
@@ -18,6 +19,7 @@ public class GameDto {
     private Blood blood;
     private PlayerPain playerPain;
     private List<Explode> explodes;
+    private Bonus bonus;
     public MyTank getMyTank() {
         return myTank;
     }
@@ -48,5 +50,15 @@ public class GameDto {
 
     public void setExplodes(List<Explode> explodes) {
         this.explodes = explodes;
+    }
+
+    public Bonus getBonus() {
+        return bonus;
+    }
+
+    public void setBonus(Bonus bonus) {
+        //将原来的bonus置为null
+        this.bonus=null;
+        this.bonus = bonus;
     }
 }

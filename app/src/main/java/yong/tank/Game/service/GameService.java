@@ -1,9 +1,20 @@
 package yong.tank.Game.service;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import yong.tank.Dto.GameDto;
+import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
+import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
 
 /**
@@ -15,8 +26,11 @@ public class GameService {
     private boolean gameStateFlag=false;
     private static String TAG ="GameService";
     private GameThread gameThread;
-    public GameService(GameDto gameDto) {
+    private Context context;
+    private Timer timer;
+    public GameService(GameDto gameDto,Context context) {
         this.gameDto = gameDto;
+        this.context = context;
     }
 
     public void gameStart(){
@@ -24,9 +38,24 @@ public class GameService {
             gameThread= new GameThread();
             Thread thread = new Thread(gameThread);
             thread.start();
+            //启动bonus的线程
+            this.startMakeBonus();
         }else{
             Log.w(TAG,"gameThread is not null");
         }
+    }
+
+
+    public void startMakeBonus(){
+        timer = new Timer();
+        BonusMaker bonusMaker = new BonusMaker();
+        //schedule(TimerTask task, long delay, long period)
+        //等待试试10s后开始调度，每隔10s产生一个
+        Log.w(TAG,"bonus start to maker");
+        timer.schedule(bonusMaker,5000,10000);
+    }
+    public void stopMakeBonus(){
+        timer.cancel();
     }
 
     public void gameStop(){
@@ -67,9 +96,6 @@ public class GameService {
                                 gameDto.getMyTank().getBulletsFire().remove(i);//移除子弹
                                 gameDto.getExplodes().add(explode);//发生爆炸
                             }
-
-
-
                         }
                     }
                 try {
@@ -87,4 +113,48 @@ public class GameService {
 
     }
 
+    //产生bonus的线程
+    //这里注意，一定要确定，bonus会被直接用完
+    public class BonusMaker extends TimerTask {
+
+        @Override
+        public void run() {
+            //获取bonus的路径
+            Log.w(TAG,"********************************产生一个bonus****************************");
+            //随机产生一个bonus，注意这里的bonus和子弹是绑定的
+            int bonusType =StaticVariable.BONUSPICTURE[new Random().nextInt(StaticVariable.BONUSPICTURE.length)];
+            Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(),bonusType);//0~length-1之间的数
+            List<Point> bonusPath =getBonusPath(bonusPicture);
+            Bonus bonus = new Bonus(bonusPicture,bonusPath,bonusType);
+            //设置bonus
+            gameDto.setBonus(bonus);
+        }
+    }
+
+    //计算bonus的路径
+    private List<Point> getBonusPath(Bitmap bonusPicture) {
+        //这里关联speed和distance，暂时不处理
+        List<Point> bulletPath = new ArrayList<>();
+        int direction =new Random().nextInt(2); //生成随机方向
+        int bonus_x; //这里应该等于bonuspicture的宽度
+        int bonus_y_init = StaticVariable.SCREEN_HEIGHT/StaticVariable.BONUS_Y;  //初始为1/5处的地方
+        int bonus_y;
+        int speed=StaticVariable.BONUS_SPEED;
+        //TODO 振幅为图片的宽度乘以比例
+        int scale = bonusPicture.getHeight();
+        if(direction==0){
+            bonus_x=0;
+        }else{
+            bonus_x= StaticVariable.SCREEN_WIDTH;
+            speed = -speed;
+        }
+        while(bonus_x>=0&&bonus_x<=StaticVariable.SCREEN_WIDTH){
+            bonus_x=bonus_x+speed;
+            //注意这里除法是易错点
+            bonus_y=bonus_y_init +(int)(Math.sin((double)bonus_x/StaticVariable.BONUS_STEP)*scale);
+            Point point = new Point(bonus_x,bonus_y,0,false);
+            bulletPath.add(point);
+        }
+        return bulletPath;
+    }
 }

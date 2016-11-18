@@ -1,5 +1,7 @@
 package yong.tank.Game.control;
 
+import android.content.Context;
+
 import yong.tank.Game.service.GameService;
 
 /**
@@ -10,8 +12,10 @@ import yong.tank.Game.service.GameService;
 public class GameControler {
     private GameService gameService;
     private static String TAG ="GameControler";
-    public GameControler(GameService gameService) {
+    private Context context;
+    public GameControler(GameService gameService,Context context) {
         this.gameService = gameService;
+        this.context =  context;
     }
 
     //开启gameService的线程
