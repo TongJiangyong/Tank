@@ -1,7 +1,6 @@
 package yong.tank.Game.thread;
 
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -31,7 +30,7 @@ public class BonusThread implements Runnable  {
         while(flag){
             try {
                 synchronized (holder){
-                    Log.w(TAG,"TEST BonusThread");
+                    //Log.w(TAG,"TEST BonusThread");
                     /*******************关于bonus的使用方法*******************************/
                     //参考别人的代码，也是要设置路径，考虑一下.....
                     //考虑设置什么路径呢？

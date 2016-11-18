@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.View.BloodView;
 import yong.tank.Game.View.BonusView;
+import yong.tank.Game.View.ExplodeView;
 import yong.tank.Game.View.GameView;
 import yong.tank.Game.View.PlayerView;
 import yong.tank.Game.View.SelectView;
@@ -51,6 +52,13 @@ public class GameActivity extends Activity implements View.OnClickListener {
         GameDto gameDto = new GameDto();
         tankType=this.getIntent().getIntExtra("tankType", 0);
         mapType=this.getIntent().getIntExtra("mapType", 0);
+        //TODO 初始化explode
+        for(int i=0;i<StaticVariable.EXPLODESPICTURE_GROUND.length;i++){
+            StaticVariable.EXPLODESONGROND[i]=BitmapFactory.decodeResource(getResources(), StaticVariable.EXPLODESPICTURE_GROUND[i]);
+        }
+        for(int i=0;i<StaticVariable.EXPLODESPICTURE_TANKE.length;i++){
+            StaticVariable.EXPLODESONTANK[i]=BitmapFactory.decodeResource(getResources(), StaticVariable.EXPLODESPICTURE_TANKE[i]);
+        }
         //TODO 测试tank
         MyTank myTank =initTank(tankType);
         gameDto.setMyTank(myTank);
@@ -71,6 +79,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //绘制bloodView
         ViewBase bloodView =new BloodView(this,gameDto);
         bloodView.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        //绘制explodeView
+        ViewBase explodeView =new ExplodeView(this,gameDto);
+        explodeView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         //绘制bonuxView
         ViewBase bonusVew = new BonusView(this,gameDto);
         bonusVew.setZOrderOnTop(true); //设置canves为透明必须要加.....
@@ -83,6 +94,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         activity_game.addView(playerView);
         activity_game.addView(bloodView);
         activity_game.addView(bonusVew);
+        activity_game.addView(explodeView);
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/

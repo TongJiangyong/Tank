@@ -24,7 +24,7 @@ public class Bullet {
     private static String TAG = "Bullet";
     private Matrix matrix = new Matrix(); // 预备用作旋转的类
     private boolean drawFlag=false;
-    private int pathPosition = 0;
+    private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
 
     //测试绘制路径
     private Path path = new Path();
@@ -128,4 +128,11 @@ public class Bullet {
         this.bulletDistance = bulletDistance;
     }
 
+    public int getPathPosition() {
+        return pathPosition;
+    }
+
+    public void setPathPosition(int pathPosition) {
+        this.pathPosition = pathPosition;
+    }
 }

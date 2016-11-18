@@ -1,5 +1,7 @@
 package yong.tank.tool;
 
+import android.graphics.Bitmap;
+
 import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
@@ -67,9 +69,36 @@ public class StaticVariable {
             new BulletBascInfo(0,20,50, R.mipmap.s,"子母弹_母"),
             new BulletBascInfo(0,20,50,R.mipmap.s_s,"子母弹_子"),
     };
-    //初始化物理场
+    //初始化物理场  这里的物理场应该和手机屏幕适应，但是没有想到好方法
     public static double GRAVITY=11;
     public static double INTERVAL_TIME = 0.5;    //初始化与路径相关参数
     public static  int PREVIEWPATHLENGTH = 50; //priewpath有12个点,测试使用50个
     public static int PATHLENGTH  = 50; //path有40个点
+
+    //初始化爆炸的图像
+    public static int[] EXPLODESPICTURE_GROUND={
+            R.mipmap.baozha1,
+            R.mipmap.baozha2,
+            R.mipmap.baozha3,
+            R.mipmap.baozha4,
+            R.mipmap.baozha5,
+            R.mipmap.baozha6,
+            R.mipmap.baozha7,
+            R.mipmap.baozha8,
+            R.mipmap.baozha9,
+            //R.mipmap.baozha0,
+    };
+    public static int[] EXPLODESPICTURE_TANKE={
+            R.mipmap.tank_baozha1,
+            R.mipmap.tank_baozha2,
+            R.mipmap.tank_baozha3,
+            R.mipmap.tank_baozha4,
+            R.mipmap.tank_baozha5,
+            //R.mipmap.baozha0,
+            // R.mipmap.tank_4,  暂时不加这个，以后再加......
+    };
+    public static Bitmap[]  EXPLODESONGROND = new Bitmap[EXPLODESPICTURE_GROUND.length];
+    public static Bitmap[]  EXPLODESONTANK =  new Bitmap[EXPLODESPICTURE_TANKE.length];
+    public static int EXPLODE_TYPE_GROUND = 0;
+    public static int EXPLODE_TYPE_TANK = 1;
 }

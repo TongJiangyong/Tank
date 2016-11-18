@@ -59,7 +59,7 @@ public class MyTank implements Tank{
         //this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
         this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/5;
-        bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？
+        bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
     }
 
     public void drawSelf(Canvas canvas){
@@ -102,6 +102,7 @@ public class MyTank implements Tank{
         //绘制所有的子弹
         if(bulletsFire.size()==0){
         }else{
+            //注意多线程的处理
             for (int i = bulletsFire.size() -1; i >= 0; i--)
             {
                 //绘制子弹
