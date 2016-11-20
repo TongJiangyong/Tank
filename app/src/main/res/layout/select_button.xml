@@ -4,20 +4,19 @@ android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:orientation="vertical"
 android:id="@+id/bt">
-    <!--有padding才能显示select的框，没办法-->
+    <!--有padding才能显示select的框，没办法,其实这个布局很有问题，不管了......-->
     <ImageView
         android:id="@+id/imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="1dp"
-        android:src="@mipmap/origin"
         android:background="@drawable/with_border"
         />
     <TextView
         android:id="@+id/buttonNum"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="∞"
+        android:gravity="right"
         android:paddingTop="1px"
         />
 </yong.tank.modal.SelectButton>

@@ -12,10 +12,11 @@ public class Blood {
     private Bitmap blood;
     private Bitmap power;
     private Bitmap bloodBlock;
+    //TODO blood相关的硬编码
     private int bloodBlock_x=20;
     private int bloodBlock_y=20;
-    private float bloodNum;
-    private float powerNum;
+    private double bloodNum;
+    private double powerNum;
     private Boolean allowFire = true;       //子弹装填时间使能 （时间开关）
 
     public Blood(Bitmap blood, Bitmap power, Bitmap bloodBlock, float bloodNum,float powerNum) {
@@ -44,23 +45,30 @@ public class Blood {
         canvas.drawBitmap(bloodBlock,bloodBlock_x,bloodBlock_y, null);
         //绘制血条
         canvas.drawBitmap(blood, src_blood, des_blood, null);
-        //绘制子弹进度条
+        //绘制装填进度条
         canvas.drawBitmap(power,src_power,des_power, null);
+        //TODO 这里设置装填的时间需要1s 硬编码
+        if(powerNum<1){
+            powerNum=powerNum+0.04;
+        }else{
+            //设置运行发射
+            this.allowFire = true;
+        }
     }
 
-    public float getBloodNum() {
+    public double getBloodNum() {
         return bloodNum;
     }
 
-    public void setBloodNum(float bloodNum) {
+    public void setBloodNum(double bloodNum) {
         this.bloodNum = bloodNum;
     }
 
-    public float getPowerNum() {
+    public double getPowerNum() {
         return powerNum;
     }
 
-    public void setPowerNum(float powerNum) {
+    public void setPowerNum(double powerNum) {
         this.powerNum = powerNum;
     }
 
@@ -72,5 +80,8 @@ public class Blood {
         this.allowFire = allowFire;
     }
 
+    public void subtractionBlood(double subtraction){
+        bloodNum=bloodNum-subtraction;
+    }
 
 }

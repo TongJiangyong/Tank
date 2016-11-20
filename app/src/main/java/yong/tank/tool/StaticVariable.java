@@ -65,12 +65,26 @@ public class StaticVariable {
 
 //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
-    public static BulletBascInfo[] bulletBascInfos = {
-            new BulletBascInfo(0,150,50,R.mipmap.origin,"普通弹"),
-            new BulletBascInfo(0,20,50,R.mipmap.armor,"穿甲弹"),
-            new BulletBascInfo(0,20,50,R.mipmap.ice,"冰弹"),
-            new BulletBascInfo(0,20,50,R.mipmap.s_s,"加速弹"),
-            new BulletBascInfo(0,20,50, s,"子母弹_母"),
+    public static BulletBascInfo[] BUTTLE_BASCINFOS = {
+            new BulletBascInfo(0,150,0.2,R.mipmap.origin,"普通弹"), //0
+            new BulletBascInfo(0,120,0.4,R.mipmap.armor,"穿甲弹"),  //1
+            new BulletBascInfo(0,140,0.3,R.mipmap.ice,"冰弹"),    //2
+            new BulletBascInfo(0,150,0.2,R.mipmap.s_s,"加速弹"),   //3
+            new BulletBascInfo(0,150,50, s,"子母弹_母"),
+    };
+    //初始化子弹的类型
+    public static int ORIGIN = 0;
+    public static int ARMOR = 1;
+    public static int ICE = 2;
+    public static int S_S = 3;
+    //初始化子弹信息
+    public static int BUTTON_NUM_ORIGN = 10;
+    public static int BUTTON_NUM_MAX = 999;
+    public static int[][] TANK_BULLET_YPTE ={
+            {StaticVariable.ORIGIN,BUTTON_NUM_MAX},
+            {StaticVariable.ARMOR,StaticVariable.BUTTON_NUM_ORIGN},
+            {StaticVariable.ICE,StaticVariable.BUTTON_NUM_ORIGN},
+            {StaticVariable.S_S,StaticVariable.BUTTON_NUM_ORIGN},
     };
     //初始化物理场  这里的物理场应该和手机屏幕适应，但是没有想到好方法
     public static double GRAVITY=11;
@@ -114,4 +128,9 @@ public class StaticVariable {
     public static int BONUS_SPEED = 10;
     public static int BONUS_STEP =50 ;
     public static final int BONUS_Y = 5;
+    //gameservice中toast更新
+    public final static int MSG_TOAST = 0;
+    //button中message更新
+    public final static int MSG_UPDATE = 1;
+
 }

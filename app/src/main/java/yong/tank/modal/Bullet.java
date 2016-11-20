@@ -25,7 +25,6 @@ public class Bullet {
     private Matrix matrix = new Matrix(); // 预备用作旋转的类
     private boolean drawFlag=false;
     private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
-
     //测试绘制路径
     private Path path = new Path();
     //发射路径点
@@ -134,5 +133,9 @@ public class Bullet {
 
     public void setPathPosition(int pathPosition) {
         this.pathPosition = pathPosition;
+    }
+
+    public BulletBascInfo getBulletBascInfo() {
+        return bulletBascInfo;
     }
 }

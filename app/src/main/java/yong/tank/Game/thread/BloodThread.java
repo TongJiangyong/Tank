@@ -46,7 +46,8 @@ public class BloodThread implements Runnable {
                 }
             }
             try {
-                Thread.sleep(300);
+                //让装填的过程更流畅
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

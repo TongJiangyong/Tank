@@ -2,12 +2,14 @@ package yong.tank.Dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import yong.tank.modal.Blood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
+import yong.tank.modal.SelectButton;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -19,7 +21,9 @@ public class GameDto {
     private Blood blood;
     private PlayerPain playerPain;
     private List<Explode> explodes;
-    private Bonus bonus;
+    private Bonus bonus = null;
+    private Map<Integer,SelectButton> selectButtons;
+
     public MyTank getMyTank() {
         return myTank;
     }
@@ -61,4 +65,13 @@ public class GameDto {
         this.bonus=null;
         this.bonus = bonus;
     }
+
+    public Map<Integer, SelectButton> getSelectButtons() {
+        return selectButtons;
+    }
+
+    public void setSelectButtons(Map<Integer, SelectButton> selectButtons) {
+        this.selectButtons = selectButtons;
+    }
+
 }

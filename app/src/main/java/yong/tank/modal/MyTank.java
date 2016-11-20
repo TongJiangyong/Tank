@@ -3,6 +3,7 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,24 +33,22 @@ public class MyTank implements Tank{
     //预发射路径点
     private List<Point> preFirePath;
     //已经发射的子弹，严格控制子弹加入
-    private List<Bullet> bulletsFire;
-    //坦克拥有的子弹类型和每种类型的数量
+    private List<Bullet> bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
+    //tank所拥有的子弹种类
     /**  类型   数量
-     *  0       10000
+     *  0       100000
      *  1        10
      *  2        10
      *  3        10
      *  4        10
+     *  暂时只允许坦克只拥有两种子弹
      * **/
-    private int[][] bulletsType={
-            {0,1000},
-            {1,0},
-            {2,0},
-            {3,0},
-            {4,0},
-    };;
-    //坦克的发射子弹类型
-    private int selectedBullets=0;
+    //坦克的当前发射子弹类型
+    private int selectedBullets=StaticVariable.ORIGIN;
+    //坦克的当前发射子弹数量
+    private int selectedBulletsNum = StaticVariable.TANK_BULLET_YPTE[0][1];
+
+    //坦克的当前所拥有的发射类型和该类型的子弹数量
     public MyTank(Bitmap tankPicture,Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
         this.tankPicture = tankPicture;
         this.tankType = tankType;
@@ -58,8 +57,8 @@ public class MyTank implements Tank{
         this.tankPosition_x=StaticVariable.SCREEN_WIDTH/4-this.tankPicture.getWidth()/2;
         //this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
-        this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/5;
-        bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
+        this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*2/3;
+        Log.w(TAG,"current bullet num:"+selectedBulletsNum);
     }
 
     public void drawSelf(Canvas canvas){
@@ -72,7 +71,6 @@ public class MyTank implements Tank{
         }else{
             this.tankPosition_x+=((tankBascInfo.getSpeed()/10)*tankDirectrion);
         }
-        //Log.w(TAG,"tank position:"+this.tankPosition_x);
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         //Bitmap armPicture_tmp_2 = Tool.reBuildImg(armPicture_tmp,0,1,1,true,false);
@@ -97,6 +95,7 @@ public class MyTank implements Tank{
             {
                 canvas.drawPoint(preFirePath.get(i).getX(), preFirePath.get(i).getY(), preFirePathPaint);
             }
+            this.drawPreFireCircle(canvas);
         }
 
         //绘制所有的子弹
@@ -109,8 +108,9 @@ public class MyTank implements Tank{
                 bulletsFire.get(i).drawSelf(canvas);
             }
         }
-
-        //测试绘制一个圆环：
+    }
+    //绘制prefire的圆环：
+    private void drawPreFireCircle(Canvas canvas) {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5);
@@ -174,14 +174,6 @@ public class MyTank implements Tank{
 
     public void setBulletsFire(List<Bullet> bulletsFire) {
         this.bulletsFire = bulletsFire;
-    }
-
-    public int[][] getBulletsType() {
-        return bulletsType;
-    }
-
-    public void setBulletsType(int[][] bulletsType) {
-        this.bulletsType = bulletsType;
     }
 
     public int getSelectedBullets() {
@@ -275,5 +267,22 @@ public class MyTank implements Tank{
 
     public void addBuleetFire(Bullet bullet) {
         this.getBulletsFire().add(bullet);
+    }
+
+    public int getSelectedBulletsNum() {
+        return selectedBulletsNum;
+    }
+
+    public void setSelectedBulletsNum(int selectedBulletsNum) {
+        this.selectedBulletsNum = selectedBulletsNum;
+    }
+
+    //x，y的坐标在第3象限外
+    public boolean isOutDirection(int dx, int dy) {
+        if(dx<=this.getTankCenter().getX()&&dy>=this.getTankCenter().getY()){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

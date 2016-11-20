@@ -7,11 +7,10 @@ package yong.tank.modal;
 public class BulletBascInfo {
     private int type;
     private int speed;
-    private int power;
+    private double power;
     private int picture;
     private String bulletName;
-
-    public BulletBascInfo(int type, int speed, int power, int picture, String bulletName) {
+    public BulletBascInfo(int type, int speed, double power, int picture, String bulletName) {
         this.type = type;
         this.speed = speed;
         this.power = power;
@@ -35,7 +34,7 @@ public class BulletBascInfo {
         this.speed = speed;
     }
 
-    public int getPower() {
+    public double getPower() {
         return power;
     }
 

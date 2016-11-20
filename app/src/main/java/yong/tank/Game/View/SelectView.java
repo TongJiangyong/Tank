@@ -11,17 +11,20 @@ import java.util.Map;
 
 import yong.tank.R;
 import yong.tank.modal.SelectButton;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
  */
 
+//这里有一个框架设计的失误，slelectView不仅仅充当bullet的显示，而且充当存放tank拥有的子弹数量和子弹种类的类
 public class SelectView extends LinearLayout{
     private Context context;
     private static String TAG = "SelectView";
     private SelectButton selectButton_1;
     private SelectButton selectButton_2;
-    private Map<Integer,SelectButton> selectButtons= new HashMap<>();
+    private Map<Integer,SelectButton> selectButtons= new HashMap<Integer,SelectButton>(2);
+
     //这些方法都需要继承，不知道为什么
     public SelectView(Context context) {
         super(context);
@@ -46,18 +49,30 @@ public class SelectView extends LinearLayout{
 
     public void initButton(){
         //TODO 也可以通过配置文件设置，这里暂时就用硬编码
+        //button1为默认的配置
         selectButton_1 = (SelectButton)findViewById(R.id.selectButton_1);
         selectButton_1.initSelectButton();
         selectButton_1.setButtonSelected();
+        selectButton_1.setButtonPic(R.mipmap.origin);
+        //设置其为被配置的状态
+        selectButton_1.setFilled(true);
+        //这里是失误，设施button的属性.........
+        //坦克的当前发射子弹类型
+        selectButton_1.setBulletType(StaticVariable.ORIGIN);
+        //坦克的当前发射子弹数量
+        selectButton_1.setBulletNum(StaticVariable.TANK_BULLET_YPTE[StaticVariable.ORIGIN][1]);
         selectButtons.put(R.id.selectButton_1,selectButton_1);
+        //button2为设置的配置
         selectButton_2 = (SelectButton)findViewById(R.id.selectButton_2);
         selectButton_2.initSelectButton();
         //TODO 设置一个为空的图片
-        selectButton_2.setButtonPic(R.mipmap.ice);
+        //selectButton_2.setButtonPic(R.mipmap.ice);
         selectButton_2.setButtonNoSelected();
+        //设置其为没有被配置的状态
+        selectButton_2.setFilled(false);
         //TODO 设计字体的大小等,或者字的位置
-        selectButton_2.setButtonNum("--");
-        selectButtons.put(R.id.selectButton_1,selectButton_2);
+        //selectButton_2.setButtonNum("--");
+        selectButtons.put(R.id.selectButton_2,selectButton_2);
     }
 
     public SelectButton getSelectButton_1() {
@@ -83,4 +98,6 @@ public class SelectView extends LinearLayout{
     public void setSelectButtons(Map<Integer, SelectButton> selectButtons) {
         this.selectButtons = selectButtons;
     }
+
+
 }

@@ -16,12 +16,14 @@ public class Bonus {
     private int bonusDirection= 0;  //0为左 ，1为右边
     private int bonus_x;
     private int bonus_y;
+    private boolean isBonusFired = false; //设置bonus的状态 是否被击中等
     private static String TAG = "Bonus";
     private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
     //bonus的路径点
     private List<Point> bonusPath;
     //bonus是否需要继续绘制非flag
     private boolean isDrawFlag=true;
+    private Point bonusCenter = new Point();
     private int bonusType; //注意，这里的type和子弹的类型有关系，击中bonus后，产生相应的变化
     public Bonus(Bitmap bonusPicture, List<Point> bonusPath,int bonusType) {
         this.bonusPicture = bonusPicture;
@@ -31,7 +33,7 @@ public class Bonus {
 
     public void drawSelf(Canvas canvas) {
         //TODO 绘制bonus 注意
-        if(bonusPath!=null&&pathPosition<bonusPath.size()&&isDrawFlag){
+        if(bonusPath!=null&&pathPosition<bonusPath.size()&&isDrawFlag&&!isBonusFired){
             bonus_x=bonusPath.get(pathPosition).getX();
             bonus_y=bonusPath.get(pathPosition).getY();
             canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
@@ -83,4 +85,29 @@ public class Bonus {
     public Bitmap getBonusPicture() {
         return bonusPicture;
     }
+
+    public boolean isBonusFired() {
+        return isBonusFired;
+    }
+
+    public void setIsBonusFired(boolean isBonusFired) {
+        this.isBonusFired = isBonusFired;
+    }
+
+    public Point getBonusCenter() {
+        this.bonusCenter.setX(this.getBonus_x()+this.bonusPicture.getWidth()/2);
+        this.bonusCenter.setY(this.getBonus_y()+this.bonusPicture.getHeight()/2);
+        return bonusCenter;
+    }
+
+    public boolean isInBonusScope(int dx,int dy){
+        if(Math.abs(dx-this.getBonusCenter().getX())<this.bonusPicture.getWidth()/2&&
+           Math.abs(dy-this.getBonusCenter().getY())<this.bonusPicture.getHeight()/2){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
 }

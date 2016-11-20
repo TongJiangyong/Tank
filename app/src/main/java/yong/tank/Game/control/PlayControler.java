@@ -3,12 +3,16 @@ package yong.tank.Game.control;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import yong.tank.Dto.GameDto;
+import yong.tank.R;
 import yong.tank.modal.Bullet;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
@@ -126,14 +130,23 @@ public class PlayControler {
                                                                                         distance,
                                                                                         tankDegree,
                                                                                         true));
+                            //这一段代码加了，可以在绘制出第三象限时，停止prefire
+                            //测试发现，加了以后，游戏性很差......
+/*                            if(!this.gameDto.getMyTank().isOutDirection(dx,dy)){
+                                releasePoint.setPointNull();
+                                startPoint.setPointNull();
+                                //停止prePath的绘制
+                                this.gameDto.getMyTank().setPreFirePath(null);
+                            }*/
                         }
-                        //这里判断是否处于释放区域
+                        //这里判断是否处于释放区域,或者社稷位置不对.....
                         if(this.gameDto.getMyTank().isOutFireCircle(dx,dy)){
                             releasePoint.setPointNull();
                             startPoint.setPointNull();
                             //停止prePath的绘制
                             this.gameDto.getMyTank().setPreFirePath(null);
                         }
+
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
@@ -184,29 +197,52 @@ public class PlayControler {
             //设置使能发射
             this.gameDto.getMyTank().setFireAction(true);
             //装载子弹并发射
-            if(this.gameDto.getMyTank().getEnableFire()&& this.gameDto.getBlood().getAllowFire()){
+            if(this.gameDto.getMyTank().getEnableFire()&&
+                    this.gameDto.getBlood().getAllowFire()&&
+                    this.gameDto.getMyTank().getSelectedBulletsNum()>0){
                 //停止prePath的绘制
                 this.gameDto.getMyTank().setPreFirePath(null);
                 tankOnFire();
             }
             this.gameDto.getMyTank().setFireAction(false);
+            //增加子弹为0的提醒
+            if(this.gameDto.getMyTank().getSelectedBulletsNum()==0){
+                Toast.makeText(this.context.getApplicationContext(), "当前子弹数量为0！", Toast.LENGTH_SHORT).show();// 显示时间较短
+            }
         }
     }
 
-        //发射子弹
+        //1/发射子弹，2、并重置装填的时间，3、更新bullet的计数
         public void tankOnFire(){
-            //增加新的子弹
+            //***************发射子弹*************
             Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
             //在tank中加入子弹
             this.gameDto.getMyTank().addBuleetFire(bullet);
+            //***************重置装填的时间*************
+            //如果子弹的类型不是连续弹，则设置装填时间
+            if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
+            {
+                this.gameDto.getBlood().setPowerNum(1);
+            }else{
+                this.gameDto.getBlood().setPowerNum(0);
+                //设置禁止发射,直到装填时间回复
+                this.gameDto.getBlood().setAllowFire(false);
+            }
+            //***************更新bullet的计数*************
+            //如果当前的子弹类型不为初始类型，则需要更新计数
+            if(gameDto.getMyTank().getSelectedBullets()!=StaticVariable.ORIGIN){
+                //子弹计数
+                gameDto.getSelectButtons().get(R.id.selectButton_2).subtractBulletNum();
+                this.gameDto.getMyTank().setSelectedBulletsNum(gameDto.getSelectButtons().get(R.id.selectButton_2).getBulletNum());
+            }
         }
 
 
     //初始化子弹
     private Bullet initBullet(int bulletType){
-        Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.bulletBascInfos[bulletType].getPicture());
+        Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
-        Bullet bullet = new Bullet(bulletPicture,StaticVariable.bulletBascInfos[bulletType]);
+        Bullet bullet = new Bullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
         //初始化坦克的性能
         bullet.setBulletDegree(tankDegree);
         bullet.setBulletDistance(distance);
@@ -233,8 +269,8 @@ public class PlayControler {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<Point>();
 
-        double bulletV_x=StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
-        double bulletV_y=-(StaticVariable.bulletBascInfos[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
+        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
+        double bulletV_y=-(StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
         int pathNum = 0;
         if (isPreView) {
             pathNum = StaticVariable.PREVIEWPATHLENGTH;
@@ -261,4 +297,33 @@ public class PlayControler {
         return bulletPath;
     }
 
+    //主要动作为：1、更换selectView的外观 2 、设置mytank的当前子弹类型
+    public void setClick(View view) {
+        switch (view.getId()) {
+            //***************更换selectView的外观***************
+            //这种配置方法并不好，不过设置一下也是可以的.....
+            case R.id.selectButton_2:
+                Log.w(TAG,"selectButton_2");
+                //当选择时，如果为空则不能选上，如果不为空，则选上，并设置tank的子弹为选上的子弹
+                if(this.gameDto.getSelectButtons().get(R.id.selectButton_2).isFilled()){
+                    this.gameDto.getSelectButtons().get(R.id.selectButton_2).setButtonSelected();
+                    this.gameDto.getSelectButtons().get(R.id.selectButton_1).setButtonNoSelected();
+                    //***************设置mytank的当前子弹类型和数量***************
+                    this.gameDto.getMyTank().setSelectedBullets(gameDto.getSelectButtons().get(R.id.selectButton_2).getBulletType());
+                    this.gameDto.getMyTank().setSelectedBulletsNum(gameDto.getSelectButtons().get(R.id.selectButton_2).getBulletNum());
+                }
+                break;
+            case R.id.selectButton_1:
+                Log.w(TAG,"selectButton_1");
+                if(this.gameDto.getSelectButtons().get(R.id.selectButton_1).isFilled()){
+                    this.gameDto.getSelectButtons().get(R.id.selectButton_1).setButtonSelected();
+                    this.gameDto.getSelectButtons().get(R.id.selectButton_2).setButtonNoSelected();
+                    this.gameDto.getMyTank().setSelectedBullets(gameDto.getSelectButtons().get(R.id.selectButton_1).getBulletType());
+                    this.gameDto.getMyTank().setSelectedBulletsNum(gameDto.getSelectButtons().get(R.id.selectButton_1).getBulletNum());
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

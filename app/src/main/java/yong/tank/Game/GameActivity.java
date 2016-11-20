@@ -5,12 +5,14 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import yong.tank.Dto.GameDto;
 import yong.tank.Game.View.BloodView;
@@ -90,6 +92,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
+        gameDto.setSelectButtons(selectView.getSelectButtons());
         activity_game.addView(gameView);
         activity_game.addView(playerView);
         activity_game.addView(bloodView);
@@ -129,7 +132,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         power_picture = BitmapFactory.decodeResource(getResources(), StaticVariable.POWERR);
         Bitmap bloodBlock_picture=null;
         bloodBlock_picture = BitmapFactory.decodeResource(getResources(), StaticVariable.BLOODBLOCK);
-        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,(float)0.7,(float)0.7);
+        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,1,1);
         return blood;
     }
 
@@ -137,16 +140,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         //在这里传入selectView,然后进行逻辑处理即可....
-        Log.w(TAG,"id:"+Integer.toHexString(view.getId()));
-        switch (view.getId()) {
-            case R.id.selectButton_2:
-                Log.w(TAG,"view1:");
-                break;
-            case R.id.selectButton_1:
-                Log.w(TAG,"view2:");
-                break;
-            default:
-                break;
-        }
+        this.playControler.setClick(view);
     }
+
+
 }

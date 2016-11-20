@@ -3,7 +3,11 @@ package yong.tank.Game.service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import yong.tank.Dto.GameDto;
+import yong.tank.R;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
 import yong.tank.modal.Point;
@@ -33,6 +38,18 @@ public class GameService {
         this.context = context;
     }
 
+    //设置handle的处理
+    //注意这里为主线程....handler默认使用主线程的looper
+    private  Handler myHandler = new Handler() {
+        public void handleMessage (Message msg) {//此方法在ui线程运行
+            switch(msg.what){
+                case StaticVariable.MSG_TOAST:
+                    Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
+            }
+
+        }
+    };
+
     public void gameStart(){
         if(gameThread==null){
             gameThread= new GameThread();
@@ -44,6 +61,12 @@ public class GameService {
             Log.w(TAG,"gameThread is not null");
         }
     }
+
+
+
+/*    public  void makeToast(String message){
+        Toast.makeText(this.context.getApplicationContext(), message, Toast.LENGTH_SHORT).show();// 显示时间较
+    }*/
 
 
     public void startMakeBonus(){
@@ -74,30 +97,23 @@ public class GameService {
         @Override
         public void run() {
             while(threadFlag){
-                //TODO 测试explode
                 gameDto.getMyTank().setEnableFire(true);
-                    int num=gameDto.getMyTank().getBulletsFire().size();
-                    if(num!=0){
-                        for(int i=(num-1);i>=0;i--){
-                            //如果打中地面
-                            if(gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_y()> StaticVariable.SCREEN_HEIGHT/4*3){
-                                Explode explode = new Explode(StaticVariable.EXPLODESONGROND,
-                                        gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_x(),
-                                        gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_y(),
-                                        StaticVariable.EXPLODE_TYPE_GROUND);
-                                gameDto.getMyTank().getBulletsFire().remove(i);//移除子弹
-                                gameDto.getExplodes().add(explode);//发生爆炸
-                                //如果打中坦克
-                            }else if(gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_x()> StaticVariable.SCREEN_WIDTH/4*3){
-                                Explode explode = new Explode(StaticVariable.EXPLODESONTANK,
-                                        gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_x(),
-                                        gameDto.getMyTank().getBulletsFire().get(i).getBulletPosition_y(),
-                                        StaticVariable.EXPLODE_TYPE_TANK);
-                                gameDto.getMyTank().getBulletsFire().remove(i);//移除子弹
-                                gameDto.getExplodes().add(explode);//发生爆炸
-                            }
+                int num=gameDto.getMyTank().getBulletsFire().size();
+                if(num!=0){
+                    for(int i=(num-1);i>=0;i--){
+                        //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+                        //这里设置continue语句来解决这个问题.....
+                        //测试击中bonus后用的方法
+                        if (testFireBonus(i)){
+                            continue;
                         }
+                        //测试爆炸用的方法
+                        if(testExplode(i)){
+                            continue;
+                        }
+
                     }
+                }
                 try {
                     //逻辑用的时间短一点....
                     Thread.sleep(20);
@@ -107,23 +123,114 @@ public class GameService {
             }
         }
 
+
         public void gameThreadStop() {
             this.threadFlag = true;
         }
 
     }
+    //测试击中bonus的反应
+    //1、停止bonus 2、设置selectView 3、削减血条 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
+    private boolean testFireBonus(int bullet){
+        if(gameDto.getBonus()!=null){
+            if(gameDto.getBonus().isInBonusScope(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                 gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
+                //***************设置selectView***************
+                //设置selectView的图像和文字，并设置tank的子弹属性
+                // 注意这里因为是bonus比bullet的种类少一个,所以为：bulletType+1
+                int bulletType = this.gameDto.getBonus().getBonusType()+1;
+                //TODO 将message设为方法
+                //这里涉及上主线程UI更新的问题，比较麻烦，在android中只能采用message通知的方法
+                // selectView并不是采用实时刷新的方法做的，所以比较麻烦
+                Message msg = new Message();
+                msg.what = StaticVariable.MSG_UPDATE;
+                Bundle bundle = new Bundle();
+                bundle.putInt("bullletNum",StaticVariable.BUTTON_NUM_ORIGN);  //设置子弹数量
+                bundle.putInt("bullletType",bulletType);  //设置子弹的种类
+                bundle.putInt("bullletPicture",StaticVariable.BUTTLE_BASCINFOS[(bulletType)].getPicture());  //设置子弹的图片
+                msg.setData(bundle);//mes利用Bundle传递数据
+                gameDto.getSelectButtons().get(R.id.selectButton_2).getMyHandler().sendMessage(msg);
+                //设置selected为填充状态
+                gameDto.getSelectButtons().get(R.id.selectButton_2).setFilled(true);
+                //***************根据当前的tank子弹状态，更新子弹状态***************
+                //如果当前更新的子弹是bonus的子弹，则更新为最新的bonus子弹
+                if(gameDto.getMyTank().getSelectedBullets()!=StaticVariable.ORIGIN){
+                    this.gameDto.getMyTank().setSelectedBullets(bulletType);
+                    this.gameDto.getMyTank().setSelectedBulletsNum(StaticVariable.BUTTON_NUM_ORIGN);
+                }
+                //***************削减血条***************
+                double boldSubtraction =gameDto.getMyTank().getBulletsFire().get(bullet).getBulletBascInfo().getPower();
+                //TODO 这里好好想一下，如何实现注册，然后回调函数.....
+                gameDto.getBlood().subtractionBlood(boldSubtraction);
+                if(gameDto.getBlood().getBloodNum()<0){
+                    //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
+                    Message msgInfo = myHandler.obtainMessage();
+                    msgInfo.what = StaticVariable.MSG_TOAST;
+                    Bundle bundleMsg = new Bundle();
+                    bundleMsg.putString("message","血条已空");  //设置子弹数量
+                    msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
+                    myHandler.sendMessage(msgInfo);
+                    gameDto.getBlood().setBloodNum(1);
+                }
+                //***************设置bonus停止***************
+                gameDto.getBonus().setIsBonusFired(true);
+                gameDto.setBonus(null);
+                //***************产生爆炸***************
+                addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                        gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                        StaticVariable.EXPLODE_TYPE_TANK);
+                gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //测试爆炸用的方法
+    private boolean testExplode(int bullet) {
+        //TODO 测试explode
+        //如果打中地面
+        if(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.SCREEN_HEIGHT/4*3){
+            addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                    gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.EXPLODE_TYPE_GROUND);
+            gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
+            return true;
+            //如果打中坦克
+        }
+        return false;
+    }
+
+
+    //产生爆炸的方法
+    public void addExplode(int dx,int dy,int type){
+        Explode explode = null;
+        if(type==StaticVariable.EXPLODE_TYPE_GROUND){
+           explode = new Explode(StaticVariable.EXPLODESONGROND,
+                    dx,
+                    dy,
+                    type);
+        }else{
+            explode = new Explode(StaticVariable.EXPLODESONTANK,
+                    dx,
+                    dy,
+                    type);
+        }
+        gameDto.getExplodes().add(explode);//发生爆炸
+    }
+
 
     //产生bonus的线程
     //这里注意，一定要确定，bonus会被直接用完
     public class BonusMaker extends TimerTask {
-
         @Override
         public void run() {
             //获取bonus的路径
             Log.w(TAG,"********************************产生一个bonus****************************");
             //随机产生一个bonus，注意这里的bonus和子弹是绑定的
-            int bonusType =StaticVariable.BONUSPICTURE[new Random().nextInt(StaticVariable.BONUSPICTURE.length)];
-            Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(),bonusType);//0~length-1之间的数
+            int bonusType = new Random().nextInt(StaticVariable.BONUSPICTURE.length);
+            Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(),StaticVariable.BONUSPICTURE[bonusType]);//0~length-1之间的数
             List<Point> bonusPath =getBonusPath(bonusPicture);
             Bonus bonus = new Bonus(bonusPicture,bonusPath,bonusType);
             //设置bonus
