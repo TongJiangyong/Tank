@@ -14,6 +14,13 @@ import static yong.tank.R.mipmap.s;
 
 public class StaticVariable {
 
+    //设置游戏模式的静态变量
+    public enum GAME_MODE {
+
+        LOCAL, INTERNET, BLUETOOTH
+
+    }
+    public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public final static int[] GAMEMODE= {1,2,3};

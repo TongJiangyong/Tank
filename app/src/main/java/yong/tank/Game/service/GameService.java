@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import yong.tank.Communicate.InternetCommunicate.ClentCommunicate;
 import yong.tank.Dto.GameDto;
 import yong.tank.R;
 import yong.tank.modal.Bonus;
@@ -57,6 +58,15 @@ public class GameService {
             thread.start();
             //启动bonus的线程
             this.startMakeBonus();
+            //启动对应模式的communicate线程
+            if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.INTERNET){
+                ClentCommunicate clentCommunicate = new ClentCommunicate();
+                //在这里加入需要的各种监听？或者不进行监听，直接通过msg传也行，两种都写吧......
+                clentCommunicate.getClientInputThread().addCommandObserver();
+                clentCommunicate.start();
+            }
+
+            //在这里启动数据交互线程，暂时学习一下
         }else{
             Log.w(TAG,"gameThread is not null");
         }
