@@ -5,5 +5,5 @@ package yong.tank.Communicate.InterfaceGroup;
  */
 
 public interface ObserverMsg {
-    void msgRecived(Object object);
+    void msgRecived(String msg);
 }

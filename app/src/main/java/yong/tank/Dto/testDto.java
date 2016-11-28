@@ -12,4 +12,12 @@ public class testDto {
         this.id = id;
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "testDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

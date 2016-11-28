@@ -1,5 +1,7 @@
 package yong.tank.Communicate.InternetCommunicate;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -10,11 +12,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Communicate.InterfaceGroup.Subject;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/26.
@@ -27,6 +31,7 @@ public class ClientInputThread implements Runnable,Subject{
     private BufferedReader in;
     public static final String TAG = "ClientInputThread";
     private Charset charset = Charset.forName("UTF-8");
+    private Handler myHander;
     // 存放观察者
     private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
@@ -65,8 +70,15 @@ public class ClientInputThread implements Runnable,Subject{
             if (socket != null)
                 socket.close();
         } catch (IOException e) {
+            Message msg = myHander.obtainMessage();
+            msg.what = StaticVariable.MSG_COMMUNICATE_ERROR;
+            myHander.sendMessage(msg);
             e.printStackTrace();
         }
+    }
+
+    public void setMyHander(Handler myHander) {
+        this.myHander = myHander;
     }
 
     @Override
@@ -85,8 +97,8 @@ public class ClientInputThread implements Runnable,Subject{
     }
 
     @Override
-    public void removeInfoObserver(ObserverInfo observerInfos) {
-        observerInfos.infoRecived(observerInfos);
+    public void removeInfoObserver(ObserverInfo observerInfo) {
+        observerInfos.remove(observerInfos);
     }
 
     @Override
@@ -106,19 +118,34 @@ public class ClientInputThread implements Runnable,Subject{
        //进行包的解析工作
         //格式为：
         //msg:{"comDataS":{"commad":"1","object":{"id":12,"name":"test"}},"flag":"654321#"}
-        Log.w(TAG,"***********************解析包***********************");
-        Log.w(TAG, "flag:"+ ComDataPackage.unpackToF(msg).getFlag());
-        Log.w(TAG, "cmmand:"+ComDataPackage.unpackToF(msg).getComDataS().getCommad());
-        //Log.w(TAG, "info:"+(String) ComDataPackage.unpackToF(msg).getComDataS().getObject());
-        for(ObserverMsg o:observerMsgs){
-            o.msgRecived(msg);
+        //解析的逻辑为，将info解析为string，然后统一以string进行处理......
+        //Log.w(TAG,"***********************解析包***********************");
+        //Log.w(TAG, "flag:"+ ComDataPackage.unpackToF(msg,"testTdo").getFlag());
+        //Log.w(TAG, "cmmand:"+ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getCommad());
+        //这个解析多了两毫秒......没办法，就这样吧......
+        //testDto testDto = (testDto)ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getObject();
+        //String test=ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getObject();
+        //testDto testDto = ComDataPackage.packageToObject(test);
+        //Log.w(TAG, "object::"+testDto.toString());
+        ComDataF comDataF  = ComDataPackage.unpackToF(msg);
+        //处理聊天信息
+        if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_MSG)){
+            for(ObserverMsg o:observerMsgs){
+                //传入string
+                o.msgRecived(comDataF.getComDataS().getObject());
+            }
+            //处理info信息
+        }else if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_INFO)){
+            for(ObserverInfo o:observerInfos){
+                //传入对象
+                o.infoRecived(ComDataPackage.packageToObject(comDataF.getComDataS().getObject()));
+            }
+            //处理command相关的信息
+        }else {
+            for(ObserverCommand o:observerCommands){
+                //传入command
+                o.commandRecived(comDataF.getComDataS().getCommad());
+            }
         }
-        for(ObserverInfo o:observerInfos){
-            o.infoRecived(msg);
-        }
-        for(ObserverCommand o:observerCommands){
-            o.commandRecived(msg);
-        }
-
     }
 }

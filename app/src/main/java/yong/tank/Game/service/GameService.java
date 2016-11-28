@@ -19,9 +19,10 @@ import java.util.TimerTask;
 
 import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
+import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
+import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
-import yong.tank.Communicate.InternetCommunicate.ClentCommunicate;
 import yong.tank.Dto.GameDto;
 import yong.tank.Dto.testDto;
 import yong.tank.R;
@@ -34,15 +35,16 @@ import yong.tank.tool.StaticVariable;
  * Created by hasee on 2016/11/10.
  */
 
-public class GameService implements ObserverInfo,ObserverMsg {
+public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private GameDto gameDto;
     private boolean gameStateFlag=false;
     private static String TAG ="GameService";
     private GameThread gameThread;
     private Context context;
     private Timer timer;
+    private boolean connectFlag =false;
     //TODO 测试代码
-    ClentCommunicate clentCommunicate ;
+    private ClientCommunicate clientCommunicate;
     Gson gson = new Gson();
 
 
@@ -59,27 +61,42 @@ public class GameService implements ObserverInfo,ObserverMsg {
             switch(msg.what){
                 case StaticVariable.MSG_TOAST:
                     Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
+                    break;
                     //网络连接失败
                 case StaticVariable.MSG_CONNECT_ERROR:
-                    Toast.makeText(context.getApplicationContext(),  "与对手连接失败", Toast.LENGTH_SHORT).show();
                     connectError();
+                    break;
                     //网络连接成功
                 case StaticVariable.MSG_CONNECT_SUCCESS:
-                    Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
                     connectInit();
+                    break;
+                //网络连接故障
+                case StaticVariable.MSG_COMMUNICATE_ERROR:
+                    communicateError();
+                    break;
+                //网络连接故障
+                case StaticVariable.MSG_COMMUNICATE_OUT:
+                    communicateOut();
+                    break;
             }
 
         }
+
     };
 
     private void connectError() {
-
+        this.connectFlag=false;
+        Toast.makeText(context.getApplicationContext(),  "与对手连接失败", Toast.LENGTH_SHORT).show();
+        //TODO 延迟执行退出程序
     }
 
     private void connectInit() {
         //连接成功后，添加监听
-        clentCommunicate.getClientInputThread().addInfoObserver(this);
-        clentCommunicate.getClientInputThread().addMsgObserver(this);
+        this.connectFlag=true;
+        clientCommunicate.addInfoObserver(this);
+        clientCommunicate.addMsgObserver(this);
+        clientCommunicate.addCommandObserver(this);
+        Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
     }
     public void gameStart(){
         if(gameThread==null){
@@ -89,22 +106,13 @@ public class GameService implements ObserverInfo,ObserverMsg {
             //启动bonus的线程
             this.startMakeBonus();
             //启动对应模式的communicate线程
-            if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.INTERNET){
-                clentCommunicate = new ClentCommunicate(StaticVariable.SERVER_IP,StaticVariable.SERVER_PORT);
-                clentCommunicate.setMyHandle(myHandler);
-                new Thread(clentCommunicate).start();
-            }
-
+            clientCommunicate.setMyHandle(myHandler);
+            clientCommunicate.startCommunicate();
             //在这里启动数据交互线程，暂时学习一下
         }else{
             Log.w(TAG,"gameThread is not null");
         }
     }
-
-
-
-
-
 
     public void startMakeBonus(){
         timer = new Timer();
@@ -122,10 +130,16 @@ public class GameService implements ObserverInfo,ObserverMsg {
         if(gameThread!=null){
             gameThread.gameThreadStop();
             //TODO 这里设置一个游戏结束标识符，进行判断,然后置为null
+
+
+            //关闭网络
+            clientCommunicate.stopCommunicate();
         }else{
             Log.w(TAG,"gameThread is  null");
         }
     }
+
+
 
 
     class GameThread implements Runnable {
@@ -276,10 +290,10 @@ public class GameService implements ObserverInfo,ObserverMsg {
 
             //TODO 测试通信
             testDto testDto = new testDto(12,"test");
-            ComDataF comDataF = ComDataPackage.packageToF("654321#","1",testDto);
-            if(clentCommunicate.getClientOutputThread()!=null){
-                Log.w(TAG,"sendInfo");
-                clentCommunicate.getClientOutputThread().setMsg(gson.toJson(comDataF));
+            ComDataF comDataF = ComDataPackage.packageToF("654321#","8",gson.toJson(testDto));
+            if(connectFlag){
+                    Log.w(TAG,"send info");
+                    clientCommunicate.sendInfo(gson.toJson(comDataF));
             }
         }
     }
@@ -311,18 +325,36 @@ public class GameService implements ObserverInfo,ObserverMsg {
         return bulletPath;
     }
 
-
-    /*****************************************这里是与通信相关的方法***************************************/
-    //在这里处理收到的数据即可 只处理收到的信息交换数据
-    @Override
-    public void infoRecived(Object object) {
-        Log.w(TAG,"TEST info recived");
+    public ClientCommunicate getClientCommunicate() {
+        return clientCommunicate;
     }
-    //处理收到的信息数据
-    @Override
-    public void msgRecived(Object object) {
-        Log.w(TAG,"TEST msg recived");
 
+    public void setClientCommunicate(ClientCommunicate clientCommunicate) {
+        this.clientCommunicate = clientCommunicate;
+    }
+
+    /*****************************************这里是与通信相关的方法*****时间差大概在10~30ms之间**********************************/
+    @Override
+    public void commandRecived(String command) {
+        Log.w(TAG,"reviced cmmand:"+command);
+    }
+
+    @Override
+    public void infoRecived(testDto testDto) {
+        Log.w(TAG,"reviced testDto:"+testDto.toString());
+    }
+
+    @Override
+    public void msgRecived(String msg) {
+        Log.w(TAG,"reviced msg:"+msg);
+    }
+
+
+    private void communicateError() {
+        Toast.makeText(context.getApplicationContext(),  "网络通信故障", Toast.LENGTH_SHORT).show();
+    }
+    private void communicateOut() {
+        Toast.makeText(context.getApplicationContext(),  "对方断开连接", Toast.LENGTH_SHORT).show();
     }
 
 

@@ -1,11 +1,15 @@
 package yong.tank.Communicate.InternetCommunicate;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/26.
@@ -18,6 +22,7 @@ public class ClientOutputThread implements Runnable{
     private static String TAG ="ClientOutputThread";
     private boolean isStart = true;
     private String msg;
+    private Handler myHander;
 
     public ClientOutputThread(Socket socket) {
         this.socket = socket;
@@ -40,7 +45,9 @@ public class ClientOutputThread implements Runnable{
             notify();
         }
     }
-
+    public void setMyHander(Handler myHander) {
+        this.myHander = myHander;
+    }
     @Override
     public void run() {
         try {
@@ -58,6 +65,7 @@ public class ClientOutputThread implements Runnable{
                         wait();// 发送完消息后，线程进入等待状态
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        Log.w(TAG,"error 1");
                     }
                 }
             }
@@ -65,6 +73,9 @@ public class ClientOutputThread implements Runnable{
             if (socket != null)
                 socket.close();
         } catch (IOException e) {
+            Message msg = myHander.obtainMessage();
+            msg.what = StaticVariable.MSG_COMMUNICATE_ERROR;
+            myHander.sendMessage(msg);
             e.printStackTrace();
         }
     }

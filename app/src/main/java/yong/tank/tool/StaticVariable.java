@@ -144,8 +144,15 @@ public class StaticVariable {
     public final static int MSG_CONNECT_SUCCESS = 2;
     //网络连接失败
     public final static int MSG_CONNECT_ERROR = 3;
+    //网络通信故障
+    public final static int MSG_COMMUNICATE_ERROR=4;
+    //网络主动断开
+    public final static int MSG_COMMUNICATE_OUT=5;
     //设置通讯相关的部分 String ip, int port
     //public static String SERVER_IP = "192.168.1.102";
     public static String SERVER_IP = "192.168.191.1";
     public static int SERVER_PORT =  9999;
+    //定义的command：
+    public static String COMMAND_MSG =  "9";
+    public static String COMMAND_INFO =  "8";
 }

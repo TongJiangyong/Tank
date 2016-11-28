@@ -1,14 +1,16 @@
 package yong.tank.Communicate.ComData;
 
+import java.io.Serializable;
+
 /**
  * Created by hasee on 2016/11/26.
  */
 
-public class ComDataS {
+public class ComDataS implements Serializable {
     private String commad;
-    private Object object;
+    private String object;
 
-    public ComDataS(String commad, Object object) {
+    public ComDataS(String commad, String object) {
         this.commad = commad;
         this.object = object;
     }
@@ -21,11 +23,11 @@ public class ComDataS {
         this.commad = commad;
     }
 
-    public Object getObject() {
+    public String getObject() {
         return object;
     }
 
-    public void setObject(Object object) {
+    public void setObject(String object) {
         this.object = object;
     }
 }
