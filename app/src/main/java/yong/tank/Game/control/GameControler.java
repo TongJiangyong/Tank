@@ -13,6 +13,7 @@ public class GameControler {
     private GameService gameService;
     private static String TAG ="GameControler";
     private Context context;
+    //注入部分包括 service data communicate三部分内容
     public GameControler(GameService gameService,Context context) {
         this.gameService = gameService;
         this.context =  context;

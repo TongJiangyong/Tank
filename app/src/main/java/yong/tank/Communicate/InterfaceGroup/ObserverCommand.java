@@ -1,4 +1,4 @@
-package yong.tank.Communicate.observerInterface;
+package yong.tank.Communicate.InterfaceGroup;
 
 /**
  * Created by hasee on 2016/11/26.

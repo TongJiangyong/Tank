@@ -1,4 +1,4 @@
-package yong.tank.Communicate.observerInterface;
+package yong.tank.Communicate.InterfaceGroup;
 
 /**
  * Created by hasee on 2016/11/26.
@@ -11,5 +11,5 @@ public interface Subject {
     void removeInfoObserver(ObserverInfo oberserInfo);
     void addCommandObserver(ObserverCommand oberserCommand);
     void removeCommandObserver(ObserverCommand oberserCommand);
-    void notifyWatchers(Object object);
+    void notifyWatchers(String object);
 }

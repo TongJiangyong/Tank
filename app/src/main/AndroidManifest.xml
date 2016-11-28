@@ -23,11 +23,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".SelectTank.View.SelectActivity" ></activity>
-        <activity android:name=".Game.GameActivity" ></activity>
+        <activity android:name=".Game.GameActivity"
+            android:configChanges="orientation|screenSize" ><!--设置切换后，方法不执行两次-->
+            </activity>
         <activity android:name=".Result.view.ResultActivity" ></activity>
         <activity android:name=".Help.View.HelpActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" >>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
 
         </activity>
     </application>

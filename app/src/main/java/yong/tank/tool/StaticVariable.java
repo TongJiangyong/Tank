@@ -20,7 +20,7 @@ public class StaticVariable {
         LOCAL, INTERNET, BLUETOOTH
 
     }
-    public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
+    public static GAME_MODE CHOSED_MODE = GAME_MODE.INTERNET;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public final static int[] GAMEMODE= {1,2,3};
@@ -135,9 +135,17 @@ public class StaticVariable {
     public static int BONUS_SPEED = 10;
     public static int BONUS_STEP =50 ;
     public static final int BONUS_Y = 5;
+    //与message相关
     //gameservice中toast更新
     public final static int MSG_TOAST = 0;
     //button中message更新
     public final static int MSG_UPDATE = 1;
-
+    //网络连接成功
+    public final static int MSG_CONNECT_SUCCESS = 2;
+    //网络连接失败
+    public final static int MSG_CONNECT_ERROR = 3;
+    //设置通讯相关的部分 String ip, int port
+    //public static String SERVER_IP = "192.168.1.102";
+    public static String SERVER_IP = "192.168.191.1";
+    public static int SERVER_PORT =  9999;
 }

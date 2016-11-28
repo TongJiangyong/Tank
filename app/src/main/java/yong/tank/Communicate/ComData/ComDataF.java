@@ -14,11 +14,11 @@ package yong.tank.Communicate.ComData;
  * **/
 public class ComDataF {
     private String flag;//服务器端采用flag+object的形式做简化处理  0#自己的id/给服务器    123456#/广播
-    private ComDataF comDataF;
+    private ComDataS comDataS;
 
-    public ComDataF(String flag, ComDataF comDataF) {
+    public ComDataF(String flag, ComDataS comDataS) {
         this.flag = flag;
-        this.comDataF = comDataF;
+        this.comDataS = comDataS;
     }
 
     public String getFlag() {
@@ -29,11 +29,11 @@ public class ComDataF {
         this.flag = flag;
     }
 
-    public ComDataF getComDataF() {
-        return comDataF;
+    public ComDataS getComDataS() {
+        return comDataS;
     }
 
-    public void setComDataF(ComDataF comDataF) {
-        this.comDataF = comDataF;
+    public void setComDataS(ComDataS comDataS) {
+        this.comDataS = comDataS;
     }
 }

@@ -9,14 +9,21 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import yong.tank.Communicate.ComData.ComDataF;
+import yong.tank.Communicate.ComData.ComDataPackage;
+import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
+import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Communicate.InternetCommunicate.ClentCommunicate;
 import yong.tank.Dto.GameDto;
+import yong.tank.Dto.testDto;
 import yong.tank.R;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
@@ -27,13 +34,19 @@ import yong.tank.tool.StaticVariable;
  * Created by hasee on 2016/11/10.
  */
 
-public class GameService {
+public class GameService implements ObserverInfo,ObserverMsg {
     private GameDto gameDto;
     private boolean gameStateFlag=false;
     private static String TAG ="GameService";
     private GameThread gameThread;
     private Context context;
     private Timer timer;
+    //TODO 测试代码
+    ClentCommunicate clentCommunicate ;
+    Gson gson = new Gson();
+
+
+
     public GameService(GameDto gameDto,Context context) {
         this.gameDto = gameDto;
         this.context = context;
@@ -46,11 +59,28 @@ public class GameService {
             switch(msg.what){
                 case StaticVariable.MSG_TOAST:
                     Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
+                    //网络连接失败
+                case StaticVariable.MSG_CONNECT_ERROR:
+                    Toast.makeText(context.getApplicationContext(),  "与对手连接失败", Toast.LENGTH_SHORT).show();
+                    connectError();
+                    //网络连接成功
+                case StaticVariable.MSG_CONNECT_SUCCESS:
+                    Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
+                    connectInit();
             }
 
         }
     };
 
+    private void connectError() {
+
+    }
+
+    private void connectInit() {
+        //连接成功后，添加监听
+        clentCommunicate.getClientInputThread().addInfoObserver(this);
+        clentCommunicate.getClientInputThread().addMsgObserver(this);
+    }
     public void gameStart(){
         if(gameThread==null){
             gameThread= new GameThread();
@@ -60,10 +90,9 @@ public class GameService {
             this.startMakeBonus();
             //启动对应模式的communicate线程
             if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.INTERNET){
-                ClentCommunicate clentCommunicate = new ClentCommunicate();
-                //在这里加入需要的各种监听？或者不进行监听，直接通过msg传也行，两种都写吧......
-                clentCommunicate.getClientInputThread().addCommandObserver();
-                clentCommunicate.start();
+                clentCommunicate = new ClentCommunicate(StaticVariable.SERVER_IP,StaticVariable.SERVER_PORT);
+                clentCommunicate.setMyHandle(myHandler);
+                new Thread(clentCommunicate).start();
             }
 
             //在这里启动数据交互线程，暂时学习一下
@@ -74,9 +103,7 @@ public class GameService {
 
 
 
-/*    public  void makeToast(String message){
-        Toast.makeText(this.context.getApplicationContext(), message, Toast.LENGTH_SHORT).show();// 显示时间较
-    }*/
+
 
 
     public void startMakeBonus(){
@@ -99,6 +126,7 @@ public class GameService {
             Log.w(TAG,"gameThread is  null");
         }
     }
+
 
     class GameThread implements Runnable {
 
@@ -245,6 +273,14 @@ public class GameService {
             Bonus bonus = new Bonus(bonusPicture,bonusPath,bonusType);
             //设置bonus
             gameDto.setBonus(bonus);
+
+            //TODO 测试通信
+            testDto testDto = new testDto(12,"test");
+            ComDataF comDataF = ComDataPackage.packageToF("654321#","1",testDto);
+            if(clentCommunicate.getClientOutputThread()!=null){
+                Log.w(TAG,"sendInfo");
+                clentCommunicate.getClientOutputThread().setMsg(gson.toJson(comDataF));
+            }
         }
     }
 
@@ -274,4 +310,20 @@ public class GameService {
         }
         return bulletPath;
     }
+
+
+    /*****************************************这里是与通信相关的方法***************************************/
+    //在这里处理收到的数据即可 只处理收到的信息交换数据
+    @Override
+    public void infoRecived(Object object) {
+        Log.w(TAG,"TEST info recived");
+    }
+    //处理收到的信息数据
+    @Override
+    public void msgRecived(Object object) {
+        Log.w(TAG,"TEST msg recived");
+
+    }
+
+
 }
