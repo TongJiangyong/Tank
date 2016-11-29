@@ -156,4 +156,11 @@ public class StaticVariable {
     //定义的command：
     public static String COMMAND_MSG =  "9";
     public static String COMMAND_INFO =  "8";
+
+    //定义蓝牙相关的量：
+    public static final String BLUE_DEVICE_NAME = "YONG";
+    public static final String BLUE_FAILED_MESSAGE = "BLUE_FAILED_MESSAGE";
+    public static final String BLUE_LOST_MESSAGE = "BLUE_LOST_MESSAGE";
+    //蓝牙连接状态
+    public static final int  BLUE_STATE =0;
 }
