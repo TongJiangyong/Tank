@@ -151,6 +151,7 @@ public class StaticVariable {
     //设置通讯相关的部分 String ip, int port
     //public static String SERVER_IP = "192.168.1.102";
     public static String SERVER_IP = "192.168.191.1";
+    //public static String SERVER_IP = "115.154.191.5";
     public static int SERVER_PORT =  9999;
     //定义的command：
     public static String COMMAND_MSG =  "9";

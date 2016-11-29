@@ -9,7 +9,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     buildTypes {
         release {
@@ -27,5 +27,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.squareup.retrofit2:retrofit:2.0.1'
 
 }

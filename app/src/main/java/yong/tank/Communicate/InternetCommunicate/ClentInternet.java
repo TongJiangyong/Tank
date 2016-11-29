@@ -24,7 +24,7 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
     private ClientThread clientThread;
     private String ip;
     private int port;
-    private static String TAG ="ClentCommunicate";
+    private static String TAG ="ClentInternet";
     private boolean connectFlag =false;
     private int connectCount = 0;
     private Handler myHandle;
@@ -38,7 +38,7 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
             client = new Socket();
             while(!connectFlag){
                 try{
-                    client.connect(new InetSocketAddress(ip, port), 3000);
+                    client.connect(new InetSocketAddress(ip, port), 30000);
                 }catch (Exception e){
                     Log.w(TAG,"connect error :"+e);
                 }
@@ -56,7 +56,7 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
                 }
                 //判断连接失败
                 if(connectCount>3){
-                    Log.w(TAG,"ConnectedError.....");
+                    Log.w(TAG,"Connected failed.....");
                     Message msg = myHandle.obtainMessage();
                     msg.what = StaticVariable.MSG_CONNECT_ERROR;
                     myHandle.sendMessage(msg);

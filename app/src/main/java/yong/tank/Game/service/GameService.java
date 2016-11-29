@@ -41,7 +41,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private static String TAG ="GameService";
     private GameThread gameThread;
     private Context context;
-    private Timer timer;
+    private Timer timerBonus;
+    private Timer timerCommunnicate;
     private boolean connectFlag =false;
     //TODO 测试代码
     private ClientCommunicate clientCommunicate;
@@ -109,21 +110,31 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             clientCommunicate.setMyHandle(myHandler);
             clientCommunicate.startCommunicate();
             //在这里启动数据交互线程，暂时学习一下
+            this.startCommunicateThread();
         }else{
             Log.w(TAG,"gameThread is not null");
         }
     }
 
+    private void startCommunicateThread() {
+        timerCommunnicate = new Timer();
+        CommunicateThread communicateThread = new CommunicateThread();
+        //schedule(TimerTask task, long delay, long period)
+        //等待试试10s后开始调度，每隔10s产生一个
+        Log.w(TAG,"start to communicate");
+        timerBonus.schedule(communicateThread,5000,100);
+    }
+
     public void startMakeBonus(){
-        timer = new Timer();
+        timerBonus = new Timer();
         BonusMaker bonusMaker = new BonusMaker();
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
         Log.w(TAG,"bonus start to maker");
-        timer.schedule(bonusMaker,5000,10000);
+        timerBonus.schedule(bonusMaker,5000,10000);
     }
     public void stopMakeBonus(){
-        timer.cancel();
+        timerBonus.cancel();
     }
 
     public void gameStop(){
@@ -288,13 +299,25 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             //设置bonus
             gameDto.setBonus(bonus);
 
-            //TODO 测试通信
-            testDto testDto = new testDto(12,"test");
-            ComDataF comDataF = ComDataPackage.packageToF("654321#","8",gson.toJson(testDto));
+        }
+    }
+
+    //互相communicate的线程
+    public class CommunicateThread extends TimerTask {
+        @Override
+        public void run() {
             if(connectFlag){
+
+                if(connectFlag){
                     Log.w(TAG,"send info");
+                    testDto testDto = new testDto(12,"test");
+                    ComDataF comDataF = ComDataPackage.packageToF("654321#","12",gson.toJson(testDto));
                     clientCommunicate.sendInfo(gson.toJson(comDataF));
+             }
+
             }
+
+
         }
     }
 

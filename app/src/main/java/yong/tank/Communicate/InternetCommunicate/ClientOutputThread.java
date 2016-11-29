@@ -54,8 +54,9 @@ public class ClientOutputThread implements Runnable{
             // 没有消息写出的时候，线程等待
             while (isStart) {
                 if (msg != null) {
-                    Log.w(TAG,"send info："+msg);
-                    outupt.write(msg);
+                    //Log.w(TAG,"send info："+msg);
+                    //每次send完加一个结束符
+                    outupt.write(msg+"$");
                     outupt.flush();
                     msg =null;
                 }
