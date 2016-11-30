@@ -1,6 +1,7 @@
 package yong.tank.Title.View;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -79,5 +80,39 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        //Log.w(TAG,"TESTBLUE");
+        // 蓝牙启动后返回的result
+        if (requestCode == StaticVariable.REQUEST_CODE_BLUETOOTH_ON)
+        {
+            switch (resultCode)
+            {
+                // 点击确认按钮
+                case Activity.RESULT_OK:
+                    titlePresenter.enableBluetooth();
+                    break;
+                // 点击取消按钮或点击返回键
+                case Activity.RESULT_CANCELED:
+                    break;
+                default:
+                    break;
+            }
+        }
+        //选取设备后，触发的代码
+        if(requestCode == StaticVariable.CHOSED_BLUT_DEVICE){
+            switch (resultCode)
+            {
+                // 点击确认按钮
+                case Activity.RESULT_OK:
+                    titlePresenter.toBlueTankChose(resultCode, data);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
 
 }

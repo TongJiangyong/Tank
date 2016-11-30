@@ -65,7 +65,7 @@ public class ListDevice extends Activity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				bluetoothadapter.startDiscovery();
-				bu_scan.setVisibility(View.GONE);
+				bu_scan.setClickable(false);
 			}
 
 		});
@@ -80,7 +80,7 @@ public class ListDevice extends Activity {
 				Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 				startActivity(discoverableIntent);
-				bu_can_check.setVisibility(View.GONE);
+				bu_can_check.setClickable(false);
 
 			}
 
@@ -99,7 +99,6 @@ public class ListDevice extends Activity {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 			bluetoothadapter.cancelDiscovery();// 取消搜索
 			// 获取设备的MAC地址
-			bluetoothadapter.cancelDiscovery();
 			String msg = ((TextView) v).getText().toString();
 			String address = msg.substring(msg.length() - 17);
 

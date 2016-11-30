@@ -163,4 +163,9 @@ public class StaticVariable {
     public static final String BLUE_LOST_MESSAGE = "BLUE_LOST_MESSAGE";
     //蓝牙连接状态
     public static final int  BLUE_STATE =0;
+    //蓝牙触发代码
+    public static final int REQUEST_CODE_BLUETOOTH_ON = 1313;
+    //选择要连接的蓝牙设备后，触发的代码
+    public static final int CHOSED_BLUT_DEVICE=1312;
+
 }
