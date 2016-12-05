@@ -1,9 +1,12 @@
 package yong.tank.Title.presenter;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
+import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
 import yong.tank.Help.View.HelpActivity;
 import yong.tank.SelectTank.View.SelectActivity;
 import yong.tank.Title.View.ITitleView;
@@ -16,9 +19,11 @@ import yong.tank.tool.StaticVariable;
  */
 
 public class TitlePresenter implements ITitlePresenter {
+    private static String TAG = "TitlePresenter";
     private MainActivity context;
     private ITitleView titleView;
     private BluetoothAdapter bluetoothadpter=null;
+    private ClientBluetooth clientBluetooth = null;
     public TitlePresenter(MainActivity context, ITitleView titleView){
         this.titleView=titleView;
         this.context=context;
@@ -45,7 +50,10 @@ public class TitlePresenter implements ITitlePresenter {
         if(StaticVariable.BLUE_STATE != 1){
             if(bluetoothadpter.getState() == bluetoothadpter.STATE_ON){
                 Intent intent = new Intent(this.context,ListDevice.class);
+                //打开蓝牙的线程
+                clientBluetooth=this.setupChat();
                 //没办法，为了使用这个starrfor result 只能传入MainActivity
+                //打开蓝牙list的显示线程
                 this.context.startActivityForResult(intent,StaticVariable.CHOSED_BLUT_DEVICE);
             }
             else{
@@ -61,8 +69,7 @@ public class TitlePresenter implements ITitlePresenter {
                 // 设置 Bluetooth 设备可见时间
                 requestBluetoothOn.putExtra(
                         BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
-                        300);
-
+                        200);
                 // 请求开启 Bluetooth
                 this.context.startActivityForResult(requestBluetoothOn,
                         StaticVariable.REQUEST_CODE_BLUETOOTH_ON);
@@ -80,7 +87,15 @@ public class TitlePresenter implements ITitlePresenter {
 
     @Override
     public void toNet(){
-        titleView.showToast("联网模式开发中...");
+        //TODO 测试蓝牙方法
+        if(clientBluetooth.mConnectedThread!=null){
+            titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
+        }else{
+            Log.i(TAG,"test to send infos");
+            clientBluetooth.sendInfo("test blutooth");
+            titleView.showToast("联网模式开发中...&& 蓝牙发送消息");
+        }
+
     }
     @Override
     public void tohelp(){
@@ -99,11 +114,23 @@ public class TitlePresenter implements ITitlePresenter {
     public void toBlueTankChose(int resultCode, Intent data) {
         //TODO 准备blue_socket的连接 跳转到tank的选择界面即可.....
         //这个如何和BluetoothChatService结合起来，可以看一些代码
-        connecting = true;//表示正在链接
         Uri address = data.getData();
-        System.out.println("我ws是那个远程设备的地址"+address.toString());
-        for_connect = new connect_thread(address.toString(),mhanlder);
-        for_connect.start();
+        System.out.println("我是那个远程设备的地址"+address.toString());
+        //测试蓝牙的连接情况
+        // Get the BLuetoothDevice object
+        BluetoothDevice device = bluetoothadpter.getRemoteDevice(address.toString());
+        clientBluetooth.connectDevice(device,false);
+        // Attempt to connect to the device
+    }
+
+    private ClientBluetooth setupChat() {
+        if(clientBluetooth==null){
+            // Initialize the BluetoothChatService to perform bluetooth connections
+            clientBluetooth = new ClientBluetooth();
+            //clientBluetooth.setMyHandle(myHandler);
+            clientBluetooth.startCommunicate();
+        }
+        return clientBluetooth;
     }
 
 }

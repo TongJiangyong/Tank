@@ -24,7 +24,7 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
     private Button battleNet;
     private Button battleHelp;
     private ITitlePresenter titlePresenter;
-
+    // Member object for the chat services
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +38,7 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         StaticVariable.SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
         initButton();
         titlePresenter =new TitlePresenter(this,this);
-        Log.d(TAG, "Test in company");
+        Log.i(TAG, "Test in company");
     }
 
     private void initButton() {
@@ -56,19 +56,19 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.battle_computer:
-                //Log.d(TAG,"battle_computer");
+                //Log.i(TAG,"battle_computer");
                 titlePresenter.toComputer();
                 break;
             case R.id.battle_blue:
-                //Log.d(TAG,"battle_computer");
+                //Log.i(TAG,"battle_computer");
                 titlePresenter.toBluetooth();
                 break;
             case R.id.battle_net:
-                //Log.d(TAG,"battle_computer");
+                //Log.i(TAG,"battle_computer");
                 titlePresenter.toNet();
                 break;
             case R.id.help:
-                //Log.d(TAG,"battle_computer");
+                //Log.i(TAG,"battle_computer");
                 titlePresenter.tohelp();
                 break;
             default:
@@ -106,6 +106,7 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
             {
                 // 点击确认按钮
                 case Activity.RESULT_OK:
+                    Log.i(TAG,"toBlueTankChose");
                     titlePresenter.toBlueTankChose(resultCode, data);
                     break;
                 default:
