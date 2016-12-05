@@ -13,7 +13,7 @@
 		    android:id="@+id/can_discovered"
 		    android:layout_width="150dp"
 		    android:layout_height="wrap_content"
-		    android:text="设备可被检测"
+		    android:text="等待设备接入"
 		/>
 		    <Button
 		    android:layout_toRightOf="@id/can_discovered"
@@ -21,7 +21,7 @@
 		    android:id="@+id/scan_bluetooth"
 		    android:layout_width="150dp"
 		    android:layout_height="wrap_content"
-		    android:text="扫描设备"
+		    android:text="接入其他设备"
 		    />
 
 <TextView

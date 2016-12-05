@@ -13,4 +13,5 @@ public interface ITitlePresenter {
     void tohelp();
     void enableBluetooth();
     void toBlueTankChose(int resultCode, Intent data);
+    void turnOffBluetooth();
 }

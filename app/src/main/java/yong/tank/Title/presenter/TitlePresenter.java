@@ -4,7 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
 import yong.tank.Help.View.HelpActivity;
@@ -16,6 +19,7 @@ import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/10/27.
+ * 不知道为啥，其他的蓝牙只能采用被动连接的方式.....otz
  */
 
 public class TitlePresenter implements ITitlePresenter {
@@ -23,11 +27,55 @@ public class TitlePresenter implements ITitlePresenter {
     private MainActivity context;
     private ITitleView titleView;
     private BluetoothAdapter bluetoothadpter=null;
-    private ClientBluetooth clientBluetooth = null;
+    private ClientBluetooth clientBluetooth ;
     public TitlePresenter(MainActivity context, ITitleView titleView){
         this.titleView=titleView;
         this.context=context;
     }
+    //处理蓝牙、蓝牙连接的一些反馈信息
+    private Handler myHandler = new Handler() {
+        public void handleMessage (Message msg) {//此方法在ui线程运行
+            switch(msg.what){
+                case StaticVariable.BLUE_TOAST:
+                    Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
+                    break;
+                //蓝牙连接失败
+                case StaticVariable.BLUE_CONNECT_ERROR:
+                    titleView.showToast("blueTooth connect error and turn to passivity mode");
+                    Log.i(TAG,"blueTooth connect error and turn to passivity mode");
+                    if(clientBluetooth==null){
+                        Log.i(TAG,"clientBluetooth ERROR_1");
+                    }
+                    StaticVariable.BLUE_STATE = 0;
+                    break;
+                //蓝牙主动连接成功
+                case StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE:
+                    Log.i(TAG,"blueTooth activity connect success");
+                    titleView.showToast("blueTooth activity connect success");
+                    StaticVariable.BLUE_STATE = 1;
+                    break;
+                //蓝牙被动连接成功
+                case StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE:
+                    titleView.showToast("blueTooth passivity connect success");
+                    Log.i(TAG,"blueTooth passivity connect success");
+                    break;
+                //允许蓝牙传输
+                case StaticVariable.BLUE_ENABLE_SEND_WRITE:
+                    titleView.showToast("enable blue communicate");
+                    Log.i(TAG,"enable blue communicate");
+                    break;
+                //蓝牙连接故障
+                case StaticVariable.BLUE_COMMUNICATE_ERROR:
+                    titleView.showToast("blueTooth communicate error");
+                    Log.i(TAG,"blueTooth communicate error");
+                    StaticVariable.BLUE_STATE = 0;
+                    //关闭蓝牙对象
+                    Log.i(TAG,"BLUE_COMMUNICATE_ERROR");
+                    turnOffBluetooth();
+                    break;
+            }
+        }
+    };
     @Override
     public void toComputer(){
         //titleView.showToast("开始人机大战");
@@ -49,9 +97,11 @@ public class TitlePresenter implements ITitlePresenter {
         // TODO 这里的逻辑整理一下.....
         if(StaticVariable.BLUE_STATE != 1){
             if(bluetoothadpter.getState() == bluetoothadpter.STATE_ON){
+                Log.i(TAG,"show device");
                 Intent intent = new Intent(this.context,ListDevice.class);
-                //打开蓝牙的线程
+                //建立clientBluetooth的对象
                 clientBluetooth=this.setupChat();
+                clientBluetooth.setMyHandle(myHandler);
                 //没办法，为了使用这个starrfor result 只能传入MainActivity
                 //打开蓝牙list的显示线程
                 this.context.startActivityForResult(intent,StaticVariable.CHOSED_BLUT_DEVICE);
@@ -78,7 +128,7 @@ public class TitlePresenter implements ITitlePresenter {
             //titleView.showToast("请先连接蓝牙");
         }
         else{
-            titleView.showToast("蓝牙连接成功....进入选择要连接的设备");
+            titleView.showToast("蓝牙程序已启动....不能进入设备选择界面");
         }
     }
 
@@ -88,7 +138,7 @@ public class TitlePresenter implements ITitlePresenter {
     @Override
     public void toNet(){
         //TODO 测试蓝牙方法
-        if(clientBluetooth.mConnectedThread==null){
+        if(this.clientBluetooth.getBluetoothConnected()==null){
             titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
         }else{
             Log.i(TAG,"test to send infos");
@@ -123,14 +173,29 @@ public class TitlePresenter implements ITitlePresenter {
         // Attempt to connect to the device
     }
 
+    @Override
+    public void turnOffBluetooth() {
+        Log.i(TAG,"turnOffBluetooth");
+        if(clientBluetooth!=null){
+            Log.i(TAG,"end clientBlueTooth");
+            clientBluetooth.stopCommunicate();
+            clientBluetooth = null;
+        }
+    }
+
+
     private ClientBluetooth setupChat() {
         if(clientBluetooth==null){
             // Initialize the BluetoothChatService to perform bluetooth connections
+            Log.i(TAG,"creat ClientBluetooth");
             clientBluetooth = new ClientBluetooth();
-            //clientBluetooth.setMyHandle(myHandler);
+            //进入监听模式....
             clientBluetooth.startCommunicate();
         }
         return clientBluetooth;
     }
 
+    public ClientBluetooth getClientBluetooth() {
+        return clientBluetooth;
+    }
 }

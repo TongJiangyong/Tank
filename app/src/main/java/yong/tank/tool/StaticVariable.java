@@ -162,10 +162,21 @@ public class StaticVariable {
     public static final String BLUE_FAILED_MESSAGE = "BLUE_FAILED_MESSAGE";
     public static final String BLUE_LOST_MESSAGE = "BLUE_LOST_MESSAGE";
     //蓝牙连接状态
-    public static final int  BLUE_STATE =0;
+    public static  int  BLUE_STATE =0;
     //蓝牙触发代码
     public static final int REQUEST_CODE_BLUETOOTH_ON = 1313;
     //选择要连接的蓝牙设备后，触发的代码
     public static final int CHOSED_BLUT_DEVICE=1312;
-
+    //蓝牙连接出错
+    public final static int BLUE_CONNECT_ERROR=4;
+    //蓝牙通讯错误
+    public final static int BLUE_COMMUNICATE_ERROR=1;
+    //蓝牙主动连接成功
+    public final static int BLUE_CONNECT_SUCCESS_ACTIVE = 2;
+    //蓝牙被动连接成功
+    public final static int BLUE_CONNECT_SUCCESS_PASSIVE = 3;
+    //允许使用蓝牙
+    public final static int BLUE_ENABLE_SEND_WRITE = 5;
+    //blue的toast
+    public final static int BLUE_TOAST = 100;
 }

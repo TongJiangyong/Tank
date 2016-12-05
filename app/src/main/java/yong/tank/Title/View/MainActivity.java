@@ -109,7 +109,13 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
                     Log.i(TAG,"toBlueTankChose");
                     titlePresenter.toBlueTankChose(resultCode, data);
                     break;
+                case Activity.DEFAULT_KEYS_SHORTCUT:
+                    Log.i(TAG,"等待设备连入即可.....");
+                    break;
                 default:
+                    Log.i(TAG,"return error");
+                    //关掉相关的blue tooth
+                    titlePresenter.turnOffBluetooth();
                     break;
             }
 

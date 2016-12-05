@@ -16,7 +16,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Title.View.MainActivity">
+        <activity android:name=".Title.View.MainActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +26,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SelectTank.View.SelectActivity" ></activity>
+        <activity android:name=".SelectTank.View.SelectActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"></activity>
         <activity
             android:name="yong.tank.Title.View.ListDevice"
             android:theme="@android:style/Theme.Dialog"

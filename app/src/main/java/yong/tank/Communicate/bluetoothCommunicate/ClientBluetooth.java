@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
+import yong.tank.tool.StaticVariable;
 
 /**
  * 这个类做了所有蓝牙连接相关的工作 ，他有一个线程监听蓝牙,一个线程连接蓝牙
@@ -38,7 +40,7 @@ public class ClientBluetooth implements ClientCommunicate {
     private static final UUID MY_UUID_SECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final UUID MY_UUID_INSECURE =
-            UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+            UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -47,7 +49,7 @@ public class ClientBluetooth implements ClientCommunicate {
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
     //TODO 改为private 测试
-    public BluetoothConnected mConnectedThread;
+    private BluetoothConnected mConnectedThread;
     private int mState;
 
     // Constants that indicate the current connection state
@@ -89,14 +91,16 @@ public class ClientBluetooth implements ClientCommunicate {
     /**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume() */
-    public synchronized void startConnectService() {
-        Log.i(TAG, "startConnectService");
+    public synchronized void startListening() {
+        Log.i(TAG, "startListening");
         mAdapter.enable();
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+        if (mConnectedThread != null) {
+            Log.i(TAG,"mConnectedThread end_1");
+            mConnectedThread.cancel(); mConnectedThread = null;}
 
         setState(STATE_LISTEN);
 
@@ -109,7 +113,7 @@ public class ClientBluetooth implements ClientCommunicate {
             mInsecureAcceptThread = new AcceptThread(false);
             mInsecureAcceptThread.start();
         }
-        Log.i(TAG, "startConnectService successed");
+        Log.i(TAG, "startListening successed");
     }
 
     /**
@@ -126,7 +130,10 @@ public class ClientBluetooth implements ClientCommunicate {
         }
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+        if (mConnectedThread != null) {
+            Log.i(TAG,"mConnectedThread end_2");
+            mConnectedThread.cancel();
+            mConnectedThread = null;}
 
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(device, secure);
@@ -147,7 +154,10 @@ public class ClientBluetooth implements ClientCommunicate {
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
 
         // Cancel any thread currently running a connection
-        if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+        if (mConnectedThread != null) {
+            Log.i(TAG,"mConnectedThread end_2");
+            mConnectedThread.cancel();
+            mConnectedThread = null;}
 
         // Cancel the accept thread because we only want to connect to one device
         if (mSecureAcceptThread != null) {
@@ -161,15 +171,13 @@ public class ClientBluetooth implements ClientCommunicate {
 
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new BluetoothConnected(socket, socketType,this);
+        mConnectedThread.setMyHander(mHandler);
         mConnectedThread.start();
-        Log.i(TAG,"BluetoothConnected");
-
-        // Send the name of the connected device back to the UI Activity
-/*        Message msg = mHandler.obtainMessage();
-        Bundle bundle = new Bundle();
-        bundle.putString(StaticVariable.BLUE_DEVICE_NAME, device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);*/
+        Message msg = new Message();
+        //被动连接成功
+        msg.what = StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE;
+        getMyHandle().sendMessage(msg);
+        Log.i(TAG,"AcceptThread in STATE_CONNECTING");
 
         setState(STATE_CONNECTED);
     }
@@ -186,6 +194,7 @@ public class ClientBluetooth implements ClientCommunicate {
         }
 
         if (mConnectedThread != null) {
+            Log.i(TAG,"mConnectedThread end_4");
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
@@ -228,14 +237,13 @@ public class ClientBluetooth implements ClientCommunicate {
      */
     private void connectionFailed() {
         // Send a failure message back to the Activity
-/*        Message msg = mHandler.obtainMessage();
-        Bundle bundle = new Bundle();
-        bundle.putString(StaticVariable.BLUE_FAILED_MESSAGE, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);*/
 
         // Start the service over to restart listening mode
-        ClientBluetooth.this.startConnectService();
+        Log.i(TAG,"connectionFailed");
+        Message msg = new Message();
+        msg.what = StaticVariable.BLUE_CONNECT_ERROR;
+        getMyHandle().sendMessage(msg);
+        ClientBluetooth.this.startListening();
     }
 
     /**
@@ -243,14 +251,13 @@ public class ClientBluetooth implements ClientCommunicate {
      */
     public void connectionLost() {
         // Send a failure message back to the Activity
-/*        Message msg = mHandler.obtainMessage();
-        Bundle bundle = new Bundle();
-        bundle.putString(StaticVariable.BLUE_LOST_MESSAGE, "设备连接中断");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);*/
 
         // Start the service over to restart listening mode
-        ClientBluetooth.this.startConnectService();
+        Log.i(TAG,"connectionLost");
+        Message msg = new Message();
+        msg.what = StaticVariable.BLUE_CONNECT_ERROR;
+        getMyHandle().sendMessage(msg);
+        ClientBluetooth.this.startListening();
     }
 
     @Override
@@ -270,7 +277,7 @@ public class ClientBluetooth implements ClientCommunicate {
 
     @Override
     public void setMyHandle(Handler myHandle) {
-        this.mHandler = mHandler;
+        this.mHandler = myHandle;
     }
 
     public Handler getMyHandle() {
@@ -285,7 +292,7 @@ public class ClientBluetooth implements ClientCommunicate {
 
     @Override
     public void startCommunicate() {
-        this.startConnectService();
+        this.startListening();
     }
 
     @Override
@@ -336,11 +343,10 @@ public class ClientBluetooth implements ClientCommunicate {
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
-                    Log.i(TAG, "AcceptThread is listening " + this);
                     socket = mmServerSocket.accept();
                     Log.i(TAG, "AcceptThread is in " + this);
                 } catch (IOException e) {
-                    Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    Log.e(TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -351,9 +357,9 @@ public class ClientBluetooth implements ClientCommunicate {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
                                 // Situation normal. Start the connected thread.
+                                Log.i(TAG,"connected by others");
                                 connected(socket, socket.getRemoteDevice(),
                                         mSocketType);
-                                Log.i(TAG,"AcceptThread in STATE_CONNECTING");
                                 break;
                             case STATE_NONE:
                             case STATE_CONNECTED:
@@ -417,40 +423,41 @@ public class ClientBluetooth implements ClientCommunicate {
 
         public void run() {
             //Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
-            Log.i(TAG, "........");
             setName("ConnectThread" + mSocketType);
             Log.i(TAG, "set mSocketType successed");
-            // Always cancel discovery because it will slow down a connection
             mAdapter.cancelDiscovery();
-            Log.i(TAG, "ccancel discovery");
             // Make a connection to the BluetoothSocket
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
-                Log.i(TAG,"try to connected");
+                //主动连接状态
                 mmSocket.connect();
                 Log.i(TAG,"connected successed");
+                Message msg = new Message();
+                msg.what = StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE;
+                getMyHandle().sendMessage(msg);
             } catch (IOException e) {
                 // Close the socket
+                Log.e(TAG,"connect error :"+e);
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
+                //出错并进入监听模式
                 connectionFailed();
                 return;
             }
-            Log.i(TAG,"is in this place?");
             // Reset the ConnectThread because we're done
             synchronized (ClientBluetooth.this) {
                 mConnectThread = null;
             }
-
+/*
             // Start thonnected thread
             Log.i(TAG,"try to start connected thread");
             connected(mmSocket, mmDevice, mSocketType);
-            Log.i(TAG,"started connected thread");
+            Log.i(TAG,"started connected thread");*/
         }
 
         public void cancel() {
@@ -462,6 +469,13 @@ public class ClientBluetooth implements ClientCommunicate {
         }
     }
 
-
+    public BluetoothConnected getBluetoothConnected() {
+        if(mConnectedThread==null){
+            Log.i(TAG,"mConnectedThread return null");
+            return null;
+        }else{
+            return mConnectedThread;
+        }
+    }
 }
 

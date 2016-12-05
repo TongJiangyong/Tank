@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class ListDevice extends Activity {
 		ListOld.setOnItemClickListener(mDeviceClickListener);
 		//*********************************************************************************************************************
 
-		//查找设备按钮
+		//查找设备按钮，预备接入其他设备
 		bu_scan.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -66,12 +67,13 @@ public class ListDevice extends Activity {
 				// TODO Auto-generated method stub
 				bluetoothadapter.startDiscovery();
 				bu_scan.setClickable(false);
+				bu_can_check.setClickable(false);
 			}
 
 		});
 		//*********************************************************************************************************************
 
-		//本地设备可被扫描
+		//本地设备可被扫描，等待设备接入
 		bu_can_check.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -80,8 +82,12 @@ public class ListDevice extends Activity {
 				Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 				startActivity(discoverableIntent);
+				bu_scan.setClickable(false);
 				bu_can_check.setClickable(false);
-
+				showToast("等待其他设备接入中.......");
+				Intent intent = new Intent();
+				setResult(Activity.DEFAULT_KEYS_SHORTCUT, intent);
+				finish();
 			}
 
 		});
@@ -150,6 +156,9 @@ public class ListDevice extends Activity {
 		}
 	}
 
+	public void showToast(String info){
+		Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
+	}
 }
 
 

@@ -6,6 +6,7 @@ package yong.tank.Communicate.bluetoothCommunicate;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -48,6 +49,10 @@ public class BluetoothConnected extends Thread implements Subject {
         try {
             this.input = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
             this.output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            Message msg = new Message();
+            //被动连接成功
+            this.myHander.sendMessage(msg);
+            Log.i(TAG,"AcceptThread in STATE_CONNECTING");
         } catch (IOException e) {
             Log.e(TAG, "temp sockets not created", e);
         }
@@ -68,11 +73,11 @@ public class BluetoothConnected extends Thread implements Subject {
                 // Send the obtained bytes to the UI Activity
 /*                    mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();*/
-            } catch (IOException e) {
+            }catch (IOException e) {
                 Log.e(TAG, "disconnected", e);
                 clientBluetooth.connectionLost();
                 // Start the service over to restart listening mode
-                clientBluetooth.startConnectService();
+                clientBluetooth.startListening();
                 break;
             }
         }
@@ -87,6 +92,7 @@ public class BluetoothConnected extends Thread implements Subject {
         try {
             Log.i(TAG,"sendMes:" +msg);
             output.write(msg);
+            output.flush();
             Log.w(TAG,"sendMes");
             // Share the sent message back to the UI Activity
 /*                mHandler.obtainMessage(BluetoothChat.MESSAGE_WRITE, -1, -1, buffer)
@@ -98,6 +104,8 @@ public class BluetoothConnected extends Thread implements Subject {
 
     public void cancel() {
         try {
+            input.close();
+            output.close();
             mmSocket.close();
         } catch (IOException e) {
             Log.e(TAG, "close() of connect socket failed", e);
