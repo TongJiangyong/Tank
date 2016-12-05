@@ -88,7 +88,7 @@ public class TitlePresenter implements ITitlePresenter {
     @Override
     public void toNet(){
         //TODO 测试蓝牙方法
-        if(clientBluetooth.mConnectedThread!=null){
+        if(clientBluetooth.mConnectedThread==null){
             titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
         }else{
             Log.i(TAG,"test to send infos");
