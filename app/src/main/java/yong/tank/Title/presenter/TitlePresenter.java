@@ -9,12 +9,18 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import rx.Observer;
 import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
+import yong.tank.Communicate.webConnect.NetWorks;
 import yong.tank.Help.View.HelpActivity;
+import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.SelectTank.View.SelectActivity;
 import yong.tank.Title.View.ITitleView;
 import yong.tank.Title.View.ListDevice;
 import yong.tank.Title.View.MainActivity;
+import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 
 /**
@@ -28,6 +34,8 @@ public class TitlePresenter implements ITitlePresenter {
     private ITitleView titleView;
     private BluetoothAdapter bluetoothadpter=null;
     private ClientBluetooth clientBluetooth ;
+    private Gson gson = new Gson();
+    private LocalRecord<User> localUser = new LocalRecord<User>();
     public TitlePresenter(MainActivity context, ITitleView titleView){
         this.titleView=titleView;
         this.context=context;
@@ -138,14 +146,55 @@ public class TitlePresenter implements ITitlePresenter {
     @Override
     public void toNet(){
         //TODO 测试蓝牙方法
-        if(this.clientBluetooth.getBluetoothConnected()==null){
+/*        if(this.clientBluetooth.getBluetoothConnected()==null){
             titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
         }else{
             Log.i(TAG,"test to send infos");
             clientBluetooth.sendInfo("test blutooth");
             titleView.showToast("联网模式开发中...&& 蓝牙发送消息");
-        }
+        }*/
+        //测试连接是否成功
+        NetWorks.connectTest("connectedTest",new Observer<String>() {
+            @Override
+            public void onCompleted() {}
 
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"connected error :"+e);
+            }
+
+            @Override
+            public void onNext(String info) {
+                Log.i(TAG,"connected info :"+info);
+            }
+        });
+        Log.i(TAG,"sync or asyc_1");
+        //获取用户信息
+        NetWorks.getUserInfo("getUserInfo",1,new Observer<String>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"getUserInfo error :"+e);
+            }
+
+            @Override
+            public void onNext(String info) {
+                Log.i(TAG,"user info :"+info);
+                //User user = gson.fromJson(info,User.class);
+                User user = new User();
+                localUser.saveInfoLocal(user,StaticVariable.USER_FILE);
+                User userLocal =localUser.readInfoLocal(StaticVariable.USER_FILE);
+                if(userLocal==null){
+                    Log.i(TAG,"read info :"+userLocal.toString());
+                }else{
+                    Log.i(TAG,"没有用户信息");
+                }
+
+            }
+        });
+        Log.i(TAG,"sync or asyc_2");
     }
     @Override
     public void tohelp(){

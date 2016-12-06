@@ -1,6 +1,9 @@
 package yong.tank.tool;
 
 import android.graphics.Bitmap;
+import android.os.Environment;
+
+import java.io.File;
 
 import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
@@ -150,7 +153,7 @@ public class StaticVariable {
     public final static int MSG_COMMUNICATE_OUT=5;
     //设置通讯相关的部分 String ip, int port
     //public static String SERVER_IP = "192.168.1.102";
-    public static String SERVER_IP = "192.168.191.1";
+    public static String SERVER_IP = "192.168.1.122";
     //public static String SERVER_IP = "115.154.191.5";
     public static int SERVER_PORT =  9999;
     //定义的command：
@@ -179,4 +182,12 @@ public class StaticVariable {
     public final static int BLUE_ENABLE_SEND_WRITE = 5;
     //blue的toast
     public final static int BLUE_TOAST = 100;
+
+
+   /* 与存储相关的数据 */
+    public final static String TANK_USER_INFO="tank_userinfo.bat";
+    public final static String TANK_RECORD_INFO="tank_recordinfo.bat";
+    //好像不能通过这种方法获取root
+    public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
+    public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
 }
