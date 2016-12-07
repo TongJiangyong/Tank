@@ -35,5 +35,8 @@ public class ExplodeView extends ViewBase{
         this.explodeThread.stopThread();
     }
 
-
+    @Override
+    public void startThread() {
+        new Thread(this.explodeThread).start();
+    }
 }

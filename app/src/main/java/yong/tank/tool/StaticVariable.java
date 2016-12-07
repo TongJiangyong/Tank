@@ -23,7 +23,15 @@ public class StaticVariable {
         LOCAL, INTERNET, BLUETOOTH
 
     }
-    public static GAME_MODE CHOSED_MODE = GAME_MODE.INTERNET;
+    //设置游戏的类名
+    public static String[] VIEW_LIST ={
+            "yong.tank.Game_Activity.View.GameView",
+            "yong.tank.Game_Activity.View.PlayerView",
+            "yong.tank.Game_Activity.View.BloodView",
+            "yong.tank.Game_Activity.View.BonusView",
+            "yong.tank.Game_Activity.View.ExplodeView",
+};
+    public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
     public final static int[] GAMEMODE= {1,2,3};

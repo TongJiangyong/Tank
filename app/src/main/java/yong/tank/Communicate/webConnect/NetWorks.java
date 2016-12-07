@@ -32,6 +32,12 @@ public class NetWorks extends RetrofitUtils {
 
         @POST("WebService")
         Observable<String> getUserInfo(@Query("action") String action,@Query("userId") int userId);
+
+        @POST("WebService")
+        Observable<String> savaUserInfo(@Query("action") String action,@Query("userId") int userId);
+
+        @POST("WebService")
+        Observable<String> getRoomList(@Query("action") String action,@Query("userId") int userId);
     }
 
     //测试连接状态

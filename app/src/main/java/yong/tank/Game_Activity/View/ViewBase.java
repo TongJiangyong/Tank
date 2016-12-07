@@ -46,4 +46,5 @@ public abstract class ViewBase extends SurfaceView implements SurfaceHolder.Call
 
     abstract void stopThread();
 
+    public abstract void startThread();
 }

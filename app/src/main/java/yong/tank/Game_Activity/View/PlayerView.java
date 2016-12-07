@@ -28,8 +28,12 @@ public class PlayerView extends ViewBase{
     }
 
     @Override
-    void stopThread() {
+    public void stopThread() {
         this.playerThread.stopThread();
     }
 
+    @Override
+    public void startThread() {
+        new Thread(this.playerThread).start();
+    }
 }

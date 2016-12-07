@@ -3,7 +3,6 @@ package yong.tank.Game_Activity.View;
 import android.content.Context;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.thread.ExplodeThread;
 import yong.tank.Game_Activity.thread.GameThread;
 
 /**
@@ -13,7 +12,7 @@ import yong.tank.Game_Activity.thread.GameThread;
 public class GameView extends ViewBase{
 
     private GameThread gameThread;
-    private ExplodeThread explodeThread; //注意这里将explode的thread给了gameView，并没有放到单独的view中，可能会出现锁的问题
+    //private ExplodeThread explodeThread;注意这里将explode的thread给了gameView，并没有放到单独的view中，可能会出现锁的问题
     private static String TAG = "GameView";
 
     public GameView(Context context) {
@@ -40,6 +39,9 @@ public class GameView extends ViewBase{
         this.gameThread.stopThread();
         //this.explodeThread.stopThread();
     }
-
+    @Override
+    public void startThread() {
+        new Thread(this.gameThread).start();
+    }
 
 }

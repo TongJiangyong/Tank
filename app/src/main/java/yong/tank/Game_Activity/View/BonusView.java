@@ -32,6 +32,9 @@ public class BonusView extends ViewBase{
     void stopThread() {
         this.bonusThread.stopThread();
     }
-
+    @Override
+    public void startThread() {
+        new Thread(this.bonusThread).start();
+    }
 
 }

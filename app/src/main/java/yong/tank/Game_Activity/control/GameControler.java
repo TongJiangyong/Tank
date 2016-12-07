@@ -4,6 +4,7 @@ import android.content.Context;
 
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InternetCommunicate.ClentInternet;
+import yong.tank.Communicate.LocalCommunicate.ClientLocal;
 import yong.tank.Game_Activity.service.GameService;
 import yong.tank.tool.StaticVariable;
 
@@ -26,7 +27,7 @@ public class GameControler {
         }else if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.BLUETOOTH){
             this.clientCommunicate = new ClentInternet(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
         }else{
-            this.clientCommunicate = new ClentInternet(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
+            this.clientCommunicate = new ClientLocal(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
         }
         //给service设置通讯借口
         this.gameService.setClientCommunicate(this.clientCommunicate);

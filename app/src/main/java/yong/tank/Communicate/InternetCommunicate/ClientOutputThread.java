@@ -57,7 +57,8 @@ public class ClientOutputThread implements Runnable{
                     //Log.w(TAG,"send info："+msg);
                     //每次send的后标志用于区别数据段
                     //或者采用这样的对象序列化试试 http://ayanisyy-163-com.iteye.com/blog/688648 暂时别使用json....
-                    outupt.write(msg+"$");
+                    outupt.write(msg);
+                    outupt.write('\n');
                     outupt.flush();
                     msg =null;
                 }

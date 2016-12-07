@@ -122,6 +122,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
         Log.w(TAG,"start to communicate");
+        //就用100ms进行测试
         timerBonus.schedule(communicateThread,5000,100);
     }
 

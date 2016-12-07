@@ -1,22 +1,24 @@
 package yong.tank.Game_Activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.View.BloodView;
-import yong.tank.Game_Activity.View.BonusView;
-import yong.tank.Game_Activity.View.ExplodeView;
-import yong.tank.Game_Activity.View.GameView;
-import yong.tank.Game_Activity.View.PlayerView;
 import yong.tank.Game_Activity.View.SelectView;
 import yong.tank.Game_Activity.View.ViewBase;
 import yong.tank.Game_Activity.control.GameControler;
@@ -69,8 +71,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
         Blood blood = initBlood(true);
         gameDto.setBlood(blood);
         //TODO 考虑可否用反射处理这个问题,最后考虑用spring处理这个问题
+
         //绘制gameView
-        ViewBase gameView =new GameView(this,gameDto);
+/*        ViewBase gameView =new GameView(this,gameDto);
         gameView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         //绘制playerView
         ViewBase playerView =new PlayerView(this,gameDto);
@@ -83,18 +86,24 @@ public class GameActivity extends Activity implements View.OnClickListener {
         explodeView.setZOrderOnTop(true); //设置canves为透明必须要加.....
         //绘制bonuxView
         ViewBase bonusVew = new BonusView(this,gameDto);
-        bonusVew.setZOrderOnTop(true); //设置canves为透明必须要加.....
+        bonusVew.setZOrderOnTop(true); //设置canves为透明必须要加.....*/
         //绘制selectView   这里添加selectView之前，还要设置view的基本位置信息，主要在layout中处理位置
         SelectView selectView = (SelectView)findViewById(R.id.selectView);
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
         gameDto.setSelectButtons(selectView.getSelectButtons());
-        activity_game.addView(gameView);
+        List<ViewBase> views=initViews(gameDto);
+        for(ViewBase v:views){
+            //v.startThread();
+            v.setZOrderOnTop(true);
+            activity_game.addView(v);
+        }
+/*        activity_game.addView(gameView);
         activity_game.addView(playerView);
         activity_game.addView(bloodView);
         activity_game.addView(bonusVew);
-        activity_game.addView(explodeView);
+        activity_game.addView(explodeView);*/
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/
@@ -138,6 +147,45 @@ public class GameActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         //在这里传入selectView,然后进行逻辑处理即可....
         this.playControler.setClick(view);
+    }
+
+
+    //初始化图像绘制界面
+    public List<ViewBase> initViews(GameDto gameDto)  {
+        List<ViewBase> views= new ArrayList<>(StaticVariable.VIEW_LIST.length);
+        for(String className:StaticVariable.VIEW_LIST){
+            Log.i(TAG,"className:"+className);
+            Class<?>cls = null;
+            try {
+                cls = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                Log.i(TAG,"e");
+                e.printStackTrace();
+            }
+            Constructor<?> ctr = null;
+            try {
+                ctr = cls.getConstructor(Context.class,GameDto.class);
+            } catch (NoSuchMethodException e) {
+                Log.i(TAG,"e");
+                e.printStackTrace();
+            }
+            ViewBase v= null;
+            try {
+                v = (ViewBase) ctr.newInstance(this,gameDto);
+            } catch (InstantiationException e) {
+                Log.i(TAG,"e");
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                Log.i(TAG,"e");
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                Log.i(TAG,"e");
+                e.printStackTrace();
+            }
+            views.add(v);
+
+        }
+        return views;
     }
 
 

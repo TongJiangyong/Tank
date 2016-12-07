@@ -33,5 +33,11 @@ public class BloodView extends ViewBase{
         this.bloodThread.stopThread();
     }
 
+    //Blood为什么只有在init中才有用？？？？？
+    @Override
+    public void startThread() {
+        new Thread(this.bloodThread).start();
+    }
+
 
 }
