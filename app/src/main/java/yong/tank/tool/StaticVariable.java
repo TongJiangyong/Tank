@@ -190,4 +190,5 @@ public class StaticVariable {
     //好像不能通过这种方法获取root的internal目录
     public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
     public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
+    public static String API_KEY ="449526a5a32aa8f5ff15f94c8110738c";
 }

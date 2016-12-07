@@ -13,13 +13,15 @@ import com.google.gson.Gson;
 
 import rx.Observer;
 import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
-import yong.tank.Communicate.webConnect.NetWorks;
+import yong.tank.Communicate.webConnect.TmdbScraper;
 import yong.tank.Help_Activity.View.HelpActivity;
 import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.SelectTank_Activity.View.SelectActivity;
 import yong.tank.Title_Activity.View.ITitleView;
 import yong.tank.Title_Activity.View.ListDevice;
 import yong.tank.Title_Activity.View.MainActivity;
+import yong.tank.modal.TmdbMovieDetail;
+import yong.tank.modal.TmdbSearchResult;
 import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 
@@ -154,7 +156,7 @@ public class TitlePresenter implements ITitlePresenter {
             titleView.showToast("联网模式开发中...&& 蓝牙发送消息");
         }*/
         //测试连接是否成功
-        NetWorks.connectTest("connectedTest",new Observer<String>() {
+        TmdbScraper.getSearchResult(StaticVariable.API_KEY,"zh","飓风营救",false,1,new Observer<TmdbSearchResult>() {
             @Override
             public void onCompleted() {}
 
@@ -164,13 +166,14 @@ public class TitlePresenter implements ITitlePresenter {
             }
 
             @Override
-            public void onNext(String info) {
-                Log.i(TAG,"connected info :"+info);
+            public void onNext(TmdbSearchResult tmdbSearchResult) {
+                Log.i(TAG,"搜索到的电影信息为:"+gson.toJson(tmdbSearchResult).toString());
             }
         });
         Log.i(TAG,"sync or asyc_1");
         //获取用户信息
-        NetWorks.getUserInfo("getUserInfo",1,new Observer<String>() {
+        //(int id,String api_key,Observer<TmdbMovieDetail> observer){
+        TmdbScraper.getMovieDetail(550,StaticVariable.API_KEY,new Observer<TmdbMovieDetail>(){
             @Override
             public void onCompleted() {}
 
@@ -180,18 +183,8 @@ public class TitlePresenter implements ITitlePresenter {
             }
 
             @Override
-            public void onNext(String info) {
-                Log.i(TAG,"user info :"+info);
-                //User user = gson.fromJson(info,User.class);
-                User user = new User();
-                localUser.saveInfoLocal(user,StaticVariable.USER_FILE);
-                User userLocal =localUser.readInfoLocal(StaticVariable.USER_FILE);
-                if(userLocal==null){
-                    Log.i(TAG,"read info :"+userLocal.toString());
-                }else{
-                    Log.i(TAG,"没有用户信息");
-                }
-
+            public void onNext(TmdbMovieDetail tmdbMovieDetail) {
+                Log.i(TAG,"获取的电影信息为："+gson.toJson(tmdbMovieDetail).toString());
             }
         });
         Log.i(TAG,"sync or asyc_2");

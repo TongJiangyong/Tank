@@ -44,5 +44,8 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
    // compile 'com.squareup.retrofit2:converter-scalars'
    // compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+   /*jsoup*/
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.8.3'
+
     testCompile 'junit:junit:4.12'
 }

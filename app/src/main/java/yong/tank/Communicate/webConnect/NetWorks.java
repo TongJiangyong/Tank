@@ -10,6 +10,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by hasee on 2016/12/6.
  * 完成对retrofit的封装，并在这里使用到Rxjava，封装使用即可.......
+ * 在这里设置不同的借口，适应不同的数据选择方法.....暂时用TMDB和豆瓣两个为测试，测试两个 1搜索，2，打印信息即可
  */
 
 public class NetWorks extends RetrofitUtils {

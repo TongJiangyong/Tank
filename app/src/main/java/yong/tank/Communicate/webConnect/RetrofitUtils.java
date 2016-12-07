@@ -3,7 +3,7 @@ package yong.tank.Communicate.webConnect;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by hasee on 2016/11/28.
@@ -13,7 +13,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public abstract class RetrofitUtils {
 
     //服务器路径
-    private static final String API_SERVER = "http://192.168.1.122:8080/webService";
+    private static final String API_SERVER = "https://api.themoviedb.org/3";
+
 
     private static Retrofit mRetrofit;
     private static OkHttpClient mOkHttpClient;
@@ -32,7 +33,8 @@ public abstract class RetrofitUtils {
             }
             mRetrofit = new Retrofit.Builder()
                     .baseUrl(API_SERVER + "/")
-                    .addConverterFactory(ScalarsConverterFactory.create())
+                    //.addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .client(mOkHttpClient)
                     .build();
