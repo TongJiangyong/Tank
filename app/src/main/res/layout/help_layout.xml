@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="yong.tank.Title.View.MainActivity">
+    tools:context="yong.tank.Title_Activity.View.MainActivity">
 
     <ImageView
         android:id="@+id/help_bg"

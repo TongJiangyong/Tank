@@ -187,7 +187,7 @@ public class StaticVariable {
    /* 与存储相关的数据 */
     public final static String TANK_USER_INFO="tank_userinfo.bat";
     public final static String TANK_RECORD_INFO="tank_recordinfo.bat";
-    //好像不能通过这种方法获取root
+    //好像不能通过这种方法获取root的internal目录
     public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
     public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
 }

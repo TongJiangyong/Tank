@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
-import yong.tank.SelectTank.modal.PictureInfo;
+import yong.tank.SelectTank_Activity.modal.PictureInfo;
 
 /**
  * Created by hasee on 2016/10/28.

@@ -7,7 +7,8 @@
     android:background="@mipmap/bg_game_2"
     android:orientation="vertical">
 
-    <yong.tank.Game.View.SelectView android:id="@+id/selectView"
+    <yong.tank.Game_Activity.View.SelectView
+        android:id="@+id/selectView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -22,6 +23,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             layout="@layout/select_button" />
-    </yong.tank.Game.View.SelectView>
+    </yong.tank.Game_Activity.View.SelectView>
 
 </RelativeLayout>
