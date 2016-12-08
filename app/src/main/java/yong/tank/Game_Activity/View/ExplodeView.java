@@ -3,7 +3,7 @@ package yong.tank.Game_Activity.View;
 import android.content.Context;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.thread.ExplodeThread;
+import yong.tank.Game_Activity.ViewThread.ExplodeThread;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -22,21 +22,16 @@ public class ExplodeView extends ViewBase{
         super(context, gameDto);
     }
 
-    @Override
-    void initThread() {
-        this.explodeThread = new ExplodeThread(this.gameDto,this.holder);
-        new Thread(this.explodeThread).start();
 
-
-    }
 
     @Override
-    void stopThread() {
+    public void stopThread() {
         this.explodeThread.stopThread();
     }
 
     @Override
     public void startThread() {
+        this.explodeThread = new ExplodeThread(this.gameDto,this.holder);
         new Thread(this.explodeThread).start();
     }
 }

@@ -1,9 +1,10 @@
-package yong.tank.Game_Activity.thread;
+package yong.tank.Game_Activity.ViewThread;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -44,12 +45,13 @@ public class PlayerThread implements Runnable {
 
     public void run() {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
+        Log.i(TAG,"PlayerThread START_1");
         while(flag){
             try {
+                Log.i(TAG,"PlayerThread START");
                 canvas=this.holder.lockCanvas();
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
                 this.gameDto.getPlayerPain().drawSelf(canvas);
-                //Log.d(TAG,"test player....");
             } catch (Exception e) {
                 // TODO: handle exception
             } finally {

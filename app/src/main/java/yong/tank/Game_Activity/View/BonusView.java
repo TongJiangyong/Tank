@@ -3,7 +3,7 @@ package yong.tank.Game_Activity.View;
 import android.content.Context;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.thread.BonusThread;
+import yong.tank.Game_Activity.ViewThread.BonusThread;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -22,18 +22,15 @@ public class BonusView extends ViewBase{
         super(context, gameDto);
     }
 
-    @Override
-    void initThread() {
-        this.bonusThread = new BonusThread(this.gameDto,this.holder);
-        new Thread(this.bonusThread).start();
-    }
+
 
     @Override
-    void stopThread() {
+    public void stopThread() {
         this.bonusThread.stopThread();
     }
     @Override
     public void startThread() {
+        this.bonusThread = new BonusThread(this.gameDto,this.holder);
         new Thread(this.bonusThread).start();
     }
 

@@ -29,7 +29,7 @@ public abstract class ViewBase extends SurfaceView implements SurfaceHolder.Call
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        this.initThread();
+
     }
 
     @Override
@@ -42,9 +42,8 @@ public abstract class ViewBase extends SurfaceView implements SurfaceHolder.Call
         this.stopThread();
     }
 
-    abstract void initThread();
 
-    abstract void stopThread();
+    abstract public void stopThread();
 
-    public abstract void startThread();
+    abstract public void startThread();
 }

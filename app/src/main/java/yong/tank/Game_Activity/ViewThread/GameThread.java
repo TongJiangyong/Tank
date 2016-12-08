@@ -1,4 +1,4 @@
-package yong.tank.Game_Activity.thread;
+package yong.tank.Game_Activity.ViewThread;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,14 +10,14 @@ import yong.tank.Dto.GameDto;
 /**
  * Created by jiangyong_tong on 2016/10/31.
  */
-//TODO 重点：测试GSOM能否转换非规则数据，入bitmap等数据......
-public class BloodThread implements Runnable {
+
+public class GameThread implements Runnable {
     private boolean flag =true;
     private GameDto gameDto;
     private SurfaceHolder holder;
     private Canvas canvas;
-    private static String TAG = "BloodThread";
-    public BloodThread(GameDto gameDto, SurfaceHolder holder) {
+    private static String TAG = "GameThread";
+    public GameThread(GameDto gameDto,SurfaceHolder holder) {
         this.flag =true;
         this.holder = holder;
         this.gameDto = gameDto;
@@ -32,9 +32,11 @@ public class BloodThread implements Runnable {
         while(flag){
             try {
                 synchronized (holder){
+                    //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
                     canvas=this.holder.lockCanvas();
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    gameDto.getBlood().drawSelf(canvas);
+                    //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
+                    gameDto.getMyTank().drawSelf(canvas);
                 }
                 }
             catch (Exception e) {
@@ -46,7 +48,6 @@ public class BloodThread implements Runnable {
                 }
             }
             try {
-                //让装填的过程更流畅
                 Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();

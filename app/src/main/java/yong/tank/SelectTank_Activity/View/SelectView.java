@@ -148,7 +148,7 @@ public class SelectView extends View {
         {
             //Log.d(TAG,"TEST2:"+i+" "+tankPictures[i].getPicture());
             float padding = i*tankPictures[i].getPicture().getHeight()+tankPictures[i].getPicture().getHeight();
-            float tankPicture_x = StaticVariable.SCREEN_WIDTH/16;
+            float tankPicture_x = StaticVariable.SCREEN_WIDTH/20;
             float tankPicture_y = SCREEN_HEIGHT/16+padding;
             canvas.drawBitmap(tankPictures[i].getPicture(), tankPicture_x, tankPicture_y, null);// 绘制背景
             //设置图片的位置:

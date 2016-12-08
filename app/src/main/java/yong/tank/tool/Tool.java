@@ -1,11 +1,17 @@
 package yong.tank.tool;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import yong.tank.SelectTank_Activity.modal.PictureInfo;
+import yong.tank.modal.Point;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -213,5 +219,75 @@ public class Tool {
     public static Bitmap shifang(Bitmap a){
         if (a != null && !a.isRecycled()) {/*a.recycle();*/a=null;}
         return a ;
+    }
+
+    //生成子弹路径
+    //计算bonus的路径
+    public static List<Point> getBonusPath(Bitmap bonusPicture) {
+        //这里关联speed和distance，暂时不处理
+        List<Point> bulletPath = new ArrayList<>();
+        int direction =new Random().nextInt(2); //生成随机方向
+        int bonus_x; //这里应该等于bonuspicture的宽度
+        int bonus_y_init = StaticVariable.SCREEN_HEIGHT/StaticVariable.BONUS_Y;  //初始为1/5处的地方
+        int bonus_y;
+        int speed=StaticVariable.BONUS_SPEED;
+        //TODO 振幅为图片的宽度乘以比例
+        int scale = bonusPicture.getHeight();
+        if(direction==0){
+            bonus_x=0;
+        }else{
+            bonus_x= StaticVariable.SCREEN_WIDTH;
+            speed = -speed;
+        }
+        while(bonus_x>=0&&bonus_x<=StaticVariable.SCREEN_WIDTH){
+            bonus_x=bonus_x+speed;
+            //注意这里除法是易错点
+            bonus_y=bonus_y_init +(int)(Math.sin((double)bonus_x/StaticVariable.BONUS_STEP)*scale);
+            Point point = new Point(bonus_x,bonus_y,0,false);
+            bulletPath.add(point);
+        }
+        return bulletPath;
+    }
+
+
+    /**
+     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     */
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    /**
+     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+     */
+    public static int px2dip(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+    /**
+     * 将px值转换为sp值，保证文字大小不变
+     *
+     * @param pxValue
+     * @param fontScale
+     *            （DisplayMetrics类中属性scaledDensity）
+     * @return
+     */
+    public static int px2sp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
+    /**
+     * 将sp值转换为px值，保证文字大小不变
+     *
+     * @param spValue
+     * @param fontScale
+     *            （DisplayMetrics类中属性scaledDensity）
+     * @return
+     */
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
     }
 }

@@ -1,4 +1,4 @@
-package yong.tank.Game_Activity.thread;
+package yong.tank.Game_Activity.ViewThread;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

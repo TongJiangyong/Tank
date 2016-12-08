@@ -3,7 +3,7 @@ package yong.tank.Game_Activity.View;
 import android.content.Context;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.thread.GameThread;
+import yong.tank.Game_Activity.ViewThread.GameThread;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -23,24 +23,17 @@ public class GameView extends ViewBase{
         super(context, gameDto);
     }
 
-    @Override
-    void initThread() {
-        this.gameThread = new GameThread(this.gameDto,this.holder);
-        new Thread(this.gameThread).start();
-        //TODO 测试发现，如果将explode的线程，写在这里，会发生很严重的问题.....
-        //this.explodeThread = new ExplodeThread(this.gameDto,this.holder);
-        //new Thread(this.explodeThread).start();
 
-
-    }
 
     @Override
-    void stopThread() {
+    public void stopThread() {
         this.gameThread.stopThread();
         //this.explodeThread.stopThread();
     }
+
     @Override
     public void startThread() {
+        this.gameThread = new GameThread(this.gameDto,this.holder);
         new Thread(this.gameThread).start();
     }
 

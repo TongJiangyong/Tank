@@ -16,9 +16,12 @@ import yong.tank.modal.SelectButton;
  */
 
 public class GameDto {
-    //这里最好每一个modal，都会在里面.....
+    //初始化必备的
+    private int tankType ;
+    private int mapType ;
     private MyTank myTank;
     private Blood blood;
+    //这里最好每一个modal，都会在里面.....
     private PlayerPain playerPain;
     private List<Explode> explodes;
     private Bonus bonus = null;
@@ -74,4 +77,19 @@ public class GameDto {
         this.selectButtons = selectButtons;
     }
 
+    public int getTankType() {
+        return tankType;
+    }
+
+    public void setTankType(int tankType) {
+        this.tankType = tankType;
+    }
+
+    public int getMapType() {
+        return mapType;
+    }
+
+    public void setMapType(int mapType) {
+        this.mapType = mapType;
+    }
 }

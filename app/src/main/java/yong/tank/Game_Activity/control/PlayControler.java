@@ -40,8 +40,8 @@ public class PlayControler {
         this.gameDto=gameDto;
         this.gameControler=gameControler;
     }
-    //TODO 这个没弄懂，看API弄懂一下.....
-    //TODO，这个逻辑，应该写在control中.....
+
+    //这个逻辑，应该写在control中，但是由于水平比较低，相当于另外拉了一个controler.....
     public void setMotion(MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             /**测试发现，只有最后第一个手指的down，才会触发这个**/
@@ -131,7 +131,7 @@ public class PlayControler {
                                                                                         tankDegree,
                                                                                         true));
                             //这一段代码加了，可以在绘制出第三象限时，停止prefire
-                            //测试发现，加了以后，游戏性很差......
+                            //测试发现，加了以后，游戏性很差，所以就不加了......
 /*                            if(!this.gameDto.getMyTank().isOutDirection(dx,dy)){
                                 releasePoint.setPointNull();
                                 startPoint.setPointNull();

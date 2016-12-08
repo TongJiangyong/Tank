@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -26,10 +25,14 @@ import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Dto.GameDto;
 import yong.tank.Dto.testDto;
 import yong.tank.R;
+import yong.tank.modal.Blood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
+import yong.tank.modal.MyTank;
+import yong.tank.modal.PlayerPain;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
+import yong.tank.tool.Tool;
 
 /**
  * Created by hasee on 2016/11/10.
@@ -44,15 +47,18 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private Timer timerBonus;
     private Timer timerCommunnicate;
     private boolean connectFlag =false;
-    //TODO 测试代码
+    //TODO 测试通讯的代码
     private ClientCommunicate clientCommunicate;
-    Gson gson = new Gson();
-
+    private Gson gson = new Gson();
 
 
     public GameService(GameDto gameDto,Context context) {
         this.gameDto = gameDto;
         this.context = context;
+        //TODO 完成游戏启动前初始化的相关配置工作....
+        this.initLocal();
+        //TODO 完成远程连接工作后启动
+        //this.initRemote();
     }
 
     //设置handle的处理
@@ -295,7 +301,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             //随机产生一个bonus，注意这里的bonus和子弹是绑定的
             int bonusType = new Random().nextInt(StaticVariable.BONUSPICTURE.length);
             Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(),StaticVariable.BONUSPICTURE[bonusType]);//0~length-1之间的数
-            List<Point> bonusPath =getBonusPath(bonusPicture);
+            List<Point> bonusPath =Tool.getBonusPath(bonusPicture);
             Bonus bonus = new Bonus(bonusPicture,bonusPath,bonusType);
             //设置bonus
             gameDto.setBonus(bonus);
@@ -322,32 +328,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         }
     }
 
-    //计算bonus的路径
-    private List<Point> getBonusPath(Bitmap bonusPicture) {
-        //这里关联speed和distance，暂时不处理
-        List<Point> bulletPath = new ArrayList<>();
-        int direction =new Random().nextInt(2); //生成随机方向
-        int bonus_x; //这里应该等于bonuspicture的宽度
-        int bonus_y_init = StaticVariable.SCREEN_HEIGHT/StaticVariable.BONUS_Y;  //初始为1/5处的地方
-        int bonus_y;
-        int speed=StaticVariable.BONUS_SPEED;
-        //TODO 振幅为图片的宽度乘以比例
-        int scale = bonusPicture.getHeight();
-        if(direction==0){
-            bonus_x=0;
-        }else{
-            bonus_x= StaticVariable.SCREEN_WIDTH;
-            speed = -speed;
-        }
-        while(bonus_x>=0&&bonus_x<=StaticVariable.SCREEN_WIDTH){
-            bonus_x=bonus_x+speed;
-            //注意这里除法是易错点
-            bonus_y=bonus_y_init +(int)(Math.sin((double)bonus_x/StaticVariable.BONUS_STEP)*scale);
-            Point point = new Point(bonus_x,bonus_y,0,false);
-            bulletPath.add(point);
-        }
-        return bulletPath;
-    }
+
 
     public ClientCommunicate getClientCommunicate() {
         return clientCommunicate;
@@ -382,4 +363,50 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
 
+    /********************************下面是与初始化相关的代码***********************************************/
+    /***初始化主要包括两个过程
+     * 1、本地数据的初始化
+     * 2、远程连接成功后，数据的初始化，
+     * 3两者初始化成功后，才能进行数据的通行
+     * **/
+
+    private void initLocal() {
+        //TODO 初始化explode
+        for(int i=0;i<StaticVariable.EXPLODESPICTURE_GROUND.length;i++){
+            StaticVariable.EXPLODESONGROND[i]=BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.EXPLODESPICTURE_GROUND[i]);
+        }
+        for(int i=0;i<StaticVariable.EXPLODESPICTURE_TANKE.length;i++){
+            StaticVariable.EXPLODESONTANK[i]=BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.EXPLODESPICTURE_TANKE[i]);
+        }
+        //TODO 测试初始化tank  测试添加的东西在gameservice中试试
+        MyTank myTank =initTank(this.gameDto.getTankType());
+        gameDto.setMyTank(myTank);
+        //TODO 测试初始化玩家控制图标
+        PlayerPain playerPain = new PlayerPain();
+        gameDto.setMyTank(myTank);
+        gameDto.setPlayerPain(playerPain);
+        //TODO 测试初始化装载血条的视图
+        Blood blood = initBlood(true);
+        gameDto.setBlood(blood);
+    }
+
+    private MyTank initTank(int tankType){
+        Bitmap tankPicture_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.TANKBASCINFO[tankType].getPicture());
+        Bitmap tankPicture = Tool.reBuildImg(tankPicture_temp,0,1,1,false,true);
+        Bitmap armPicture = BitmapFactory.decodeResource(this.context.getResources(), R.mipmap.gun);
+        MyTank tank = new MyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
+        return tank;
+    }
+    private Blood initBlood(Boolean isMyBlood){
+        //TODO 如果是true会找其他图片
+        //TODO 这里暂时先别做.....以后再改....
+        Bitmap blood_picture=null;
+        blood_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BLOOD);
+        Bitmap power_picture=null;
+        power_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.POWERR);
+        Bitmap bloodBlock_picture=null;
+        bloodBlock_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BLOODBLOCK);
+        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,1,1);
+        return blood;
+    }
 }
