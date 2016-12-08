@@ -54,6 +54,10 @@ public class StaticVariable {
     public static int[] MAPPICTURE={
             R.mipmap.bg_game,
     };
+    //远程设备的基本信息 高宽、密度
+    public static int REMOTE_SCREEN_WIDTH;
+    public static int REMOTE_SCREEN_HEIGHT;
+    public static int REMOTE_DENSITY;
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     public static TankBascInfo[] TANKBASCINFO = {
             new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A,有多牛呢？"),
@@ -67,8 +71,8 @@ public class StaticVariable {
             "   程序中代码和程序中所用到图片等资源都来源于网络\n" +
             "   代码和参考的用例程序均托管在github中，地址为：\n" +
             "   https://github.com/TongJiangyong/Tank";
-    public static int selectWordSize=40;
-    public static int selectDescribeSize=60;
+    public static int SELECT_WORD_SIZE =13;
+    public static int SELECT_DECRIBE_SIZE =15;
     //设置程序画笔的统一宽度
     public static int STROKEWIDTH=3;
     public static int BLOOD =  R.mipmap.blood;

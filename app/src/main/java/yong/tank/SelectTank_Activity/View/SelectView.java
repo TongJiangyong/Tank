@@ -23,6 +23,7 @@ import static yong.tank.tool.StaticVariable.SCREEN_HEIGHT;
  * P并不能直接提供数据给view层
  * P只能通过View层暴露的方法操控view的行为
  * P/C只能通过dto间接的设置数据
+ * //这里的硬编码很麻烦，不要再动了.....尼玛
  */
 
 public class SelectView extends View {
@@ -178,16 +179,16 @@ public class SelectView extends View {
         //绘制tank的基本信息 在预览图像下面绘制 顺序为：代号，血量，力量，速度
         //TODO 绘制说明文字 硬编码
         total_X=des_selectTank.left;
-        blood_X=total_X+77;
+        blood_X=total_X+bascMeasure.getWidth()*3;
         name_Y=des_selectTank.left;
         blood_Y=name_Y+codeName.getHeight();
         power_Y=blood_Y+bloodMeasure.getHeight();
         speed_Y=power_Y+powerMeasure.getHeight();
-        describe_Y=speed_Y+speedMeasure.getHeight()+StaticVariable.selectDescribeSize+4;
+        describe_Y=speed_Y+speedMeasure.getHeight()+Tool.sp2px(context.getResources().getDisplayMetrics().scaledDensity,StaticVariable.SELECT_DECRIBE_SIZE)+3;
         canvas.drawBitmap(codeName,des_selectTank.left,name_Y, null);// 绘制代号
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStrokeWidth(3);
-        paint.setTextSize(StaticVariable.selectWordSize);
+        paint.setStrokeWidth(StaticVariable.STROKEWIDTH);
+        paint.setTextSize(Tool.sp2px(this.context.getResources().getDisplayMetrics().scaledDensity,StaticVariable.SELECT_WORD_SIZE));
         paint.setColor(Color.CYAN);
         paint.setColor(Color.RED);
         canvas.drawBitmap(bloodMeasure,total_X,blood_Y, null);// 绘制血量
@@ -195,7 +196,7 @@ public class SelectView extends View {
         canvas.drawBitmap(speedMeasure,total_X,speed_Y, null);// 绘制速度
 
         this.drawTankInfo(canvas ,selectedTank); //绘制初始化
-        //canvas.drawText("tank很牛A", total_X+90, name_Y+StaticVariable.selectWordSize, paint);// 绘制代号名称
+        //canvas.drawText("tank很牛A", total_X+90, name_Y+StaticVariable.SELECT_WORD_SIZE, paint);// 绘制代号名称
 
         //canvas.drawBitmap(bascMeasure,total_X+77+20,blood_Y, null);// 绘制基本血条
 
@@ -205,21 +206,22 @@ public class SelectView extends View {
     public void drawTankInfo(Canvas canvas ,int i){
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStrokeWidth(StaticVariable.STROKEWIDTH);
-        paint.setTextSize(StaticVariable.selectWordSize);
+        paint.setTextSize(Tool.sp2px(this.context.getResources().getDisplayMetrics().scaledDensity,StaticVariable.SELECT_WORD_SIZE));
         paint.setColor(Color.RED);
-        canvas.drawText(StaticVariable.TANKBASCINFO[i].getTankName(), total_X+90, name_Y+StaticVariable.selectWordSize, paint);// 绘制代号名称
+        //绘制代号
+        canvas.drawText(StaticVariable.TANKBASCINFO[i].getTankName(), total_X+bascMeasure.getWidth()*4, name_Y+Tool.sp2px(context.getResources().getDisplayMetrics().scaledDensity,StaticVariable.SELECT_WORD_SIZE), paint);// 绘制代号名称
 
         this.drawDramticInfo(canvas,StaticVariable.TANKBASCINFO[i].getBlood(),blood_Y);// 绘制血条
         this.drawDramticInfo(canvas,StaticVariable.TANKBASCINFO[i].getPower(),power_Y);// 绘制力量
         this.drawDramticInfo(canvas,StaticVariable.TANKBASCINFO[i].getSpeed(),speed_Y);// 绘制速度
         //这里的绘制可能需要多行，处理即可，这里就不做计算了
-        paint.setTextSize(StaticVariable.selectDescribeSize);
+        paint.setTextSize(Tool.sp2px(this.context.getResources().getDisplayMetrics().scaledDensity,StaticVariable.SELECT_DECRIBE_SIZE));
         canvas.drawText(StaticVariable.TANKBASCINFO[i].getDescribeInfo(), total_X, describe_Y, paint); //绘制describe
     }
     //绘制基本的方法
     public void drawDramticInfo(Canvas canvas ,int num,int y){
         int circle = num/10;
-        int measureInterval = 20;
+        int measureInterval = bascMeasure.getWidth()*4/5;
         //Log.d(TAG,"************************");
         for(int i=0;i<circle;i++)
         {
