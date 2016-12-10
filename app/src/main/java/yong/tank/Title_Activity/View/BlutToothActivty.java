@@ -24,7 +24,7 @@ import java.util.Set;
 
 import yong.tank.R;
 
-public class ListDevice extends Activity {
+public class BlutToothActivty extends Activity {
 
 	private ListView ListOld = null;
 	private ListView ListNew = null;

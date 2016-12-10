@@ -204,4 +204,12 @@ public class StaticVariable {
     //好像不能通过这种方法获取root的internal目录
     public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
     public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
+
+
+
+
+    /* 服务器初始化相关的ip */
+    //服务器路径
+    public static  String API_SERVER = "http://192.168.1.122:8080/webService";
+    public static  String API_SERVER_XIAN = "http://115.154.191.5:8080/webService";
 }

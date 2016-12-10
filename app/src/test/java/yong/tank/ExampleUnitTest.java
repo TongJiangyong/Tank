@@ -3,7 +3,6 @@ package yong.tank;
 import org.junit.Test;
 
 import retrofit2.Retrofit;
-import yong.tank.Communicate.webConnect.Retrofit2Base;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +16,7 @@ public class ExampleUnitTest {
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://api.github.com/")
             .build();
-    Retrofit2Base repo = retrofit.create(Retrofit2Base.class);
+    //Retrofit2Base repo = retrofit.create(Retrofit2Base.class);
     private static final String TAG = "ExampleUnitTest";
 
 

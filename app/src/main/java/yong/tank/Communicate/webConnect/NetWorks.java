@@ -34,10 +34,13 @@ public class NetWorks extends RetrofitUtils {
         Observable<String> getUserInfo(@Query("action") String action,@Query("userId") int userId);
 
         @POST("WebService")
-        Observable<String> savaUserInfo(@Query("action") String action,@Query("userId") int userId);
+        Observable<String> addNewUser(@Query("action") String action,@Query("userInfo") String userInfo);
 
         @POST("WebService")
-        Observable<String> getRoomList(@Query("action") String action,@Query("userId") int userId);
+        Observable<String> userLogin(@Query("action") String action,@Query("userInfo") String userInfo);
+
+        @POST("WebService")
+        Observable<String> getRoomList(@Query("action") String action,@Query("userId") int state);
     }
 
     //测试连接状态
@@ -49,6 +52,24 @@ public class NetWorks extends RetrofitUtils {
     public static void getUserInfo(String action,int userId,Observer<String> observer){
         setSubscribe(service.getUserInfo(action,userId),observer);
     }
+
+    //用户登录
+    public static void userLogin(String action, String userInfo,Observer<String> observer){
+        setSubscribe(service.userLogin(action,userInfo),observer);
+    }
+
+    //用户注册
+    public static void addNewUser(String action, String userInfo,Observer<String> observer){
+        setSubscribe(service.addNewUser(action,userInfo),observer);
+    }
+
+    //获取所有房间信息
+    public static void getRoomList(String action, int state,Observer<String> observer){
+        setSubscribe(service.getRoomList(action,state),observer);
+    }
+
+
+
 
 
     //以后讨论一下这里定义为静态的是否可行.....这里就暂时不处理了.....

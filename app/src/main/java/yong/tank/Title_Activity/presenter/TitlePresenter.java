@@ -1,8 +1,12 @@
 package yong.tank.Title_Activity.presenter;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -17,9 +21,11 @@ import yong.tank.Communicate.webConnect.NetWorks;
 import yong.tank.Help_Activity.View.HelpActivity;
 import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.SelectTank_Activity.View.SelectActivity;
+import yong.tank.Title_Activity.View.BlutToothActivty;
 import yong.tank.Title_Activity.View.ITitleView;
-import yong.tank.Title_Activity.View.ListDevice;
+import yong.tank.Title_Activity.View.LoginActivity;
 import yong.tank.Title_Activity.View.MainActivity;
+import yong.tank.Title_Activity.View.RegisterActivity;
 import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 
@@ -106,7 +112,7 @@ public class TitlePresenter implements ITitlePresenter {
         if(StaticVariable.BLUE_STATE != 1){
             if(bluetoothadpter.getState() == bluetoothadpter.STATE_ON){
                 Log.i(TAG,"show device");
-                Intent intent = new Intent(this.context,ListDevice.class);
+                Intent intent = new Intent(this.context,BlutToothActivty.class);
                 //建立clientBluetooth的对象
                 clientBluetooth=this.setupChat();
                 clientBluetooth.setMyHandle(myHandler);
@@ -145,7 +151,15 @@ public class TitlePresenter implements ITitlePresenter {
 
     @Override
     public void toNet(){
-        //TODO 测试蓝牙方法
+        //首先出来选择服务器的dialog，跳出来选择
+        //TODO 1、判断是否联网 ，2、选择连入的服务器 ，3、判断 是否有用户信息，没有，则区分跳转 4、跳转页面
+        ConnectivityManager cwjManager=(ConnectivityManager)this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(cwjManager.getActiveNetworkInfo().isAvailable()){
+            this.serviceChoseDialog();
+
+        }else{
+            titleView.showToast("您的设备未联网啊，请检查设备网络状况...");
+        }
 /*        if(this.clientBluetooth.getBluetoothConnected()==null){
             titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
         }else{
@@ -153,7 +167,9 @@ public class TitlePresenter implements ITitlePresenter {
             clientBluetooth.sendInfo("test blutooth");
             titleView.showToast("联网模式开发中...&& 蓝牙发送消息");
         }*/
-        //测试连接是否成功
+
+/*        //测试连接是否成功
+与web测试相关
         NetWorks.connectTest("connectedTest",new Observer<String>() {
             @Override
             public void onCompleted() {}
@@ -194,8 +210,83 @@ public class TitlePresenter implements ITitlePresenter {
 
             }
         });
-        Log.i(TAG,"sync or asyc_2");
+        Log.i(TAG,"sync or asyc_2");*/
     }
+
+    public void serviceChoseDialog(){
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(this.context);
+        //normalDialog.setIcon(R.drawable.icon_dialog);
+        normalDialog.setTitle("服务器选择");
+        normalDialog.setMessage("请选择要接入的服务器");
+        normalDialog.setPositiveButton("西安服务器",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO 测试服务器连接情况，并连接 以后处理
+                        //API_SERVER = API_SERVER_XIAN;
+                        serviceConnectTest();
+                        toLoginOrRegister();
+                    }
+                });
+        normalDialog.setNegativeButton("苏州服务器",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //TODO 测试服务器连接情况，默认服务器
+                        //API_SERVER = API_SERVER;
+                        serviceConnectTest();
+                        toLoginOrRegister();
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
+
+    public void toLoginOrRegister(){
+        Log.i(TAG,"选择服务器完毕");
+        User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
+        if(user!=null){
+            titleView.showToast("检测到您已经在该服务器注册过用户，将跳转到登录界面");
+            //titleView.showToast("帮助模块开发中..");
+            Intent intent = new Intent(context,LoginActivity.class);
+            context.startActivity(intent);
+        }else{
+            titleView.showToast("检测到您未在该服务器注册用户，将跳转到注册界面");
+            Intent intent = new Intent(context,RegisterActivity.class);
+            context.startActivity(intent);
+        }
+    }
+
+
+    public void serviceConnectTest(){
+        NetWorks.connectTest("connectedTest",new Observer<String>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"connected error :"+e);
+                titleView.showToast("服务器连接失败--->错误1");
+            }
+
+            @Override
+            public void onNext(String info) {
+                Log.i(TAG,"connected info :"+info);
+                if(info.equals("connected")){
+                    titleView.showToast("服务器连接成功");
+                }else{
+                    titleView.showToast("服务器连接失败--->错误2");
+                }
+            }
+        });
+    }
+
     @Override
     public void tohelp(){
         //titleView.showToast("帮助模块开发中..");
