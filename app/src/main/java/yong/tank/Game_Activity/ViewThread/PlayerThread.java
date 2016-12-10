@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -23,12 +22,12 @@ public class PlayerThread implements Runnable {
 
     /***************/
     private Paint paint;
-    private int outsideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
-    private int outsideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
-    private int outsideCircle_r = StaticVariable.SCREEN_WIDTH*1/10;
-    private float insideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
-    private float insideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
-    private float insideCircle_r = StaticVariable.SCREEN_WIDTH*1/20;
+    private int outsideCircle_x = StaticVariable.LOCAL_SCREEN_WIDTH *4/5;
+    private int outsideCircle_y = StaticVariable.LOCAL_SCREEN_HEIGHT *3/4;
+    private int outsideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/10;
+    private float insideCircle_x = StaticVariable.LOCAL_SCREEN_WIDTH *4/5;
+    private float insideCircle_y = StaticVariable.LOCAL_SCREEN_HEIGHT *3/4;
+    private float insideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/20;
     /***************/
 
     public PlayerThread(GameDto gameDto, SurfaceHolder holder) {
@@ -45,10 +44,10 @@ public class PlayerThread implements Runnable {
 
     public void run() {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
-        Log.i(TAG,"PlayerThread START_1");
+        //Log.i(TAG,"PlayerThread START_1");
         while(flag){
             try {
-                Log.i(TAG,"PlayerThread START");
+                //Log.i(TAG,"PlayerThread START");
                 canvas=this.holder.lockCanvas();
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
                 this.gameDto.getPlayerPain().drawSelf(canvas);

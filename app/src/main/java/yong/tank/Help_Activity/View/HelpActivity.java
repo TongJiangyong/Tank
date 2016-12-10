@@ -46,8 +46,8 @@ public class HelpActivity extends Activity implements View.OnClickListener{
         //设置背景图片，因为要进行拉伸没办法，必须要这么做.....
         Bitmap help_bg_temp  = BitmapFactory.decodeResource(getResources(),R.mipmap.callboard);
         //TODO 将图像放大N倍的硬编码,不知道为啥，这里的图片设置，很怪异,大概是这个浮动的影响，而且经常报错误out of memery
-        //float size = (float) ((float)(StaticVariable.SCREEN_WIDTH)/(float)help_bg_temp.getWidth()*2.5);
-        //Log.w(TAG,"SCREEN_WIDTH:"+StaticVariable.SCREEN_WIDTH +"  help_bg_temp:"+help_bg_temp.getWidth()+"  size:"+size +"  help_bg_temp_h:"+help_bg_temp.getHeight());
+        //float size = (float) ((float)(StaticVariable.LOCAL_SCREEN_WIDTH)/(float)help_bg_temp.getWidth()*2.5);
+        //Log.w(TAG,"LOCAL_SCREEN_WIDTH:"+StaticVariable.LOCAL_SCREEN_WIDTH +"  help_bg_temp:"+help_bg_temp.getWidth()+"  size:"+size +"  help_bg_temp_h:"+help_bg_temp.getHeight());
         help_bg = Tool.reBuildImg(help_bg_temp,0,7,7,false,false);
         //Log.w(TAG,"help_bg_temp:"+help_bg.getWidth());
         Tool.releaseBitmap(help_bg_temp);

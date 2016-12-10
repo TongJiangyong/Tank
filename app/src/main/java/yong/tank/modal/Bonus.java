@@ -41,7 +41,7 @@ public class Bonus {
             pathPosition++;
         }
         //如果超出界线，则停止绘制
-            if(bonus_x> StaticVariable.SCREEN_WIDTH||bonus_x<0){
+            if(bonus_x> StaticVariable.LOCAL_SCREEN_WIDTH ||bonus_x<0){
                 this.setDrawFlag(false);
             }
     }

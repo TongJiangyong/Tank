@@ -32,8 +32,6 @@ public class StaticVariable {
             "yong.tank.Game_Activity.View.ExplodeView",
 };
     public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
-    public static int SCREEN_WIDTH;
-    public static int SCREEN_HEIGHT;
     public final static int[] GAMEMODE= {1,2,3};
     public static int[] TANKPICTURE={
             R.mipmap.tank_0,
@@ -58,6 +56,10 @@ public class StaticVariable {
     public static int REMOTE_SCREEN_WIDTH;
     public static int REMOTE_SCREEN_HEIGHT;
     public static int REMOTE_DENSITY;
+    //本地设备的基本信息 高宽、密度
+    public static float LOCAL_DENSITY;
+    public static int LOCAL_SCREEN_WIDTH;
+    public static int LOCAL_SCREEN_HEIGHT;
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     public static TankBascInfo[] TANKBASCINFO = {
             new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A,有多牛呢？"),
@@ -89,10 +91,10 @@ public class StaticVariable {
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     public static BulletBascInfo[] BUTTLE_BASCINFOS = {
             new BulletBascInfo(0,150,0.2,R.mipmap.origin,"普通弹"), //0
-            new BulletBascInfo(0,120,0.4,R.mipmap.armor,"穿甲弹"),  //1
-            new BulletBascInfo(0,140,0.3,R.mipmap.ice,"冰弹"),    //2
-            new BulletBascInfo(0,150,0.2,R.mipmap.s_s,"加速弹"),   //3
-            new BulletBascInfo(0,150,50, s,"子母弹_母"),
+            new BulletBascInfo(0,130,0.4,R.mipmap.armor,"穿甲弹"),  //1
+            new BulletBascInfo(0,130,0.3,R.mipmap.ice,"冰弹"),    //2
+            new BulletBascInfo(0,130,0.2,R.mipmap.s_s,"加速弹"),   //3
+            new BulletBascInfo(0,130,50, s,"子母弹_母"),
     };
     //初始化子弹的类型
     public static int ORIGIN = 0;
@@ -109,8 +111,8 @@ public class StaticVariable {
             {StaticVariable.S_S,StaticVariable.BUTTON_NUM_ORIGN},
     };
     //初始化物理场  这里的物理场应该和手机屏幕适应，但是没有想到好方法
-    public static double GRAVITY=11;
-    public static double INTERVAL_TIME = 0.5;    //初始化与路径相关参数
+    public static double GRAVITY=20;
+    public static double INTERVAL_TIME = 0.3;    //初始化与路径相关参数
     public static  int PREVIEWPATHLENGTH = 50; //priewpath有12个点,测试使用50个
     public static int PATHLENGTH  = 50; //path有40个点
 
@@ -147,8 +149,8 @@ public class StaticVariable {
            R.mipmap.s_1,//F->加速弹
            // R.mipmap.tank_4,  暂时不加这个，以后再加......
    };
-    public static int BONUS_SPEED = 10;
-    public static int BONUS_STEP =50 ;
+    public static int BONUS_SPEED = 7;
+    public static int BONUS_STEP =90 ;
     public static final int BONUS_Y = 5;
     //与message相关
     //gameservice中toast更新

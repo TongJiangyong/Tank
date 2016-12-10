@@ -15,7 +15,7 @@ import yong.tank.SelectTank_Activity.modal.TankPicture;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
-import static yong.tank.tool.StaticVariable.SCREEN_HEIGHT;
+import static yong.tank.tool.StaticVariable.LOCAL_SCREEN_HEIGHT;
 
 /**
  * Created by hasee on 2016/10/27.
@@ -118,28 +118,28 @@ public class SelectView extends View {
         //TODO 这里的绘制用xml文件配置
         //第一个
         Rect srcTank_left = new Rect(0, 0, brackets_left.getWidth(), brackets_left.getHeight());
-        Rect dstTank_left = new Rect(StaticVariable.SCREEN_WIDTH/4-brackets_left.getWidth()*2,
-                SCREEN_HEIGHT/8,
-                StaticVariable.SCREEN_WIDTH/4-brackets_left.getWidth(),
-                SCREEN_HEIGHT*7/8);               //这里对图像进行了拉伸
+        Rect dstTank_left = new Rect(StaticVariable.LOCAL_SCREEN_WIDTH /4-brackets_left.getWidth()*2,
+                LOCAL_SCREEN_HEIGHT /8,
+                StaticVariable.LOCAL_SCREEN_WIDTH /4-brackets_left.getWidth(),
+                LOCAL_SCREEN_HEIGHT *7/8);               //这里对图像进行了拉伸
         //第二个
         Rect srcTank_right = new Rect(0, 0, brackets_left.getWidth(), brackets_left.getHeight());
-        Rect dstTank_right = new Rect(StaticVariable.SCREEN_WIDTH/2-brackets_right.getWidth()*2,
-                SCREEN_HEIGHT/8,
-                StaticVariable.SCREEN_WIDTH/2-brackets_right.getWidth(),
-                SCREEN_HEIGHT*7/8);                                  //这里对图像进行了拉伸
+        Rect dstTank_right = new Rect(StaticVariable.LOCAL_SCREEN_WIDTH /2-brackets_right.getWidth()*2,
+                LOCAL_SCREEN_HEIGHT /8,
+                StaticVariable.LOCAL_SCREEN_WIDTH /2-brackets_right.getWidth(),
+                LOCAL_SCREEN_HEIGHT *7/8);                                  //这里对图像进行了拉伸
         //第三个
         Rect srcMap_left = new Rect(0, 0, brackets_left.getWidth(), brackets_left.getHeight());
-        Rect dstMap_left = new Rect(StaticVariable.SCREEN_WIDTH*3/4-brackets_right.getWidth()*2,
-                SCREEN_HEIGHT/8,
-                StaticVariable.SCREEN_WIDTH*3/4-brackets_right.getWidth(),
-                SCREEN_HEIGHT*7/8);                                  //这里对图像进行了拉伸
+        Rect dstMap_left = new Rect(StaticVariable.LOCAL_SCREEN_WIDTH *3/4-brackets_right.getWidth()*2,
+                LOCAL_SCREEN_HEIGHT /8,
+                StaticVariable.LOCAL_SCREEN_WIDTH *3/4-brackets_right.getWidth(),
+                LOCAL_SCREEN_HEIGHT *7/8);                                  //这里对图像进行了拉伸
         //第四个
         Rect srcMap_right = new Rect(0, 0, brackets_left.getWidth(), brackets_left.getHeight());
-        Rect dstMap_right = new Rect(StaticVariable.SCREEN_WIDTH-brackets_right.getWidth()*2,
-                SCREEN_HEIGHT/8,
-                StaticVariable.SCREEN_WIDTH-brackets_right.getWidth(),
-                SCREEN_HEIGHT*7/8);                                  //这里对图像进行了拉伸
+        Rect dstMap_right = new Rect(StaticVariable.LOCAL_SCREEN_WIDTH -brackets_right.getWidth()*2,
+                LOCAL_SCREEN_HEIGHT /8,
+                StaticVariable.LOCAL_SCREEN_WIDTH -brackets_right.getWidth(),
+                LOCAL_SCREEN_HEIGHT *7/8);                                  //这里对图像进行了拉伸
         canvas.drawBitmap(brackets_left, srcTank_left, dstTank_left, null);// 绘制背景
         canvas.drawBitmap(brackets_right, srcTank_right, dstTank_right, null);// 绘制背景
         canvas.drawBitmap(brackets_left, srcMap_left, dstMap_left, null);// 绘制背景
@@ -149,8 +149,8 @@ public class SelectView extends View {
         {
             //Log.d(TAG,"TEST2:"+i+" "+tankPictures[i].getPicture());
             float padding = i*tankPictures[i].getPicture().getHeight()+tankPictures[i].getPicture().getHeight();
-            float tankPicture_x = StaticVariable.SCREEN_WIDTH/20;
-            float tankPicture_y = SCREEN_HEIGHT/16+padding;
+            float tankPicture_x = StaticVariable.LOCAL_SCREEN_WIDTH /20;
+            float tankPicture_y = LOCAL_SCREEN_HEIGHT /16+padding;
             canvas.drawBitmap(tankPictures[i].getPicture(), tankPicture_x, tankPicture_y, null);// 绘制背景
             //设置图片的位置:
             Tool.setRect(tankPictures[i],(int)tankPicture_x,(int)tankPicture_y);
@@ -160,8 +160,8 @@ public class SelectView extends View {
         for(int i=0;i<mapPictures.length;i++)
         {
             float padding = i*mapPictures[i].getPicture().getHeight()+mapPictures[i].getPicture().getHeight();
-            float mapPicture_x =StaticVariable.SCREEN_WIDTH/2+mapPictures[i].getPicture().getWidth()/4;
-            float mapPicture_y = StaticVariable.SCREEN_HEIGHT/16+padding;
+            float mapPicture_x =StaticVariable.LOCAL_SCREEN_WIDTH /2+mapPictures[i].getPicture().getWidth()/4;
+            float mapPicture_y = StaticVariable.LOCAL_SCREEN_HEIGHT /16+padding;
             canvas.drawBitmap(mapPictures[i].getPicture(),mapPicture_x ,mapPicture_y , null);// 绘制背景
             Tool.setRect(mapPictures[i],(int)mapPicture_x,(int)mapPicture_y);
         }

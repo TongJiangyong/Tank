@@ -54,10 +54,10 @@ public class MyTank implements Tank{
         this.tankType = tankType;
         this.tankBascInfo = tankBascInfo;
         this.armPicture=armPicture;
-        this.tankPosition_x=StaticVariable.SCREEN_WIDTH/4-this.tankPicture.getWidth()/2;
-        //this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*3/4;
+        this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH /4-this.tankPicture.getWidth()/2;
+        //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
-        this.tankPosition_y=StaticVariable.SCREEN_HEIGHT*2/3;
+        this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
         Log.w(TAG,"current bullet num:"+selectedBulletsNum);
     }
 
@@ -66,23 +66,28 @@ public class MyTank implements Tank{
         //TODO 考虑策略模式优化
         if(tankPosition_x<0){
             this.tankPosition_x=0;
-        }else if((tankPosition_x+this.tankPicture.getWidth())>StaticVariable.SCREEN_WIDTH*3/7){
-            this.tankPosition_x=(StaticVariable.SCREEN_WIDTH*3/7-this.tankPicture.getWidth());
+        }else if((tankPosition_x+this.tankPicture.getWidth())>StaticVariable.LOCAL_SCREEN_WIDTH *3/7){
+            this.tankPosition_x=(StaticVariable.LOCAL_SCREEN_WIDTH *3/7-this.tankPicture.getWidth());
         }else{
-            this.tankPosition_x+=((tankBascInfo.getSpeed()/10)*tankDirectrion);
+            //由于这里有余数，所以会让分辨率产生损失.....感觉这样没办法处理.....
+            //Log.i(TAG,"move:"+(Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())));
+            this.tankPosition_x+=((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
         }
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         //Bitmap armPicture_tmp_2 = Tool.reBuildImg(armPicture_tmp,0,1,1,true,false);
-        //TODO 武器位置的硬编码
-        int weaponPoxitionTemp_x = this.tankPosition_x+110;
-        int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+65;
+        //TODO 注意这两种方法，硬编码可以让不同分辨率的屏幕适应......
+//        Log.i(TAG,"width:"+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22));
+        int weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*2/5;
+        int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22);
         canvas.drawBitmap(armPicture_tmp,
                 weaponPoxitionTemp_x,
                 //0,0,
                 //注意这种角度的变化方法.....一定要加上图片本身的宽度....
                 weaponPoxitionTemp_y,
                 null);
+        //坦克画在arm的后面
+
         // TODO 这里weapon的点要更精细一点
         this.weaponPoxition_x = weaponPoxitionTemp_x+armPicture_tmp.getWidth();
         this.weaponPoxition_y = weaponPoxitionTemp_y;

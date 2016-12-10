@@ -8,9 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import yong.tank.Dto.GameDto;
 import yong.tank.R;
 import yong.tank.modal.Bullet;
@@ -99,8 +96,8 @@ public class PlayControler {
                             testFlag++;
                             //Log.w(TAG,"ACTION_MOVE pointerCount_3:"+pointerCount_3);
                             if(testFlag==pointerCount_3){
-                                this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH*4/5);
-                                this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT*3/4);
+                                this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH *4/5);
+                                this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT *3/4);
                                 this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
                             }
                         }
@@ -125,11 +122,11 @@ public class PlayControler {
                             countBulletPath(this.gameDto.getMyTank().getTankCenter(),dx,dy);
                             //TODO 没办法，传入负值才行...,所以在setting函数中设为负数了
                             this.gameDto.getMyTank().weaponMove(tankDegree);
-                            this.gameDto.getMyTank().setPreFirePath(this.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+                            this.gameDto.getMyTank().setPreFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                                                                         this.gameDto.getMyTank().getWeaponPoxition_y(),
                                                                                         distance,
                                                                                         tankDegree,
-                                                                                        true));
+                                                                                        true,this.gameDto.getMyTank().getSelectedBullets()));
                             //这一段代码加了，可以在绘制出第三象限时，停止prefire
                             //测试发现，加了以后，游戏性很差，所以就不加了......
 /*                            if(!this.gameDto.getMyTank().isOutDirection(dx,dy)){
@@ -181,8 +178,8 @@ public class PlayControler {
         int dy = (int) event.getY(index_2);
         //TODO 如果up的那个手指在圆圈内，则跳出
         if (this.gameDto.getPlayerPain().isInCircle(dx, dy)) {
-            this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.SCREEN_WIDTH * 4 / 5);
-            this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.SCREEN_HEIGHT * 3 / 4);
+            this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH * 4 / 5);
+            this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT * 3 / 4);
             this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
         }
         //TODO 这里设置坦克释放炮弹的方法....
@@ -247,11 +244,11 @@ public class PlayControler {
         bullet.setBulletDegree(tankDegree);
         bullet.setBulletDistance(distance);
         //计算并初始化子弹的路径
-        bullet.setFirePath(this.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+        bullet.setFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                             this.gameDto.getMyTank().getWeaponPoxition_y(),
                                             distance,
                                             tankDegree,
-                                            false));
+                                            false,this.gameDto.getMyTank().getSelectedBullets()));
         //允许绘制路径
         bullet.setDrawFlag(true);
         //初始化坦克的位置
@@ -262,40 +259,7 @@ public class PlayControler {
 
 
 
-    //将这个抽象为函数，然后调用....
-    //路径计算好以后，怎么给子弹
-    //写成一个函数，然后计算返回一系列的点和角度即可.....List<Point>
-    private List<Point> getBulletPath(int init_x,int init_y,double bulletDistance,int bulletDegree,boolean isPreView) {
-        //这里关联speed和distance，暂时不处理
-        List<Point> bulletPath = new ArrayList<Point>();
 
-        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
-        double bulletV_y=-(StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
-        int pathNum = 0;
-        if (isPreView) {
-            pathNum = StaticVariable.PREVIEWPATHLENGTH;
-        } else {
-            pathNum = StaticVariable.PATHLENGTH;
-        }
-        for (int i = 0; i < pathNum; i++) {
-            //这里计算时，采用向下为正，向右为正的方法
-            bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
-            int newPosition_x = (int) (init_x + bulletV_x * StaticVariable.INTERVAL_TIME);
-            //bulletPosition_x+=v_x*t;
-            int newPosition_y = (int) (init_y + (bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2));
-            //bulletPosition_y+=v_y*t-g*t*t/2;
-            double test = bulletV_y / bulletV_x;
-            bulletDegree = (int) Math.toDegrees(Math.atan(test));
-            Point point = new Point(init_x,init_y, bulletDegree,false);
-            bulletPath.add(point);
-            init_x=newPosition_x;
-            init_y=newPosition_y;
-            //Log.w(TAG, "bulletV_x:" + bulletV_x + " bulletV_y:" + bulletV_y);
-            //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
-            //time = time + StaticVariable.INTERVAL;
-        }
-        return bulletPath;
-    }
 
     //主要动作为：1、更换selectView的外观 2 、设置mytank的当前子弹类型
     public void setClick(View view) {

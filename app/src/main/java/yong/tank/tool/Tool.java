@@ -1,6 +1,5 @@
 package yong.tank.tool;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -221,26 +220,25 @@ public class Tool {
         return a ;
     }
 
-    //生成子弹路径
     //计算bonus的路径
     public static List<Point> getBonusPath(Bitmap bonusPicture) {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<>();
         int direction =new Random().nextInt(2); //生成随机方向
         int bonus_x; //这里应该等于bonuspicture的宽度
-        int bonus_y_init = StaticVariable.SCREEN_HEIGHT/StaticVariable.BONUS_Y;  //初始为1/5处的地方
+        int bonus_y_init = StaticVariable.LOCAL_SCREEN_HEIGHT /StaticVariable.BONUS_Y;  //初始为1/5处的地方
         int bonus_y;
         int speed=StaticVariable.BONUS_SPEED;
         //TODO 振幅为图片的宽度乘以比例
-        int scale = bonusPicture.getHeight();
+        int scale = StaticVariable.LOCAL_SCREEN_HEIGHT/10;
         if(direction==0){
             bonus_x=0;
         }else{
-            bonus_x= StaticVariable.SCREEN_WIDTH;
+            bonus_x= StaticVariable.LOCAL_SCREEN_WIDTH;
             speed = -speed;
         }
-        while(bonus_x>=0&&bonus_x<=StaticVariable.SCREEN_WIDTH){
-            bonus_x=bonus_x+speed;
+        while(bonus_x>=0&&bonus_x<=StaticVariable.LOCAL_SCREEN_WIDTH){
+            bonus_x=bonus_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY, speed);
             //注意这里除法是易错点
             bonus_y=bonus_y_init +(int)(Math.sin((double)bonus_x/StaticVariable.BONUS_STEP)*scale);
             Point point = new Point(bonus_x,bonus_y,0,false);
@@ -248,7 +246,41 @@ public class Tool {
         }
         return bulletPath;
     }
-
+    //将这个抽象为函数，然后调用....
+    //路径计算好以后，怎么给子弹
+    //写成一个函数，然后计算返回一系列的点和角度即可.....List<Point>
+    //这里感觉不对，以后做处理看看....先处理互相传输数据的模式......
+    public static List<Point> getBulletPath(int init_x,int init_y,double bulletDistance,int bulletDegree,boolean isPreView,int selectedBullets) {
+        //这里关联speed和distance，暂时不处理
+        List<Point> bulletPath = new ArrayList<Point>();
+        //this.gameDto.getMyTank().getSelectedBullets()
+        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[selectedBullets].getSpeed()*bulletDistance*Math.cos(Math.toRadians(bulletDegree));
+        double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[selectedBullets].getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree));
+        int pathNum = 0;
+        if (isPreView) {
+            pathNum = StaticVariable.PREVIEWPATHLENGTH;
+        } else {
+            pathNum = StaticVariable.PATHLENGTH;
+        }
+        for (int i = 0; i < pathNum; i++) {
+            //这里计算时，采用向下为正，向右为正的方法
+            bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
+            int newPosition_x = (init_x + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_x * StaticVariable.INTERVAL_TIME)));
+            //bulletPosition_x+=v_x*t;
+            int newPosition_y = (init_y + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2)));
+            //bulletPosition_y+=v_y*t-g*t*t/2;
+            double test = bulletV_y / bulletV_x;
+            bulletDegree = (int) Math.toDegrees(Math.atan(test));
+            Point point = new Point(init_x,init_y, bulletDegree,false);
+            //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
+            bulletPath.add(point);
+            init_x=newPosition_x;
+            init_y=newPosition_y;
+            //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            //time = time + StaticVariable.INTERVAL;
+        }
+        return bulletPath;
+    }
 
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
@@ -269,7 +301,7 @@ public class Tool {
      * 将px值转换为sp值，保证文字大小不变
      *
      * @param pxValue
-     * @param fontScale
+     * @param
      *            （DisplayMetrics类中属性scaledDensity）
      * @return
      */
@@ -282,7 +314,7 @@ public class Tool {
      * 将sp值转换为px值，保证文字大小不变
      *
      * @param spValue
-     * @param fontScale
+     * @param
      *            （DisplayMetrics类中属性scaledDensity）
      * @return
      */

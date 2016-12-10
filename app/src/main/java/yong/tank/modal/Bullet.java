@@ -57,8 +57,8 @@ public class Bullet {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(3);
         canvas.drawPath(path, paint);*/
-        if(bulletPosition_x> StaticVariable.SCREEN_WIDTH||
-                bulletPosition_y>StaticVariable.SCREEN_HEIGHT||
+        if(bulletPosition_x> StaticVariable.LOCAL_SCREEN_WIDTH ||
+                bulletPosition_y>StaticVariable.LOCAL_SCREEN_HEIGHT ||
                 bulletPosition_x<0){
             this.setDrawFlag(false);
         }

@@ -34,10 +34,13 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         setContentView(R.layout.activity_main);  //注意，这一句话一定要在initButton之前，否则，会找不到button，即findViewById会找不到....
         DisplayMetrics metric = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(metric);
-        StaticVariable.SCREEN_WIDTH = metric.widthPixels;  // 屏幕宽度（像素）
-        StaticVariable.SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
+
         initButton();
         titlePresenter =new TitlePresenter(this,this);
+        //设置本地设备的信息：
+        StaticVariable.LOCAL_SCREEN_WIDTH = metric.widthPixels;  // 屏幕宽度（像素）
+        StaticVariable.LOCAL_SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
+        StaticVariable.LOCAL_DENSITY = this.getResources().getDisplayMetrics().density ;
         Log.i(TAG, "Test in company");
     }
 

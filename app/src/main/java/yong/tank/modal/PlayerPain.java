@@ -11,12 +11,12 @@ import yong.tank.tool.StaticVariable;
 
 public class PlayerPain {
     private Paint paint = new Paint();
-    private int outsideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
-    private int outsideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
-    private int outsideCircle_r = StaticVariable.SCREEN_WIDTH*1/8;
-    private float insideCircle_x = StaticVariable.SCREEN_WIDTH*4/5;
-    private float insideCircle_y = StaticVariable.SCREEN_HEIGHT*3/4;
-    private float insideCircle_r = StaticVariable.SCREEN_WIDTH*1/20;
+    private int outsideCircle_x = StaticVariable.LOCAL_SCREEN_WIDTH *4/5;
+    private int outsideCircle_y = StaticVariable.LOCAL_SCREEN_HEIGHT *3/4;
+    private int outsideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/8;
+    private float insideCircle_x = StaticVariable.LOCAL_SCREEN_WIDTH *4/5;
+    private float insideCircle_y = StaticVariable.LOCAL_SCREEN_HEIGHT *3/4;
+    private float insideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/20;
 
     public PlayerPain() {
     }

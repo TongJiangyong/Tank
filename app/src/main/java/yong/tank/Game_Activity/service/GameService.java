@@ -261,7 +261,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private boolean testExplode(int bullet) {
         //TODO 测试explode
         //如果打中地面
-        if(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.SCREEN_HEIGHT/4*3){
+        if(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.LOCAL_SCREEN_HEIGHT /7*5){
             addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                     gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
                     StaticVariable.EXPLODE_TYPE_GROUND);
