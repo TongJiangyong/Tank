@@ -60,12 +60,14 @@ public class LoginPresenter{
         loginActivity.showToast("跳转到注册界面");
         Intent intent = new Intent(context,RegisterActivity.class);
         context.startActivity(intent);
+        this.loginActivity.finish();
     }
 
     public void toWebInfo() {
         loginActivity.showToast("跳转到用户个人信息界面");
         Intent intent = new Intent(context,WebInfoActivity.class);
         context.startActivity(intent);
+        this.loginActivity.finish();
     }
 
     public void initLoginInfo() {
@@ -91,11 +93,17 @@ public class LoginPresenter{
             public void onNext(String info) {
                 Log.i(TAG,info);
                 if(info.equals("0")){
-                    loginActivity.showToast("登录成功，跳转到个人信息界面");
-                    toWebInfo();
+                    loginActivity.showToast("用户名或者密码出错");
                 }
                 else{
-                    loginActivity.showToast("登录失败");
+                    //获取登录相关的信息，并更新本地的信息
+                    User loginUser= gson.fromJson(info,User.class);
+                    localUser.saveInfoLocal(loginUser, StaticVariable.USER_FILE);
+                    loginActivity.showToast("登录成功，跳转到个人信息界面");
+                    Intent intent = new Intent(context,WebInfoActivity.class);
+                    context.startActivity(intent);
+                    //TODO 对比一下user ID和info是否一致.....
+                    toWebInfo();
                 }
 
             }

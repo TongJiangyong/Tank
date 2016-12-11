@@ -250,15 +250,18 @@ public class TitlePresenter implements ITitlePresenter {
 
     public void toLoginOrRegister(){
         Log.i(TAG,"选择服务器完毕");
+
+        //下面一句注释的代码是测试用的，没实际意义
+        //localUser.saveInfoLocal(new User(),StaticVariable.USER_FILE);
         User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
-        if(user!=null){
+        if(user==null||user.getId()==0){
+            titleView.showToast("检测到您未在该服务器注册用户，将跳转到注册界面");
+            Intent intent = new Intent(context,RegisterActivity.class);
+            context.startActivity(intent);
+        }else{
             titleView.showToast("检测到您已经在该服务器注册过用户，将跳转到登录界面");
             //titleView.showToast("帮助模块开发中..");
             Intent intent = new Intent(context,LoginActivity.class);
-            context.startActivity(intent);
-        }else{
-            titleView.showToast("检测到您未在该服务器注册用户，将跳转到注册界面");
-            Intent intent = new Intent(context,RegisterActivity.class);
             context.startActivity(intent);
         }
     }

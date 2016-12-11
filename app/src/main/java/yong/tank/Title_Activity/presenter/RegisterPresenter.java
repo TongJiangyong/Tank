@@ -14,6 +14,7 @@ import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.Title_Activity.View.RegisterActivity;
 import yong.tank.Title_Activity.View.WebInfoActivity;
 import yong.tank.modal.User;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/10/27.
@@ -53,13 +54,42 @@ public class RegisterPresenter {
         }
     }
 
-    public void toWebInfo() {
-        registerActivity.showToast("跳转到用户个人信息界面");
-        Intent intent = new Intent(context,WebInfoActivity.class);
-        context.startActivity(intent);
+    public void toWebInfo(final User user) {
+
+        //获取登录相关的信息，并更新本地的信息
+        NetWorks.userLogin("userLogin",gson.toJson(user),new Observer<String>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"getUserInfo error :"+e);
+                registerActivity.showToast("连接服务器出错-->1");
+            }
+
+            @Override
+            public void onNext(String info) {
+                Log.i(TAG,info);
+                if(info.equals("0")){
+                    registerActivity.showToast("用户名和密码错误.....");
+                }
+                else{
+                    //获取登录相关的信息，并更新本地的信息
+                    User loginUser= gson.fromJson(info,User.class);
+                    localUser.saveInfoLocal(loginUser, StaticVariable.USER_FILE);
+                    registerActivity.showToast("登录成功，跳转到个人信息界面");
+                    Intent intent = new Intent(context,WebInfoActivity.class);
+                    context.startActivity(intent);
+                    registerActivity.finish();
+                }
+            }
+        });
+
+
+
     }
 
-    private void registerToWeb(User user) {
+    private void registerToWeb(final User user) {
         //注册用户信息
         NetWorks.addNewUser("addNewUser",gson.toJson(user),new Observer<String>() {
             @Override
@@ -76,11 +106,11 @@ public class RegisterPresenter {
                 Log.i(TAG,info);
                 if(info.equals("1"))
                     registerActivity.showToast("连接服务器出错-->2");
-                else if(info.equals("2")){
+                else if(info.equals("#")){
                     registerActivity.showToast("服务器已被注册相同的用户名");
                 }else{
                     registerActivity.showToast("注册用户信息成功");
-                    toWebInfo();
+                    toWebInfo(user);
                 }
 
             }
