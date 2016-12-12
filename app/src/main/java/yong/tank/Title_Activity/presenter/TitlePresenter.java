@@ -95,7 +95,8 @@ public class TitlePresenter implements ITitlePresenter {
         //titleView.showToast("开始人机大战");
         //1表示人机，2表示蓝牙，3表示普通
         Intent intent = new Intent(context,SelectActivity.class);
-        intent.putExtra("type", StaticVariable.GAMEMODE[0]);
+        //TODO intenet借用
+        intent.putExtra("type", StaticVariable.GAMEMODE[1]);
         context.startActivity(intent);
     }
     @Override

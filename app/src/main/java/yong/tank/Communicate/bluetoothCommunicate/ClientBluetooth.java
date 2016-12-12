@@ -16,7 +16,8 @@ import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.tool.StaticVariable;
-
+//TODO 这里出现一个很严重的问题，可能需要AIDL来处理......因为蓝牙的建立是在一个线程，但是使用在其他的线程...
+//TODO 或者只能委屈求全，在game的activity建立蓝牙的选择等处理流程.......没有办法......
 /**
  * 这个类做了所有蓝牙连接相关的工作 ，他有一个线程监听蓝牙,一个线程连接蓝牙
  * 和一个线程在连接后传送数据

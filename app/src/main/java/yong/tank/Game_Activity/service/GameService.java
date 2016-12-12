@@ -57,9 +57,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         this.context = context;
         //TODO 完成游戏启动前初始化的相关配置工作....
         this.initLocal();
-        //TODO 完成远程连接工作后启动
-        //this.initRemote();
+        //TODO 完成远程连接工作后启动 这里是做测试用的
+        this.initRemote();
     }
+
+
 
     //设置handle的处理
     //注意这里为主线程....handler默认使用主线程的looper
@@ -100,6 +102,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private void connectInit() {
         //连接成功后，添加监听
         this.connectFlag=true;
+        //TODO 网络连接 成功后，进入init相关的系列....操作，包括数据传输等......
+
         clientCommunicate.addInfoObserver(this);
         clientCommunicate.addMsgObserver(this);
         clientCommunicate.addCommandObserver(this);
@@ -370,6 +374,9 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
      * 3两者初始化成功后，才能进行数据的通行
      * **/
 
+    /**
+     * 本地初始化相关的代码
+     */
     private void initLocal() {
         //TODO 初始化explode
         for(int i=0;i<StaticVariable.EXPLODESPICTURE_GROUND.length;i++){
@@ -409,4 +416,13 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,1,1);
         return blood;
     }
+
+
+    /**
+     *远程初始化相关的代码
+     */
+    private void initRemote() {
+    }
+
+
 }
