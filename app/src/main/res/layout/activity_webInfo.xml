@@ -152,18 +152,28 @@
                 style="@style/layout_vertical"
                 android:layout_weight="4"
                 android:orientation="vertical">
-                <TextView
+                <LinearLayout
                     style="@style/layout_vertical"
                     android:layout_weight="1"
-                    android:text="可接入房间列表信息："
-                    />
+                    android:orientation="horizontal">
+                    <TextView
+                        style="@style/layout_horizontal"
+                        android:layout_weight="2"
+                        android:text="可接入房间列表："
+                        />
+                    <Button
+                        android:id="@+id/refreshRoom"
+                        style="@style/layout_horizontal"
+                        android:layout_weight="1"
+                        android:text="更新房间信息"
+                        />
+                </LinearLayout>
+                    <ListView
+                        android:layout_weight="5"
+                        android:id="@+id/list_room"
+                        style="@style/layout_vertical"
+                        />
 
-                <ListView
-                    android:layout_below="@+id/al"
-                    android:layout_weight="5"
-                    android:id="@+id/list_room"
-                    style="@style/layout_vertical"
-                    />
             </LinearLayout>
         </LinearLayout>
         <!--按钮界面-->

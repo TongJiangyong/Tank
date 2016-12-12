@@ -17,12 +17,7 @@ import static yong.tank.R.mipmap.s;
 
 public class StaticVariable {
 
-    //设置游戏模式的静态变量
-    public enum GAME_MODE {
 
-        LOCAL, INTERNET, BLUETOOTH
-
-    }
     //设置游戏的类名
     public static String[] VIEW_LIST ={
             "yong.tank.Game_Activity.View.GameView",
@@ -31,8 +26,15 @@ public class StaticVariable {
             "yong.tank.Game_Activity.View.BonusView",
             "yong.tank.Game_Activity.View.ExplodeView",
 };
+    //设置游戏的模式
+    public enum GAME_MODE {
+
+        LOCAL, INTERNET, BLUETOOTH
+
+    }
     public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
     public final static int[] GAMEMODE= {1,2,3};
+    //设置tank的图片
     public static int[] TANKPICTURE={
             R.mipmap.tank_0,
             R.mipmap.tank_1,
@@ -62,10 +64,10 @@ public class StaticVariable {
     public static int LOCAL_SCREEN_HEIGHT;
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     public static TankBascInfo[] TANKBASCINFO = {
-            new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A,有多牛呢？"),
-            new TankBascInfo(1,30,40,50,StaticVariable.TANKPICTURE_NO_ARM[1],"M4谢尔曼","简介：很牛B的坦克B，比上面牛"),
-            new TankBascInfo(2,30,30,40,StaticVariable.TANKPICTURE_NO_ARM[2],"虎式-1","简介：很牛B的坦克C，上五楼不费劲"),
-            new TankBascInfo(3,30,50,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D，最后的，总是最好的"),
+            new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A"+"\n"+",有多牛呢？"),
+            new TankBascInfo(1,30,40,50,StaticVariable.TANKPICTURE_NO_ARM[1],"M4谢尔曼","简介：很牛B的坦克B"+"\n"+",比上面牛"),
+            new TankBascInfo(2,30,30,40,StaticVariable.TANKPICTURE_NO_ARM[2],"虎式-1","简介：很牛B的坦克C"+"\n"+"，上五楼不费劲"),
+            new TankBascInfo(3,30,50,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D"+"\n"+"，最后的，总是最好的"),
     };
     public static String HELPINFO = "这里加一些帮助信息";
     public static String STATEMENTINFO =

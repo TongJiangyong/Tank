@@ -45,6 +45,8 @@ public class LoginPresenter{
                 User user = new User();
                 user.setUsername(username);
                 user.setPassword(password);
+                //设置状态为上线
+                user.setState(1);
                 loginToWeb(user);
 
             }
@@ -96,8 +98,10 @@ public class LoginPresenter{
                     loginActivity.showToast("用户名或者密码出错");
                 }
                 else{
-                    //获取登录相关的信息，并更新本地的信息
+                    //获取登录相关的信息，并更新本地的信息 ,
                     User loginUser= gson.fromJson(info,User.class);
+                    User localUserInfo = localUser.readInfoLocal(StaticVariable.USER_FILE);
+                    loginUser.setFrightRecord(localUserInfo.getFrightRecord());
                     localUser.saveInfoLocal(loginUser, StaticVariable.USER_FILE);
                     loginActivity.showToast("登录成功，跳转到个人信息界面");
                     Intent intent = new Intent(context,WebInfoActivity.class);
