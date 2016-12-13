@@ -25,7 +25,8 @@ public class SelectActivity extends Activity implements View.OnClickListener{
     private SelectPresent selectPresent;
     private Button confirmButton;
     private Button backTitle;
-    private int gameMode=1;
+    //这个mode只是测试用的，无实际意义
+    private int gameMode=0;
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -37,7 +38,7 @@ public class SelectActivity extends Activity implements View.OnClickListener{
         selectView = new SelectView(this); //这里是加载其他界面
         selectLayout.addView(selectView);
         selectPresent= new SelectPresent(this,selectView,this);
-        gameMode=this.getIntent().getIntExtra("type", StaticVariable.GAMEMODE[0]);
+        gameMode=this.getIntent().getIntExtra("type", StaticVariable.GAMEMODE[0]); //默认值为本地模式而已....
         initButton();
     }
     public void initButton(){
@@ -46,15 +47,22 @@ public class SelectActivity extends Activity implements View.OnClickListener{
         backTitle.setOnClickListener(this);
         confirmButton.setOnClickListener(this);
         switch(gameMode){
-            case 1:
+            case 0:
                     //人机
                 showToast("人机");
                 break;
             case 2:
                 //蓝牙
+                showToast("蓝牙");
                 break;
-            case 3:
+            case 1:
                 //联网
+                if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                    confirmButton.setText("创建房间");
+                }else{
+                    confirmButton.setText("加入房间");
+                }
+                showToast("联网");
                 break;
         }
     }

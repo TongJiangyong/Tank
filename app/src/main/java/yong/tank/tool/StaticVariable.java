@@ -28,12 +28,15 @@ public class StaticVariable {
 };
     //设置游戏的模式
     public enum GAME_MODE {
-
         LOCAL, INTERNET, BLUETOOTH
-
+    }
+    //设置游戏的角色：主动/被动
+    public enum GAME_RULE {
+        ACTIVITY,PASSIVE
     }
     public static GAME_MODE CHOSED_MODE = GAME_MODE.LOCAL;
-    public final static int[] GAMEMODE= {1,2,3};
+    public final static int[] GAMEMODE= {0,1,2};
+    public static GAME_RULE CHOSED_RULE =GAME_RULE.ACTIVITY;
     //设置tank的图片
     public static int[] TANKPICTURE={
             R.mipmap.tank_0,

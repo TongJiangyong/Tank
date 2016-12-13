@@ -16,7 +16,7 @@ public interface ClientCommunicate {
     //设置handle的处理
     void setMyHandle(Handler myHandle);
     //发送数据方法
-    void  sendInfo(String info);
+    void sendInfo(String info);
     //启动相应的线程
     void startCommunicate();
     //停止相应的线程

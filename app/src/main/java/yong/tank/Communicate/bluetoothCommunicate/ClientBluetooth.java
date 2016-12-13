@@ -286,7 +286,7 @@ public class ClientBluetooth implements ClientCommunicate {
     }
 
     @Override
-    public void sendInfo(String info) {
+    public void  sendInfo(String info) {
         Log.w(TAG,"sendInfo "+info);
         this.write(info);
     }

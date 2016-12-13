@@ -160,6 +160,8 @@ public class WebInfoPresenter {
         //titleView.showToast("开始人机大战");  这里还应该增加其他的数据，比如是主动还是被动 如果是被动，则还需要增加userId的选项....
         //1表示人机，2表示蓝牙，3表示普通
         Intent intent = new Intent(context,SelectActivity.class);
+        //确定为主动状态
+        StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.ACTIVITY;
         intent.putExtra("type", StaticVariable.GAMEMODE[1]); //1为网络模式
         context.startActivity(intent);
     }

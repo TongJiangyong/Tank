@@ -96,11 +96,13 @@ public class TitlePresenter implements ITitlePresenter {
         //1表示人机，2表示蓝牙，3表示普通
         Intent intent = new Intent(context,SelectActivity.class);
         //TODO intenet借用
-        intent.putExtra("type", StaticVariable.GAMEMODE[1]);
+        StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.LOCAL;
+        intent.putExtra("type", StaticVariable.GAMEMODE[0]);
         context.startActivity(intent);
     }
     @Override
     public void toBluetooth(){
+        //这一部分，在game的地方配置
         //titleView.showToast("蓝牙模式开发中..");
         bluetoothadpter = BluetoothAdapter.getDefaultAdapter();
 
@@ -119,6 +121,7 @@ public class TitlePresenter implements ITitlePresenter {
                 clientBluetooth.setMyHandle(myHandler);
                 //没办法，为了使用这个starrfor result 只能传入MainActivity
                 //打开蓝牙list的显示线程
+                StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.BLUETOOTH;
                 this.context.startActivityForResult(intent,StaticVariable.CHOSED_BLUT_DEVICE);
             }
             else{
@@ -161,57 +164,6 @@ public class TitlePresenter implements ITitlePresenter {
         }else{
             titleView.showToast("您的设备未联网啊，请检查设备网络状况...");
         }
-/*        if(this.clientBluetooth.getBluetoothConnected()==null){
-            titleView.showToast("联网模式开发中...&& 蓝牙连接线程失败");
-        }else{
-            Log.i(TAG,"test to send infos");
-            clientBluetooth.sendInfo("test blutooth");
-            titleView.showToast("联网模式开发中...&& 蓝牙发送消息");
-        }*/
-
-/*        //测试连接是否成功
-与web测试相关
-        NetWorks.connectTest("connectedTest",new Observer<String>() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {
-                Log.i(TAG,"connected error :"+e);
-            }
-
-            @Override
-            public void onNext(String info) {
-                Log.i(TAG,"connected info :"+info);
-            }
-        });
-        Log.i(TAG,"sync or asyc_1");
-        //获取用户信息
-        NetWorks.getUserInfo("getUserInfo",1,new Observer<String>() {
-            @Override
-            public void onCompleted() {}
-
-            @Override
-            public void onError(Throwable e) {
-                Log.i(TAG,"getUserInfo error :"+e);
-            }
-
-            @Override
-            public void onNext(String info) {
-                Log.i(TAG,"user info :"+info);
-                //User user = gson.fromJson(info,User.class);
-                User user = new User();
-                localUser.saveInfoLocal(user,StaticVariable.USER_FILE);
-                User userLocal =localUser.readInfoLocal(StaticVariable.USER_FILE);
-                if(userLocal==null){
-                    Log.i(TAG,"read info :"+userLocal.toString());
-                }else{
-                    Log.i(TAG,"没有用户信息");
-                }
-
-            }
-        });
-        Log.i(TAG,"sync or asyc_2");*/
     }
 
     public void serviceChoseDialog(){
@@ -251,7 +203,7 @@ public class TitlePresenter implements ITitlePresenter {
 
     public void toLoginOrRegister(){
         Log.i(TAG,"选择服务器完毕");
-
+        StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.INTERNET;
         //下面一句注释的代码是测试用的，没实际意义
         //localUser.saveInfoLocal(new User(),StaticVariable.USER_FILE);
         User user = localUser.readInfoLocal(StaticVariable.USER_FILE);

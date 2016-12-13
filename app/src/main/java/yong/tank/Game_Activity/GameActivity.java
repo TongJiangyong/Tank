@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,6 +35,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private PlayControler playControler;
     private GameControler gameControler;
     private GameService gameService;
+    private Handler gameActivityHandler = new Handler();
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -67,7 +69,13 @@ public class GameActivity extends Activity implements View.OnClickListener {
         /*********设置玩家控制器**********/
         playControler = new PlayControler(this,gameDto,gameControler);
         //TODO 所有初始化等工作完成以后，就开始游戏：
-        //TODO 这里要设定，只有初始化完全成功后，才能调用statGame方法开始游戏......
+        //TODO 这里要设定，只有初始化完全成功后，才能调用statGame方法开始游戏......这个方法，以后再调用
+        //即，针对不同的模式，启动方式完全不同.....原因：设计缺陷......
+        //设置网络的组装，也在这儿......
+        //如果是蓝牙模式，则需要设置蓝牙
+        //如果是联网模式，则需要设置联网
+        //对上诉的互联模式，统一让初始化完成后，才能全部开始游戏
+        //如果是普通的模式，则也要设定一个初始化的handle，统一控制游戏的启动.....
         gameControler.startGame();
     }
 
