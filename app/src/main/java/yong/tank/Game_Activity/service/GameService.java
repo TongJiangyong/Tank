@@ -16,8 +16,6 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import yong.tank.Communicate.ComData.ComDataF;
-import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
@@ -55,10 +53,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public GameService(GameDto gameDto,Context context) {
         this.gameDto = gameDto;
         this.context = context;
-        //TODO 完成游戏启动前初始化的相关配置工作....
-        this.initLocal();
-        //TODO 完成远程连接工作后启动 这里是做测试用的
-        this.initRemote();
+
     }
 
 
@@ -71,43 +66,20 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 case StaticVariable.MSG_TOAST:
                     Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
                     break;
-                    //网络连接失败
-                case StaticVariable.MSG_CONNECT_ERROR:
-                    connectError();
-                    break;
-                    //网络连接成功
-                case StaticVariable.MSG_CONNECT_SUCCESS:
-                    connectInit();
-                    break;
-                //网络连接故障
-                case StaticVariable.MSG_COMMUNICATE_ERROR:
-                    communicateError();
-                    break;
-                //网络连接故障
-                case StaticVariable.MSG_COMMUNICATE_OUT:
-                    communicateOut();
-                    break;
             }
 
         }
 
     };
 
-    private void connectError() {
-        this.connectFlag=false;
-        Toast.makeText(context.getApplicationContext(),  "与对手连接失败", Toast.LENGTH_SHORT).show();
-        //TODO 延迟执行退出程序
-    }
 
-    private void connectInit() {
+    private void observerInit() {
         //连接成功后，添加监听
-        this.connectFlag=true;
         //TODO 网络连接 成功后，进入init相关的系列....操作，包括数据传输等......
-
         clientCommunicate.addInfoObserver(this);
         clientCommunicate.addMsgObserver(this);
         clientCommunicate.addCommandObserver(this);
-        Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
     }
     public void gameStart(){
         if(gameThread==null){
@@ -117,7 +89,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             //启动bonus的线程
             this.startMakeBonus();
             //启动对应模式的communicate线程
-            clientCommunicate.setMyHandle(myHandler);
             clientCommunicate.startCommunicate();
             //在这里启动数据交互线程，暂时学习一下
             this.startCommunicateThread();
@@ -128,12 +99,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
     private void startCommunicateThread() {
         timerCommunnicate = new Timer();
-        CommunicateThread communicateThread = new CommunicateThread();
+        //CommunicateThread communicateThread = new CommunicateThread();
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
         Log.w(TAG,"start to communicate");
         //就用100ms进行测试
-        timerBonus.schedule(communicateThread,5000,100);
+        //timerBonus.schedule(communicateThread,5000,100);
     }
 
     public void startMakeBonus(){
@@ -160,8 +131,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             Log.w(TAG,"gameThread is  null");
         }
     }
-
-
 
 
     class GameThread implements Runnable {
@@ -313,7 +282,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         }
     }
 
-    //互相communicate的线程
+/*    //互相communicate的线程
     public class CommunicateThread extends TimerTask {
         @Override
         public void run() {
@@ -330,10 +299,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
 
         }
-    }
-
-
-
+    }*/
     public ClientCommunicate getClientCommunicate() {
         return clientCommunicate;
     }
@@ -359,12 +325,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
 
-    private void communicateError() {
-        Toast.makeText(context.getApplicationContext(),  "网络通信故障", Toast.LENGTH_SHORT).show();
-    }
-    private void communicateOut() {
-        Toast.makeText(context.getApplicationContext(),  "对方断开连接", Toast.LENGTH_SHORT).show();
-    }
 
 
     /********************************下面是与初始化相关的代码***********************************************/
@@ -373,6 +333,17 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
      * 2、远程连接成功后，数据的初始化，
      * 3两者初始化成功后，才能进行数据的通行
      * **/
+
+
+    public void initAllDataInfo() {
+        //TODO 完成游戏启动前自身数据的初始化
+        this.initLocal();
+        //TODO 完成远程连接工作后其他数据的初始化
+        this.initRemote();
+    }
+
+
+
 
     /**
      * 本地初始化相关的代码

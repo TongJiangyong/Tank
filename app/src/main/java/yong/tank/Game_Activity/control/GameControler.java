@@ -5,11 +5,8 @@ import android.content.Context;
 import java.util.List;
 
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
-import yong.tank.Communicate.InternetCommunicate.ClentInternet;
-import yong.tank.Communicate.LocalCommunicate.ClientLocal;
 import yong.tank.Game_Activity.View.ViewBase;
 import yong.tank.Game_Activity.service.GameService;
-import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -27,15 +24,6 @@ public class GameControler {
         this.gameService = gameService;
         this.context =  context;
         this.views = views;
-        if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.INTERNET) {
-            this.clientCommunicate = new ClentInternet(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
-        }else if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.BLUETOOTH){
-            this.clientCommunicate = new ClentInternet(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
-        }else{
-            this.clientCommunicate = new ClientLocal(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
-        }
-        //给service设置通讯接口
-        this.gameService.setClientCommunicate(this.clientCommunicate);
     }
 
     //开启gameService的线程
@@ -53,10 +41,14 @@ public class GameControler {
     public void stopGame(){
         //启动关闭程序的界面
         for(ViewBase v: this.views){
-            v.stopThread();
+            //以后再开启
+            //v.stopThread();
         }
         //停止程序的逻辑
-        this.gameService.gameStop();
+        //this.gameService.gameStop();
     }
 
+    public GameService getGameService() {
+        return gameService;
+    }
 }

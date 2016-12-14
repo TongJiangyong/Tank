@@ -139,7 +139,14 @@ public class WebInfoPresenter {
             String[] infos =info.split("\\#");
             String opponentUserId =infos[1].split("\\：")[1];
             String roomId =infos[2].split("\\：")[1];
+
+            Intent intent = new Intent(context,SelectActivity.class);
+            //确定为被动状态
+            StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.PASSIVE;
+            intent.putExtra("type", StaticVariable.GAMEMODE[1]); //1为网络模式
             Log.i(TAG,"opponentUserId:"+opponentUserId+" roomId:"+roomId);
+            context.startActivity(intent);
+
             //TODO 跳转连接到相应的房间
 /*            bluetoothadapter.cancelDiscovery();// 取消搜索
             // 获取设备的MAC地址

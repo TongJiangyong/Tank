@@ -62,7 +62,7 @@ public class ClientInputThread implements Runnable,Subject{
                 msg=in.readLine();
                 //msg =CharBuffer.wrap(buff).toString();
                 //msg =charset.encode(msg);
-                Log.w(TAG,"msg:"+msg);
+                Log.w(TAG,"intenet input msg:"+msg);
                 this.notifyWatchers(msg);
 
             }

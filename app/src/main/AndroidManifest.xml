@@ -47,7 +47,7 @@
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize"></activity>
         <activity
-            android:name="yong.tank.Title_Activity.View.BlutToothActivty"
+            android:name="yong.tank.Game_Activity.BlutToothActivty"
             android:theme="@android:style/Theme.Dialog"
             android:configChanges="orientation|screenSize" ><!--设置切换后，方法不执行两次-->
         </activity>

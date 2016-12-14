@@ -2,6 +2,7 @@ package yong.tank.Game_Activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,17 +12,23 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
+import yong.tank.Communicate.InternetCommunicate.ClentInternet;
+import yong.tank.Communicate.LocalCommunicate.ClientLocal;
+import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
 import yong.tank.Dto.GameDto;
 import yong.tank.Game_Activity.View.SelectView;
 import yong.tank.Game_Activity.View.ViewBase;
 import yong.tank.Game_Activity.control.GameControler;
 import yong.tank.Game_Activity.control.PlayControler;
+import yong.tank.Game_Activity.presenter.GamePresenter;
 import yong.tank.Game_Activity.service.GameService;
 import yong.tank.R;
 import yong.tank.tool.StaticVariable;
@@ -35,6 +42,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private PlayControler playControler;
     private GameControler gameControler;
     private GameService gameService;
+    private ClientCommunicate clientCommunicate;
+    private GamePresenter gamePresenter;
+    private boolean startFlag =false;
     private Handler gameActivityHandler = new Handler();
     @Override
     public void onCreate(Bundle bundle) {
@@ -44,6 +54,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置成全屏模式
         setContentView(R.layout.activity_game); //一般放在super后面比较好,但是这里，因为要横屏，所以放在后面
         RelativeLayout activity_game = (RelativeLayout) findViewById(R.id.activity_game);
+        gamePresenter = new GamePresenter(this,this);
         GameDto gameDto = new GameDto();
         //获取前面传过来的数据
         gameDto.setTankType(this.getIntent().getIntExtra("tankType", 0));
@@ -76,22 +87,63 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //如果是联网模式，则需要设置联网
         //对上诉的互联模式，统一让初始化完成后，才能全部开始游戏
         //如果是普通的模式，则也要设定一个初始化的handle，统一控制游戏的启动.....
-        gameControler.startGame();
+        boolean prepareFlag = false;
+        if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.INTERNET) {
+            //如果是联网模式
+            this.clientCommunicate = new ClentInternet(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
+            //进入联网模式的确认连接步骤
+            this.gamePresenter.prepareInternet(this.clientCommunicate);
+            //联网模式确认连接步骤及，能与远程的tcp网络通信
+
+        }else if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.BLUETOOTH){
+            //如果是蓝牙模式
+            this.clientCommunicate = new ClientBluetooth();
+            //进入蓝牙模式的确认连接步骤为，确定连上
+            this.gamePresenter.prepareBlue(this.clientCommunicate);
+        }else{
+            //如果是本地模式
+            this.clientCommunicate = new ClientLocal(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
+            //进入本地模式的确认连接步骤 可以不做
+            this.gamePresenter.prepareLocal(this.clientCommunicate);
+        }
+        //如果确认连接不成功，则不能进入游戏，通讯连接成功，才能启动下一步操作.....
+        //给service设置通讯接口
+        if(prepareFlag ){
+            this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
+            //初始化全部的数据
+            this.gameControler.getGameService().initAllDataInfo();
+            gameControler.startGame();
+            this.showToast("与对手连接出错.....");
+            startFlag = true;
+        }
+
+
+
+        //启动游戏
+
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //Toast.makeText(this, "event.getX() "+event.getX(), Toast.LENGTH_SHORT).show();
-        playControler.setMotion(event);
-        return false;
+        if(startFlag){
+            playControler.setMotion(event);
+            return false;
+        }
+        return  false;
     }
 
 
     //选择按钮的处理方式
     @Override
     public void onClick(View view) {
-        //在这里传入selectView,然后进行逻辑处理即可....
-        this.playControler.setClick(view);
+        //在这里传入electView,然后进行逻辑处理即可....
+        if(startFlag){
+            this.playControler.setClick(view);
+        }
     }
 
 
@@ -133,5 +185,49 @@ public class GameActivity extends Activity implements View.OnClickListener {
         return views;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        //Log.w(TAG,"TESTBLUE");
+        // 蓝牙启动后返回的result
+        if (requestCode == StaticVariable.REQUEST_CODE_BLUETOOTH_ON)
+        {
+            switch (resultCode)
+            {
+                // 点击确认按钮
+                case Activity.RESULT_OK:
+                    gamePresenter.enableBluetooth();
+                    break;
+                // 点击取消按钮或点击返回键
+                case Activity.RESULT_CANCELED:
+                    break;
+                default:
+                    break;
+            }
+        }
+        //选取设备后，触发的代码
+        if(requestCode == StaticVariable.CHOSED_BLUT_DEVICE){
+            switch (resultCode)
+            {
+                // 点击确认按钮
+                case Activity.RESULT_OK:
+                    Log.i(TAG,"toBlueTankChose");
+                    gamePresenter.toBlueTankChose(resultCode, data);
+                    break;
+                case Activity.DEFAULT_KEYS_SHORTCUT:
+                    Log.i(TAG,"等待蓝牙设备连入.....");
+                    break;
+                default:
+                    Log.i(TAG,"return error");
+                    //关掉相关的blue tooth
+                    gamePresenter.turnOffCommunicate();
+                    break;
+            }
 
+        }
+    }
+
+    public void showToast(String info){
+        Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
+    }
 }

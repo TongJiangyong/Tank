@@ -1,5 +1,6 @@
 package yong.tank.Communicate.InternetCommunicate;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -89,6 +90,12 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
     @Override
     public void stopCommunicate() {
         this.setIsStart(false);
+    }
+
+    //接口方法，什么都不做
+    @Override
+    public void connectDevice(BluetoothDevice device, boolean secure) {
+
     }
 
     public void addMsgObserver(ObserverMsg observerMsg) {

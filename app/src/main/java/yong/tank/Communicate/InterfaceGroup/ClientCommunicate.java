@@ -1,5 +1,6 @@
 package yong.tank.Communicate.InterfaceGroup;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 
 /**
@@ -21,4 +22,6 @@ public interface ClientCommunicate {
     void startCommunicate();
     //停止相应的线程
     void stopCommunicate();
+    //停止相应的线程
+    void connectDevice(BluetoothDevice device, boolean secure);
 }

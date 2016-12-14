@@ -1,4 +1,4 @@
-package yong.tank.Title_Activity.View;
+package yong.tank.Game_Activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

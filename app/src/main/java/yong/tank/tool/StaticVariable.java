@@ -190,15 +190,15 @@ public class StaticVariable {
     //选择要连接的蓝牙设备后，触发的代码
     public static final int CHOSED_BLUT_DEVICE=1312;
     //蓝牙连接出错
-    public final static int BLUE_CONNECT_ERROR=4;
+    public final static int BLUE_CONNECT_ERROR=6;
     //蓝牙通讯错误
-    public final static int BLUE_COMMUNICATE_ERROR=1;
+    public final static int BLUE_COMMUNICATE_ERROR=7;
     //蓝牙主动连接成功
-    public final static int BLUE_CONNECT_SUCCESS_ACTIVE = 2;
+    public final static int BLUE_CONNECT_SUCCESS_ACTIVE = 8;
     //蓝牙被动连接成功
-    public final static int BLUE_CONNECT_SUCCESS_PASSIVE = 3;
+    public final static int BLUE_CONNECT_SUCCESS_PASSIVE = 9;
     //允许使用蓝牙
-    public final static int BLUE_ENABLE_SEND_WRITE = 5;
+    public final static int BLUE_ENABLE_SEND_WRITE = 10;
     //blue的toast
     public final static int BLUE_TOAST = 100;
 

@@ -1,5 +1,6 @@
 package yong.tank.Communicate.LocalCommunicate;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -56,6 +57,11 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
 
     }
 
+    //接口方法，什么都不做
+    @Override
+    public void connectDevice(BluetoothDevice device, boolean secure) {
+
+    }
 
 
     @Override
