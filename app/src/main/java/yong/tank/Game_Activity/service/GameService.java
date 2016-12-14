@@ -338,12 +338,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public void initAllDataInfo() {
         //TODO 完成游戏启动前自身数据的初始化
         this.initLocal();
-        //TODO 完成远程连接工作后其他数据的初始化
-        this.initRemote();
+        //TODO 确定通信连接后，完成远程连接工作后其他数据的初始化
+        if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+            this.initRemoteActivity();
+        }else{
+            this.initRemotePassivity();
+        }
+
     }
-
-
-
 
     /**
      * 本地初始化相关的代码
@@ -392,7 +394,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     /**
      *远程初始化相关的代码
      */
-    private void initRemote() {
+
+    //被动的初始化过程
+    private void initRemotePassivity() {
+    }
+    //主动的初始化过程.....
+    private void initRemoteActivity() {
     }
 
 

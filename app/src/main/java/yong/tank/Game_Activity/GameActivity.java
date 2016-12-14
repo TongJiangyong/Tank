@@ -106,21 +106,6 @@ public class GameActivity extends Activity implements View.OnClickListener {
             //进入本地模式的确认连接步骤 可以不做
             this.gamePresenter.prepareLocal(this.clientCommunicate);
         }
-        //如果确认连接不成功，则不能进入游戏，通讯连接成功，才能启动下一步操作.....
-        //给service设置通讯接口
-        if(prepareFlag ){
-            this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
-            //初始化全部的数据
-            this.gameControler.getGameService().initAllDataInfo();
-            gameControler.startGame();
-            this.showToast("与对手连接出错.....");
-            startFlag = true;
-        }
-
-
-
-        //启动游戏
-
     }
 
 
@@ -230,4 +215,18 @@ public class GameActivity extends Activity implements View.OnClickListener {
     public void showToast(String info){
         Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
     }
+
+    //开始进行通信初始化的完整流程.......
+    public void initCommunicate(){
+        this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
+        //初始化全部的数据
+        this.gameControler.getGameService().initAllDataInfo();
+    }
+
+    //开始游戏
+    public void startGame(){
+        gameControler.startGame();
+        this.showToast("开始游戏...");
+    }
+
 }

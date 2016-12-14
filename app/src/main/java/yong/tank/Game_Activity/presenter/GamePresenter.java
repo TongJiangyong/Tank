@@ -62,6 +62,7 @@ public class GamePresenter {
                     ComDataF comDataF_1 = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto_1));
                     clientCommunicate.sendInfo(gson.toJson(comDataF_1));
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
+                    gameActivity.initCommunicate();
                     break;
                 //蓝牙被动连接成功
                 case StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE:
@@ -70,10 +71,7 @@ public class GamePresenter {
                     StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.PASSIVE;
                     Log.i(TAG,"blueTooth passivity connect success");
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
-                    testDto testDto_2 = new testDto(12,"test");
-                    ComDataF comDataF_2 = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto_2));
-                    clientCommunicate.sendInfo(gson.toJson(comDataF_2));
-
+                    gameActivity.initCommunicate();
                     break;
                 //允许蓝牙传输
                 case StaticVariable.BLUE_ENABLE_SEND_WRITE:
@@ -98,6 +96,7 @@ public class GamePresenter {
                     //connectInit();
                     Toast.makeText(context.getApplicationContext(),  "与TCP服务器连接成功", Toast.LENGTH_SHORT).show();
                     //TODO 确认连接成功后，开始网络通信的初始化工作
+                    gameActivity.initCommunicate();
                     break;
                 //网络连接故障
                 case StaticVariable.MSG_COMMUNICATE_ERROR:
@@ -203,16 +202,16 @@ public class GamePresenter {
         this.clientCommunicate = clientCommunicate;
         //启动Internet通讯
         this.clientCommunicate.startCommunicate();
-        //启动Internet测试
-        this.tcpConnectTest();
+        //启动Internet测试------以后再加吧....这只是一个确认作用，但是加上去会很麻烦 ，确定连接成功就可以通讯
+        //this.tcpConnectTest();
     }
 
     public void prepareBlue(ClientCommunicate clientCommunicate) {
         this.clientCommunicate = clientCommunicate;
         //启动蓝牙通讯
         this.clientCommunicate.startCommunicate();
-        //初始化连接bluetooth
-        this.toBluetoothConnectTest();
+        //初始化连接bluetooth------以后再加吧....这只是一个确认作用，但是加上去会很麻烦，确定连接成功就可以通讯
+        //this.toBluetoothConnectTest();
     }
 
     public void prepareLocal(ClientCommunicate clientCommunicate) {
