@@ -205,8 +205,8 @@ public class BluetoothConnected extends Thread implements Subject {
     }
 
     @Override
-    public void notifyWatchers(String msg) {
-        ComDataF comDataF  = ComDataPackage.unpackToF(msg);
+    public void notifyWatchers(ComDataF comDataF) {
+
         //处理聊天信息
         if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_MSG)){
             for(ObserverMsg o:observerMsgs){

@@ -12,6 +12,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
@@ -162,11 +167,30 @@ public class GamePresenter {
     public void tcpConnectTest(){
         //向TCP发送自身Id的注册数据
         clientCommunicate.setMyHandle(myHandler);
-        testDto testDto = new testDto(12,"test");
-        ComDataF comDataF = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto));
-        clientCommunicate.sendInfo(gson.toJson(comDataF));
-
+        //在这里启动一个线程进行测试编程：.....
+        CommunicateThread communicateThread = new CommunicateThread();
+        //schedule(TimerTask task, long delay, long period)
+        //等待试试10s后开始调度，每隔10s产生一个
+        Log.w(TAG,"start to communicate");
+        //就用100ms进行测试
+        Timer timer  = new Timer();
+        timer.schedule(communicateThread,3000,20);
     }
+
+    private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        //互相communicate的线程
+    public class CommunicateThread extends TimerTask {
+            int count  =0;
+        @Override
+        public void run() {
+            testDto testDto = new testDto(count,"test");
+            ComDataF comDataF = ComDataPackage.packageToF("654321#","8",gson.toJson(testDto));
+            Log.i(TAG,"发送数据时间为："+formatTime.format(new Date()));
+            clientCommunicate.sendInfo(gson.toJson(comDataF));
+            count++;
+        }
+    }
+
 
 
     public void enableBluetooth() {
@@ -203,7 +227,7 @@ public class GamePresenter {
         //启动Internet通讯
         this.clientCommunicate.startCommunicate();
         //启动Internet测试------以后再加吧....这只是一个确认作用，但是加上去会很麻烦 ，确定连接成功就可以通讯
-        //this.tcpConnectTest();
+        this.tcpConnectTest();
     }
 
     public void prepareBlue(ClientCommunicate clientCommunicate) {
@@ -211,7 +235,7 @@ public class GamePresenter {
         //启动蓝牙通讯
         this.clientCommunicate.startCommunicate();
         //初始化连接bluetooth------以后再加吧....这只是一个确认作用，但是加上去会很麻烦，确定连接成功就可以通讯
-        //this.toBluetoothConnectTest();
+        this.toBluetoothConnectTest();
     }
 
     public void prepareLocal(ClientCommunicate clientCommunicate) {

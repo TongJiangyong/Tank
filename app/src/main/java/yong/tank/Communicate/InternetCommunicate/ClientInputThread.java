@@ -4,9 +4,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -26,12 +25,12 @@ import yong.tank.tool.StaticVariable;
 
 public class ClientInputThread implements Runnable,Subject{
     private Socket socket;
-    private String msg;
     private boolean isStart = true;
-    private BufferedReader in;
+    private InputStream in;
     public static final String TAG = "ClientInputThread";
     private Charset charset = Charset.forName("UTF-8");
     private Handler myHander;
+    private byte[] readBuffer = new byte[4096];
     // 存放观察者
     private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
@@ -40,7 +39,8 @@ public class ClientInputThread implements Runnable,Subject{
     public ClientInputThread(Socket socket) {
         this.socket = socket;
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+            //in = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+            in = socket.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,15 +56,37 @@ public class ClientInputThread implements Runnable,Subject{
         try {
             while (isStart) {
                 //先测试这个方法......
-                Log.w(TAG,"readStart。。。。");
-                char[] buff = new char[1024];
+                //Log.w(TAG,"readStart。。。。");
+                //char[] buff = new char[1024];
                 //CharBuffer buff = CharBuffer.allocate(1024);
-                msg=in.readLine();
-                //msg =CharBuffer.wrap(buff).toString();
-                //msg =charset.encode(msg);
-                Log.w(TAG,"intenet input msg:"+msg);
-                this.notifyWatchers(msg);
 
+                //如果出错，就判定为断开连接......就这么做吧 简化起见.....
+                while(in.read(readBuffer)!=-1){
+                    //数据收到就有问题.....
+                    String readline=new String(readBuffer).trim();
+                    //需要重新分配，不然会有问题......
+                    readBuffer = new byte[4096];
+                    Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
+                    String[] readInfos  =readline.split("&");
+                    //解析每一个消息
+                    for(int i=0;i<readInfos.length;i++){
+                        //Log.w(TAG, "input Thread 收到的id: "+readInfos[i]);
+                        ComDataF comDataF=null;
+                        try {
+                            comDataF = ComDataPackage.unpackToF(readInfos[i]);
+                            this.notifyWatchers(comDataF);
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println("input Thread error parse file "+e);
+                            System.out.println("error info is "+readInfos[i]);
+                            continue;
+                        }
+                    }
+                }
+                Message msg = myHander.obtainMessage();
+                msg.what = StaticVariable.MSG_COMMUNICATE_ERROR;
+                myHander.sendMessage(msg);
             }
             in.close();
             if (socket != null)
@@ -112,7 +134,7 @@ public class ClientInputThread implements Runnable,Subject{
     }
 
     @Override
-    public void notifyWatchers(String msg) {
+    public void notifyWatchers(ComDataF comDataF) {
         //再这里解析，并进行遍历传输
         //Log.w(TAG,msg);
        //进行包的解析工作
@@ -127,7 +149,7 @@ public class ClientInputThread implements Runnable,Subject{
         //String test=ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getObject();
         //testDto testDto = ComDataPackage.packageToObject(test);
         //Log.w(TAG, "object::"+testDto.toString());
-        ComDataF comDataF  = ComDataPackage.unpackToF(msg);
+
         //处理聊天信息
         if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_MSG)){
             for(ObserverMsg o:observerMsgs){
@@ -139,6 +161,7 @@ public class ClientInputThread implements Runnable,Subject{
             for(ObserverInfo o:observerInfos){
                 //传入对象
                 o.infoRecived(ComDataPackage.packageToObject(comDataF.getComDataS().getObject()));
+                //Log.w(TAG, "input Thread 收到的id: "+((testDto)ComDataPackage.packageToObject(comDataF.getComDataS().getObject())).id );
             }
             //处理command相关的信息
         }else {

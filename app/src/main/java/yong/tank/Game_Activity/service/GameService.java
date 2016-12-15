@@ -11,7 +11,10 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,6 +47,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private Context context;
     private Timer timerBonus;
     private Timer timerCommunnicate;
+    private Queue<testDto> testDtos = new LinkedList<testDto>();
     private boolean connectFlag =false;
     //TODO 测试通讯的代码
     private ClientCommunicate clientCommunicate;
@@ -73,14 +77,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     };
 
 
-    private void observerInit() {
-        //连接成功后，添加监听
-        //TODO 网络连接 成功后，进入init相关的系列....操作，包括数据传输等......
-        clientCommunicate.addInfoObserver(this);
-        clientCommunicate.addMsgObserver(this);
-        clientCommunicate.addCommandObserver(this);
-        //Toast.makeText(context.getApplicationContext(),  "与对手连接成功", Toast.LENGTH_SHORT).show();
-    }
     public void gameStart(){
         if(gameThread==null){
             gameThread= new GameThread();
@@ -305,8 +301,33 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
     public void setClientCommunicate(ClientCommunicate clientCommunicate) {
+        //设置后communicate的接口后，立刻设置监听
         this.clientCommunicate = clientCommunicate;
+        this.clientCommunicate.addInfoObserver(this);
+        this.clientCommunicate.addMsgObserver(this);
+        this.clientCommunicate.addCommandObserver(this);
+        //启动一个消耗的线程
+        Timer timer  = new Timer();
+        timer.schedule(new consumeThread(),3000,20);
     }
+
+    //互相communicate的线程
+    private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    public class consumeThread extends TimerTask {
+        @Override
+        public void run() {
+            if(testDtos.size()!=0){
+
+                testDtos.poll();
+                Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
+
+            }else{
+                Log.w(TAG,"队列为空");
+            }
+
+        }
+    }
+
 
     /*****************************************这里是与通信相关的方法*****时间差大概在10~30ms之间**********************************/
     @Override
@@ -316,7 +337,13 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
     @Override
     public void infoRecived(testDto testDto) {
-        Log.w(TAG,"reviced testDto:"+testDto.toString());
+
+        testDtos.offer(testDto);
+/*        testDto testDto_temp = testDtos.poll();
+        if(testDto_temp!=null){
+            Log.w(TAG,"consumeThread 使用队列:"+testDto_temp.toString()+" 时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
+            Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
+        }*/
     }
 
     @Override
