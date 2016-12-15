@@ -19,19 +19,23 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Dto.GameDto;
 import yong.tank.Dto.testDto;
+import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.R;
 import yong.tank.modal.Blood;
 import yong.tank.modal.Bonus;
+import yong.tank.modal.DeviceInfo;
 import yong.tank.modal.Explode;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
 import yong.tank.modal.Point;
+import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
@@ -47,6 +51,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private Context context;
     private Timer timerBonus;
     private Timer timerCommunnicate;
+    private LocalRecord<User> localUser = new LocalRecord<User>();
     private Queue<testDto> testDtos = new LinkedList<testDto>();
     private boolean connectFlag =false;
     //TODO 测试通讯的代码
@@ -277,25 +282,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
         }
     }
-
-/*    //互相communicate的线程
-    public class CommunicateThread extends TimerTask {
-        @Override
-        public void run() {
-            if(connectFlag){
-
-                if(connectFlag){
-                    Log.w(TAG,"send info");
-                    testDto testDto = new testDto(12,"test");
-                    ComDataF comDataF = ComDataPackage.packageToF("654321#","12",gson.toJson(testDto));
-                    clientCommunicate.sendInfo(gson.toJson(comDataF));
-             }
-
-            }
-
-
-        }
-    }*/
     public ClientCommunicate getClientCommunicate() {
         return clientCommunicate;
     }
@@ -329,27 +315,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
 
-    /*****************************************这里是与通信相关的方法*****时间差大概在10~30ms之间**********************************/
-    @Override
-    public void commandRecived(String command) {
-        Log.w(TAG,"reviced cmmand:"+command);
-    }
 
-    @Override
-    public void infoRecived(testDto testDto) {
 
-        testDtos.offer(testDto);
-/*        testDto testDto_temp = testDtos.poll();
-        if(testDto_temp!=null){
-            Log.w(TAG,"consumeThread 使用队列:"+testDto_temp.toString()+" 时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
-            Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
-        }*/
-    }
-
-    @Override
-    public void msgRecived(String msg) {
-        Log.w(TAG,"reviced msg:"+msg);
-    }
 
 
 
@@ -366,13 +333,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         //TODO 完成游戏启动前自身数据的初始化
         this.initLocal();
         //TODO 确定通信连接后，完成远程连接工作后其他数据的初始化
-        if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+        if(StaticVariable.CHOSED_MODE!=StaticVariable.GAME_MODE.LOCAL){
             this.initRemoteActivity();
         }else{
-            this.initRemotePassivity();
+            this.initLocalActivity();
         }
 
     }
+
 
     /**
      * 本地初始化相关的代码
@@ -422,12 +390,140 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
      *远程初始化相关的代码
      */
 
-    //被动的初始化过程
-    private void initRemotePassivity() {
-    }
-    //主动的初始化过程.....
+    //发送ID到server，同时，passive端，首先开始进行主动的通讯工作
     private void initRemoteActivity() {
+        Tool.sendSelfIdToServer(this.clientCommunicate);
+        if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.PASSIVE){
+            Tool.sendSelfIdToActive(this.clientCommunicate);
+        }
     }
 
+
+    private void initLocalActivity() {
+    }
+
+    /*****************************************这里是与通信相关的方法*****时间差大概在10~30ms之间**********************************/
+
+    //主要用来向buffer中填充数据
+    @Override
+    public void infoRecived(testDto testDto) {
+        testDtos.offer(testDto);
+/*        testDto testDto_temp = testDtos.poll();
+        if(testDto_temp!=null){
+            Log.w(TAG,"consumeThread 使用队列:"+testDto_temp.toString()+" 时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
+            Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
+        }*/
+    }
+
+    /**
+     *与command处理相关的方法类
+     */
+    @Override
+    public void commandRecived(ComDataF comDataF) {
+        Log.w(TAG,"reviced cmmand:"+comDataF.getComDataS().getCommad());
+        String command = comDataF.getComDataS().getCommad();
+/*********************************与游戏初始化相关的命令***************************************************/
+        /**activity端接受到passive发送命令,记录远程的Id号码，并发送确认信息**/
+        if(command.equals(StaticVariable.INIT_PASSIVE_REQUEST_CONNECT)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                Log.w(TAG,"INIT_PASSIVE_REQUEST_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                StaticVariable.REMOTE_DEVICE_ID = comDataF.getComDataS().getObject();
+                //INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT
+                Tool.sendACKToPassive(this.clientCommunicate);
+            }else{
+                Log.i(TAG,"*******************身份错误_1************************");
+            }
+            /** passive接受确认信息，并传输自身的信息数据**/
+        }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Tool.sendSelfInfoToActive(this.clientCommunicate);
+            }else{
+                Log.i(TAG,"*******************身份错误_2************************");
+            }
+            /** activity接受信息数据，并传输自身的信息数据**/
+        }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+               //activity接受远程的数据信息
+                DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
+                StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
+                StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
+                StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
+                Tool.sendSelfInfoToPassive(this.clientCommunicate);
+            }else{
+                Log.i(TAG,"*******************身份错误_3************************");
+            }
+            /**  passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，**/
+        }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
+                StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
+                StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
+                StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
+                Tool.sendInitFinishedToActive(this.clientCommunicate);
+            }else{
+                Log.i(TAG,"*******************身份错误_3************************");
+            }
+/*********************************与游戏控制相关的命令，考虑使用广播来进行控制***************************************************/
+             /**   activity初始化完成命令，开始进入游戏，并传输初始化完成命令，**/
+        }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Tool.sendInitFinishedToPassive(this.clientCommunicate);
+                //TODO 启动游戏_activity
+                /*****在这里可以启动游戏了._ACTIVITY模式....******/
+
+            }else{
+
+            }
+        }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                //TODO 启动游戏_passive
+                /*****在这里可以启动游戏了.....PASSIVE模式******/
+
+            }else{
+
+            }
+        }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                //TODO 结束游戏_ACTIVITY
+                /*****在这里判断游戏是否结束....ACTIVITY模式******/
+
+            }else{
+
+            }
+        }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER)){
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                //TODO 结束游戏_passive
+                /*****在这里判断游戏是否结束....passive模式******/
+
+            }else{
+
+            }
+        }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY)) {
+                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:" + comDataF.getComDataS().getCommad());
+                 //TODO 中断游戏_direct
+                /*****在这里判断游戏是否主动中断....direction******/
+        }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_UNDIRECTRIY)){
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                //TODO 中断游戏_undirect
+                /*****在这里判断游戏是否主动中断....direction******/
+        }else{
+
+        }
+    }
+
+    /**
+     *主要处理信息数据的显示即可
+     */
+    @Override
+    public void msgRecived(String msg) {
+        Log.w(TAG,"reviced msg:"+msg);
+    }
 
 }

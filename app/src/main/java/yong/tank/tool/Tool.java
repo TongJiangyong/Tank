@@ -5,12 +5,30 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import yong.tank.Communicate.ComData.ComDataF;
+import yong.tank.Communicate.ComData.ComDataPackage;
+import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
+import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.SelectTank_Activity.modal.PictureInfo;
+import yong.tank.modal.DeviceInfo;
 import yong.tank.modal.Point;
+import yong.tank.modal.User;
+
+import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT;
+import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER;
+import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED;
+import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO;
+import static yong.tank.tool.StaticVariable.INIT_PASSIVE_REQUEST_CONNECT;
+import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER;
+import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED;
+import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO;
+import static yong.tank.tool.StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -322,4 +340,117 @@ public class Tool {
         //final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * scaledDensity + 0.5f);
     }
+
+    /******************************命令集合*************************************************
+     *
+     *  public final static String INIT_SEND_ID_SERVER ="1"; //发送数据到server端
+        public final static String INIT_PASSIVE_REQUEST_CONNECT ="2"; //passive发送连接命令到activity端，并传递自身的ID号、确认信息
+        public final static String INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT ="3"; //activity确认连接到的passiveId，并发送确认信息
+        public final static String INIT_PASSIVE_RESPONSE_SELFINFO ="4";    //passive接受确认信息，并传输自身的信息数据
+        public final static String INIT_ACTIVITE_RESPONSE_SELFINFO ="5";    //activity接受信息数据，并传输自身的信息数据
+        public final static String INIT_PASSIVE_RESPONSE_INIT_FINISHED ="6";  //passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，然后开始游戏
+        public final static String INIT_ACTIVITE_RESPONSE_INIT_FINISHED ="7";  //activity初始化完成命令，开始进入游戏，并传输初始化完成命令
+        public final static String INIT_PASSIVE_RESPONSE_GAMEOVER ="8";         //PASSIVE发送一轮游戏结束后的命令
+        public final static String INIT_ACTIVITE_RESPONSE_GAMEOVER ="9";        //activity发送一轮游戏结束后的命令
+        public final static String  RESPONSE_FINISHED_CONNECT ="10";        //发送断开命令
+     *****************************************************************************/
+    private static Gson gson = new Gson();
+    private static LocalRecord<User> localUser = new LocalRecord<User>();
+
+    /**
+     * 发送自己的ID给服务器
+     * @param clientCommunicate
+     */
+    public static void  sendSelfIdToServer(ClientCommunicate clientCommunicate){
+        User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
+        ComDataF comDataF = ComDataPackage.packageToF(("0#"+user.getId()),StaticVariable.INIT_SEND_ID_SERVER,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * passive发送连接命令到activity端，并传递自身的ID号、确认信息
+     * @param clientCommunicate
+     */
+    public static void  sendSelfIdToActive(ClientCommunicate clientCommunicate){
+        User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_REQUEST_CONNECT,String.valueOf(user.getId()));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * activity确认连接到的passiveId，并发送确认信息
+     * @param clientCommunicate
+     */
+    public static void  sendACKToPassive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * passive接受确认信息，并传输自身的信息数据
+     * @param clientCommunicate
+     */
+    public static void  sendSelfInfoToActive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        //传输的数据包括： 高，宽，密度
+        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * activity接受信息数据，并传输自身的信息数据
+     * @param clientCommunicate
+     */
+    public static void  sendSelfInfoToPassive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        //传输的数据包括： 高，宽，密度
+        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * activity初始化完成命令，开始进入游戏，并传输初始化完成命令
+     * @param clientCommunicate
+     */
+    public static void  sendInitFinishedToPassive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_INIT_FINISHED,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，
+     * @param clientCommunicate
+     */
+    public static void  sendInitFinishedToActive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_INIT_FINISHED,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * PASSIVE发送一轮游戏结束后的命令
+     * @param clientCommunicate
+     */
+    public static void  sendGameFinishedToActive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_GAMEOVER,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * Pactivity发送一轮游戏结束后的命令
+     * @param clientCommunicate
+     */
+    public static void  sendGameFinishedToPassive(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_GAMEOVER,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+    /**
+     * 发送断开命令
+     * @param clientCommunicate
+     */
+    public static void  sendInterruptToRemote(ClientCommunicate clientCommunicate){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), RESPONSE_FINISHED_CONNECT_DIRECTIRY,null);
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+
 }

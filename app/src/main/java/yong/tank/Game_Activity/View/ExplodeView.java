@@ -26,7 +26,10 @@ public class ExplodeView extends ViewBase{
 
     @Override
     public void stopThread() {
-        this.explodeThread.stopThread();
+        if(this.explodeThread!=null){
+            this.explodeThread.stopThread();
+        }
+
     }
 
     @Override

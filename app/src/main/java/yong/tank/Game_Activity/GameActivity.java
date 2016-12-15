@@ -11,7 +11,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.reflect.Constructor;
@@ -41,6 +44,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private static String TAG = "GameActivity";
     private PlayControler playControler;
     private GameControler gameControler;
+    private Button msgButton;
+    private ImageView msgView;
+    private TextView msgText;
     private GameService gameService;
     private ClientCommunicate clientCommunicate;
     private GamePresenter gamePresenter;
@@ -62,6 +68,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
         //绘制selectView   这里添加selectView之前，还要设置view的基本位置信息，主要在layout中处理位置
         SelectView selectView = (SelectView)findViewById(R.id.selectView);
+        msgButton = (Button)findViewById(R.id.msgButton);
+        msgView = (ImageView)findViewById(R.id.msgView);
+        msgText = (TextView)findViewById(R.id.msgText);
+        msgView.setVisibility(View.GONE);
+        msgText.setVisibility(View.GONE);
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
@@ -126,9 +137,19 @@ public class GameActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         //在这里传入electView,然后进行逻辑处理即可....
+        switch (view.getId()) {
+            case R.id.msgButton:
+                //显示出msg的界面......
+                msgView.setVisibility(View.VISIBLE);
+                msgText.setVisibility(View.VISIBLE);
+                break;
+            default:
+                break;
+        }
         if(startFlag){
             this.playControler.setClick(view);
         }
+
     }
 
 

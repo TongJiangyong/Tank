@@ -27,7 +27,9 @@ public class GameView extends ViewBase{
 
     @Override
     public void stopThread() {
-        this.gameThread.stopThread();
+        if(this.gameThread!=null){
+            this.gameThread.stopThread();
+        }
         //this.explodeThread.stopThread();
     }
 

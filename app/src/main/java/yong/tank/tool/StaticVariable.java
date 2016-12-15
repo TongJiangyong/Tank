@@ -60,11 +60,12 @@ public class StaticVariable {
     //远程设备的基本信息 高宽、密度
     public static int REMOTE_SCREEN_WIDTH;
     public static int REMOTE_SCREEN_HEIGHT;
-    public static int REMOTE_DENSITY;
+    public static float REMOTE_DENSITY;
     //本地设备的基本信息 高宽、密度
     public static float LOCAL_DENSITY;
     public static int LOCAL_SCREEN_WIDTH;
     public static int LOCAL_SCREEN_HEIGHT;
+
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     public static TankBascInfo[] TANKBASCINFO = {
             new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A"+"\n"+",有多牛呢？"),
@@ -202,7 +203,20 @@ public class StaticVariable {
     //blue的toast
     public final static int BLUE_TOAST = 100;
 
-
+    /* 信息交互coomand相关的代码 */
+    public final static String INIT_SEND_ID_SERVER ="1"; //发送数据到server端
+    public final static String INIT_PASSIVE_REQUEST_CONNECT ="2"; //passive发送连接命令到activity端，并传递自身的ID号、确认信息
+    public final static String INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT ="3"; //activity确认连接到的passiveId，并发送确认信息
+    public final static String INIT_PASSIVE_RESPONSE_SELFINFO ="4";    //passive接受确认信息，并传输自身的信息数据
+    public final static String INIT_ACTIVITE_RESPONSE_SELFINFO ="5";    //activity接受信息数据，并传输自身的信息数据
+    public final static String INIT_PASSIVE_RESPONSE_INIT_FINISHED ="6";  //passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，然后开始游戏
+    public final static String INIT_ACTIVITE_RESPONSE_INIT_FINISHED ="7";  //activity初始化完成命令，开始进入游戏，并传输初始化完成命令
+    public final static String INIT_PASSIVE_RESPONSE_GAMEOVER ="8";         //PASSIVE发送一轮游戏结束后的命令
+    public final static String INIT_ACTIVITE_RESPONSE_GAMEOVER ="9";        //activity发送一轮游戏结束后的命令
+    public final static String RESPONSE_FINISHED_CONNECT_DIRECTIRY ="10";        //发送断开命令------互相直接发送
+    public final static String RESPONSE_FINISHED_CONNECT_UNDIRECTRIY ="11";        //发送断开命令------服务器发送
+    /* 网络连接中，另一个设备的ID*/
+    public static String REMOTE_DEVICE_ID = null;
    /* 与存储相关的数据 */
     public final static String TANK_USER_INFO="tank_userinfo.bat";
     public final static String TANK_RECORD_INFO="tank_recordinfo.bat";

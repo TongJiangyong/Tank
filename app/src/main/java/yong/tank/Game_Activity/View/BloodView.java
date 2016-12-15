@@ -25,7 +25,9 @@ public class BloodView extends ViewBase{
 
     @Override
     public void stopThread() {
-        this.bloodThread.stopThread();
+        if(this.bloodThread!=null){
+            this.bloodThread.stopThread();
+        }
     }
 
     //Blood为什么只有在init中才有用？？？？？

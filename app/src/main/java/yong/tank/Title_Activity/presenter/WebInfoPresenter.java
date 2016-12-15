@@ -145,6 +145,8 @@ public class WebInfoPresenter {
             StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.PASSIVE;
             intent.putExtra("type", StaticVariable.GAMEMODE[1]); //1为网络模式
             Log.i(TAG,"opponentUserId:"+opponentUserId+" roomId:"+roomId);
+            //passive状态，记录对方的ID
+            StaticVariable.REMOTE_DEVICE_ID =  opponentUserId;
             context.startActivity(intent);
 
             //TODO 跳转连接到相应的房间

@@ -25,7 +25,9 @@ public class PlayerView extends ViewBase{
 
     @Override
     public void stopThread() {
-        this.playerThread.stopThread();
+        if(this.playerThread!=null){
+            this.playerThread.stopThread();
+        }
     }
 
     @Override

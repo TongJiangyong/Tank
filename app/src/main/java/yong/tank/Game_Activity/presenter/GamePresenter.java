@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -185,7 +184,7 @@ public class GamePresenter {
         public void run() {
             testDto testDto = new testDto(count,"test");
             ComDataF comDataF = ComDataPackage.packageToF("654321#","8",gson.toJson(testDto));
-            Log.i(TAG,"发送数据时间为："+formatTime.format(new Date()));
+            //Log.i(TAG,"发送数据时间为："+formatTime.format(new Date()));
             clientCommunicate.sendInfo(gson.toJson(comDataF));
             count++;
         }

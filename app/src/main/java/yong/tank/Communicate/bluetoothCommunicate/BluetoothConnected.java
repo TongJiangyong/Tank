@@ -223,7 +223,7 @@ public class BluetoothConnected extends Thread implements Subject {
         }else {
             for(ObserverCommand o:observerCommands){
                 //传入command
-                o.commandRecived(comDataF.getComDataS().getCommad());
+                o.commandRecived(comDataF);
             }
         }
     }
