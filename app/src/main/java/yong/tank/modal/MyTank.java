@@ -14,7 +14,7 @@ import yong.tank.tool.Tool;
 /**
  * Created by hasee on 2016/10/27.
  */
-
+//TODO 写成抽象方法，然后重写drawSelf方法？类似处理包括 bullet mytank blood.....考虑一下这种做法....可信性比较好.....
 public class MyTank implements Tank{
     private Bitmap tankPicture;
     private Bitmap armPicture;

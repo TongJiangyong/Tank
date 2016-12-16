@@ -10,33 +10,36 @@ import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
+import yong.tank.Dto.GameDto;
 
 /**
  * Created by hasee on 2016/11/26.
  */
 
 //最好将其写成单利模式
+//TODO clientLocal相关
 //这个类即一个通信的工具代理类 代理类均可以写成接口的形式，就是如此，即通信均通过代理类来实现
+//为了实现通用的通信借口 ，这里采用的逻辑是，将gameDto每隔20ms就主动发送一次数据，然后接收端做同样的处理即可
 public class ClientLocal implements  Runnable,ClientCommunicate {
     private AImaker aImaker;
-    private String ip;
-    private int port;
     private static String TAG ="ClientLocal";
     private boolean connectFlag =false;
     private int connectCount = 0;
+    private GameDto gameDto;
     private Handler mHandler;
     // 存放观察者
     private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
     private List<ObserverInfo> observerInfos = new ArrayList<ObserverInfo>();
     //穿进来要建立拿一个tank的对象信息即可
-    public ClientLocal(String ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public ClientLocal(GameDto gameDto) {
+        this.gameDto = gameDto;
     }
 
     public void run() {
         //TODO 这里启动AI的线程
+        //线程的主要作用 1、每隔20ms，发送一次gameDto的数据信息
+        //2、自动检测子弹使能的时间，如果有子弹使能，则发射子弹（一律为普通弹）
         
     }
 

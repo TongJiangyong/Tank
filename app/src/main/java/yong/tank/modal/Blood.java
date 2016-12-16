@@ -30,6 +30,7 @@ public class Blood {
         this.bloodNum = bloodNum;
     }
 
+    //这里配置一个其他的drawEnermy方法进行配置，可能会更好，或者将静态量提取出drawSelf出来
     public void drawSelf(Canvas canvas) {
         //计算血条的比例
         Rect src_blood = new Rect(0, 0, (int)(blood.getWidth()*bloodNum), blood.getHeight());
@@ -43,8 +44,6 @@ public class Blood {
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41),
                 bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,59)+(int)(power.getWidth()*powerNum),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41)+power.getHeight());
-
-
         //绘制装填进度条
         canvas.drawBitmap(power,src_power,des_power, null);
         //绘制框

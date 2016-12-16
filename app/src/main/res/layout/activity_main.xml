@@ -22,6 +22,8 @@
             android:layout_width="100px"
             android:layout_height="wrap_content"
             android:text="人机对战"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:background="#65594b" />
 
@@ -30,6 +32,8 @@
             android:layout_width="100px"
             android:layout_height="wrap_content"
             android:background="#65594b"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="蓝牙对战" />
 
@@ -38,6 +42,8 @@
             android:layout_width="100px"
             android:layout_height="wrap_content"
             android:background="#65594b"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="联网对战" />
 
@@ -46,6 +52,8 @@
             android:layout_width="100px"
             android:layout_height="wrap_content"
             android:background="#65594b"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="使用帮助" />
 

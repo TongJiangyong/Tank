@@ -38,24 +38,63 @@
     </Button>
 
 
-<!--注意控制一下两个为隐藏的状态-->
+<!--注意控制以下关于msg的控件为隐藏的状态-->
+    <!--看来后面的会覆盖在前面-->
+
+
     <ImageView
         android:id="@+id/msgView"
         android:src="@mipmap/msg_block"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:visibility="gone">
     </ImageView>
-<!--看来后面的会覆盖在前面-->
+
+    <EditText
+        android:id="@+id/msg_input"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#c7b5a0"
+        android:ems="10"
+        android:hint="@string/inputInfo"
+        android:padding="5.0dip"
+        android:paddingRight="40dp"
+        android:textColor="#ff3b3b3b"
+        android:textSize="16.0sp"
+        android:layout_alignBottom="@+id/msgView"
+        android:layout_alignLeft="@+id/msgView"
+        android:layout_alignStart="@+id/msgView"
+        android:layout_toLeftOf="@+id/msgSend"
+        android:layout_toStartOf="@+id/msgSend"
+        android:visibility="gone">
+    </EditText>
+
+    <Button
+        android:id="@+id/msgSend"
+        android:text="发送"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_alignBottom="@+id/msgView"
+        android:layout_alignRight="@+id/msgView"
+        android:layout_alignEnd="@+id/msgView"
+        android:visibility="gone">
+    </Button>
+
     <TextView
         android:id="@+id/msgText"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
         android:ellipsize="end"
-        android:maxLines="2"
-        android:text="测试  \n  sdfsdf"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:maxLines="8"
+        android:text="测试 sdf \n  sdfsdf \n 是否水电费 sdfsdf  \n  \n  \n "
+        android:layout_alignTop="@+id/msgView"
+        android:layout_alignLeft="@+id/msgView"
+        android:layout_alignStart="@+id/msgView"
+        android:visibility="gone"/> <!--invisible /visibale-->
 
 </RelativeLayout>

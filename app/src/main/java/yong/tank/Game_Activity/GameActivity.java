@@ -71,8 +71,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
         msgButton = (Button)findViewById(R.id.msgButton);
         msgView = (ImageView)findViewById(R.id.msgView);
         msgText = (TextView)findViewById(R.id.msgText);
-        msgView.setVisibility(View.GONE);
-        msgText.setVisibility(View.GONE);
+        //msgView.setVisibility(View.GONE);
+        //msgText.setVisibility(View.GONE);
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
@@ -113,7 +113,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
             this.gamePresenter.prepareBlue(this.clientCommunicate);
         }else{
             //如果是本地模式
-            this.clientCommunicate = new ClientLocal(StaticVariable.SERVER_IP, StaticVariable.SERVER_PORT);
+            this.clientCommunicate = new ClientLocal(gameDto);
             //进入本地模式的确认连接步骤 可以不做
             this.gamePresenter.prepareLocal(this.clientCommunicate);
         }
@@ -140,8 +140,14 @@ public class GameActivity extends Activity implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.msgButton:
                 //显示出msg的界面......
-                msgView.setVisibility(View.VISIBLE);
-                msgText.setVisibility(View.VISIBLE);
+                if(msgView.getVisibility()==View.GONE){
+                    msgView.setVisibility(View.VISIBLE);
+                    msgText.setVisibility(View.VISIBLE);
+                }else{
+                    msgView.setVisibility(View.GONE);
+                    msgText.setVisibility(View.GONE);
+                }
+
                 break;
             default:
                 break;

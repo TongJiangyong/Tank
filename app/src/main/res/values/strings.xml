@@ -16,4 +16,5 @@
     <string name="winComputerTime_info">单机胜利次数：</string>
     <string name="winBlueTime_info">蓝牙胜利次数：</string>
     <string name="winInternetTime_info">网络胜利次数：</string>
+    <string name="inputInfo">发送的信息...</string>
 </resources>
