@@ -45,6 +45,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private PlayControler playControler;
     private GameControler gameControler;
     private Button msgButton;
+    private Button msgSend;
     private ImageView msgView;
     private TextView msgText;
     private GameService gameService;
@@ -71,8 +72,10 @@ public class GameActivity extends Activity implements View.OnClickListener {
         msgButton = (Button)findViewById(R.id.msgButton);
         msgView = (ImageView)findViewById(R.id.msgView);
         msgText = (TextView)findViewById(R.id.msgText);
-        //msgView.setVisibility(View.GONE);
-        //msgText.setVisibility(View.GONE);
+        msgSend = (Button)findViewById(R.id.msgSend);
+        if(StaticVariable.CHOSED_MODE !=StaticVariable.GAME_MODE.LOCAL){
+            msgButton.setVisibility(View.VISIBLE);
+        }
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
@@ -143,11 +146,16 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 if(msgView.getVisibility()==View.GONE){
                     msgView.setVisibility(View.VISIBLE);
                     msgText.setVisibility(View.VISIBLE);
+                    msgSend.setVisibility(View.VISIBLE);
                 }else{
                     msgView.setVisibility(View.GONE);
                     msgText.setVisibility(View.GONE);
+                    msgSend.setVisibility(View.GONE);
                 }
 
+                break;
+            case  R.id.msgSend:
+                //TODO deal with send method
                 break;
             default:
                 break;

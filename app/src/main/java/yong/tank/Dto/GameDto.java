@@ -1,9 +1,12 @@
 package yong.tank.Dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import yong.tank.modal.EnemyBlood;
+import yong.tank.modal.EnemyTank;
 import yong.tank.modal.MyBlood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
@@ -15,12 +18,14 @@ import yong.tank.modal.SelectButton;
  * Created by jiangyong_tong on 2016/10/31.
  */
 
-public class GameDto {
+public class GameDto implements Serializable{
     //初始化必备的
     private int tankType ;
     private int mapType ;
     private MyTank myTank;
     private MyBlood myBlood;
+    private EnemyTank enemyTank;
+    private EnemyBlood enemyBlood;
     //这里最好每一个modal，都会在里面.....
     private PlayerPain playerPain;
     private List<Explode> explodes;
@@ -91,5 +96,22 @@ public class GameDto {
 
     public void setMapType(int mapType) {
         this.mapType = mapType;
+    }
+
+
+    public EnemyTank getEnemyTank() {
+        return enemyTank;
+    }
+
+    public void setEnemyTank(EnemyTank enemyTank) {
+        this.enemyTank = enemyTank;
+    }
+
+    public EnemyBlood getEnemyBlood() {
+        return enemyBlood;
+    }
+
+    public void setEnemyBlood(EnemyBlood enemyBlood) {
+        this.enemyBlood = enemyBlood;
     }
 }

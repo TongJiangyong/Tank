@@ -3,9 +3,6 @@ package yong.tank.Communicate.LocalCommunicate;
 import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
@@ -27,10 +24,6 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
     private int connectCount = 0;
     private GameDto gameDto;
     private Handler mHandler;
-    // 存放观察者
-    private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
-    private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
-    private List<ObserverInfo> observerInfos = new ArrayList<ObserverInfo>();
     //穿进来要建立拿一个tank的对象信息即可
     public ClientLocal(GameDto gameDto) {
         this.gameDto = gameDto;
@@ -40,13 +33,13 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
         //TODO 这里启动AI的线程
         //线程的主要作用 1、每隔20ms，发送一次gameDto的数据信息
         //2、自动检测子弹使能的时间，如果有子弹使能，则发射子弹（一律为普通弹）
-        
+        aImaker = new AImaker(gameDto,mHandler);
+        new Thread(aImaker).start();
     }
 
     //封装发送信息的方法 这里不用发信息，所以没用
-    public void sendInfo (String msg){
-
-    }
+    @Override
+    public void sendInfo (String msg){}
 
     @Override
     public void startCommunicate() {

@@ -8,7 +8,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import yong.tank.modal.MyBullet;
 import yong.tank.modal.Point;
 import yong.tank.modal.TankBascInfo;
 import yong.tank.tool.StaticVariable;
@@ -26,7 +25,7 @@ public abstract class Tank {
     public int tankPosition_y =0;
     public int tankDirectrion=0;
     private Point tankCenter = new Point();
-    private static String TAG = "MyTank";
+    private static String TAG = "Tank";
     public int weaponDegree =-10; //armpicture为内置的.....
     public int weaponPoxition_x =0;
     public int weaponPoxition_y =0;
@@ -35,7 +34,7 @@ public abstract class Tank {
     //预发射路径点
     public List<Point> preFirePath;
     //已经发射的子弹，严格控制子弹加入
-    public List<MyBullet> bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
+    public List<Bullet> bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
     //tank所拥有的子弹种类
     /**  类型   数量
      *  0       100000
@@ -124,11 +123,11 @@ public abstract class Tank {
             this.weaponDegree = weaponDegree;
             }
 
-    public List<MyBullet> getBulletsFire() {
+    public List<Bullet> getBulletsFire() {
             return bulletsFire;
             }
 
-    public void setBulletsFire(List<MyBullet> bulletsFire) {
+    public void setBulletsFire(List<Bullet> bulletsFire) {
             this.bulletsFire = bulletsFire;
             }
 
@@ -221,8 +220,8 @@ public abstract class Tank {
             this.preFirePath = preFirePath;
             }
 
-    public void addBuleetFire(MyBullet myBullet) {
-            this.getBulletsFire().add(myBullet);
+    public void addBuleetFire(Bullet bullet) {
+            this.getBulletsFire().add(bullet);
             }
 
     public int getSelectedBulletsNum() {
