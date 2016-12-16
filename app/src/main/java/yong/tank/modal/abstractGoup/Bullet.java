@@ -1,4 +1,4 @@
-package yong.tank.modal;
+package yong.tank.modal.abstractGoup;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,62 +7,37 @@ import android.graphics.Path;
 
 import java.util.List;
 
-import yong.tank.tool.StaticVariable;
+import yong.tank.modal.BulletBascInfo;
+import yong.tank.modal.Point;
 
 /**
  * Created by hasee on 2016/11/8.
  */
 
-public class Bullet {
+public abstract class Bullet {
     private  BulletBascInfo bulletBascInfo;
-    private int bulletPosition_x;
-    private int bulletPosition_y;
+    public int bulletPosition_x;
+    public int bulletPosition_y;
     //用来决定距离的....
-    private double bulletDistance;
-    private int bulletDegree; //armpicture为内置的.....
-    private Bitmap bulletPicture;
+    public double bulletDistance;
+    public int bulletDegree; //armpicture为内置的.....
+    public Bitmap bulletPicture;
     private static String TAG = "Bullet";
-    private Matrix matrix = new Matrix(); // 预备用作旋转的类
-    private boolean drawFlag=false;
-    private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
+    public Matrix matrix = new Matrix(); // 预备用作旋转的类
+    public boolean drawFlag=false;
+    public int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
     //测试绘制路径
     private Path path = new Path();
     //发射路径点
-    private List<Point> firePath;
+    public List<Point> firePath;
     double bulletV_x=0;
     double bulletV_y=0;
-    public Bullet(Bitmap bulletPicture,BulletBascInfo bulletBascInfo) {
+    public Bullet(Bitmap bulletPicture, BulletBascInfo bulletBascInfo) {
         this.bulletPicture = bulletPicture;
         this.bulletBascInfo = bulletBascInfo;
     }
 
-    public void drawSelf(Canvas canvas){
-        //TODO 绘制子弹 如果路径存在
-        if(firePath!=null&&drawFlag&&pathPosition<firePath.size()){
-            //for(int i =0;i<firePath.size();i++){
-            matrix.setTranslate(firePath.get(pathPosition).getX(), firePath.get(pathPosition).getY());//子弹坐标
-            matrix.postRotate(firePath.get(pathPosition).getDegree(),firePath.get(pathPosition).getX(),firePath.get(pathPosition).getY());//子弹的旋转
-            bulletPosition_x=firePath.get(pathPosition).getX();
-            bulletPosition_y=firePath.get(pathPosition).getY();
-            canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
-            //Log.w(TAG, "X:" + firePath.get(pathPosition).getX() +" Y:" + firePath.get(pathPosition).getY() + " Degree:" + firePath.get(pathPosition).getDegree());
-            pathPosition++;
-            //}
-        }
-        //TODO 计算位置
-/*        bulletPosition();
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);// 设置红色
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
-        canvas.drawPath(path, paint);*/
-        if(bulletPosition_x> StaticVariable.LOCAL_SCREEN_WIDTH ||
-                bulletPosition_y>StaticVariable.LOCAL_SCREEN_HEIGHT ||
-                bulletPosition_x<0){
-            this.setDrawFlag(false);
-        }
-    }
+    public abstract  void drawSelf(Canvas canvas);
 
     public Bitmap getBulletPicture() {
         return bulletPicture;

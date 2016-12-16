@@ -28,7 +28,7 @@ import yong.tank.Dto.GameDto;
 import yong.tank.Dto.testDto;
 import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.R;
-import yong.tank.modal.Blood;
+import yong.tank.modal.MyBlood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.DeviceInfo;
 import yong.tank.modal.Explode;
@@ -205,8 +205,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 //***************削减血条***************
                 double boldSubtraction =gameDto.getMyTank().getBulletsFire().get(bullet).getBulletBascInfo().getPower();
                 //TODO 这里好好想一下，如何实现注册，然后回调函数.....
-                gameDto.getBlood().subtractionBlood(boldSubtraction);
-                if(gameDto.getBlood().getBloodNum()<0){
+                gameDto.getMyBlood().subtractionBlood(boldSubtraction);
+                if(gameDto.getMyBlood().getBloodNum()<0){
                     //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
                     Message msgInfo = myHandler.obtainMessage();
                     msgInfo.what = StaticVariable.MSG_TOAST;
@@ -214,7 +214,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     bundleMsg.putString("message","血条已空");  //设置子弹数量
                     msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
                     myHandler.sendMessage(msgInfo);
-                    gameDto.getBlood().setBloodNum(1);
+                    gameDto.getMyBlood().setBloodNum(1);
                 }
                 //***************设置bonus停止***************
                 gameDto.getBonus().setIsBonusFired(true);
@@ -361,8 +361,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         gameDto.setMyTank(myTank);
         gameDto.setPlayerPain(playerPain);
         //TODO 测试初始化装载血条的视图
-        Blood blood = initBlood(true);
-        gameDto.setBlood(blood);
+        MyBlood myBlood = initBlood(true);
+        gameDto.setMyBlood(myBlood);
     }
 
     private MyTank initTank(int tankType){
@@ -372,7 +372,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         MyTank tank = new MyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
         return tank;
     }
-    private Blood initBlood(Boolean isMyBlood){
+    private MyBlood initBlood(Boolean isMyBlood){
         //TODO 如果是true会找其他图片
         //TODO 这里暂时先别做.....以后再改....
         Bitmap blood_picture=null;
@@ -381,8 +381,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         power_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.POWERR);
         Bitmap bloodBlock_picture=null;
         bloodBlock_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BLOODBLOCK);
-        Blood blood = new Blood(blood_picture, power_picture, bloodBlock_picture,1,1);
-        return blood;
+        MyBlood myBlood = new MyBlood(blood_picture, power_picture, bloodBlock_picture,1,1);
+        return myBlood;
     }
 
 

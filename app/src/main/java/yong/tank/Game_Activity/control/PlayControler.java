@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import yong.tank.Dto.GameDto;
 import yong.tank.R;
-import yong.tank.modal.Bullet;
+import yong.tank.modal.MyBullet;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
@@ -195,7 +195,7 @@ public class PlayControler {
             this.gameDto.getMyTank().setFireAction(true);
             //装载子弹并发射
             if(this.gameDto.getMyTank().getEnableFire()&&
-                    this.gameDto.getBlood().getAllowFire()&&
+                    this.gameDto.getMyBlood().getAllowFire()&&
                     this.gameDto.getMyTank().getSelectedBulletsNum()>0){
                 //停止prePath的绘制
                 this.gameDto.getMyTank().setPreFirePath(null);
@@ -212,18 +212,18 @@ public class PlayControler {
         //1/发射子弹，2、并重置装填的时间，3、更新bullet的计数
         public void tankOnFire(){
             //***************发射子弹*************
-            Bullet bullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
+            MyBullet myBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
             //在tank中加入子弹
-            this.gameDto.getMyTank().addBuleetFire(bullet);
+            this.gameDto.getMyTank().addBuleetFire(myBullet);
             //***************重置装填的时间*************
             //如果子弹的类型不是连续弹，则设置装填时间
             if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
             {
-                this.gameDto.getBlood().setPowerNum(1);
+                this.gameDto.getMyBlood().setPowerNum(1);
             }else{
-                this.gameDto.getBlood().setPowerNum(0);
+                this.gameDto.getMyBlood().setPowerNum(0);
                 //设置禁止发射,直到装填时间回复
-                this.gameDto.getBlood().setAllowFire(false);
+                this.gameDto.getMyBlood().setAllowFire(false);
             }
             //***************更新bullet的计数*************
             //如果当前的子弹类型不为初始类型，则需要更新计数
@@ -236,25 +236,25 @@ public class PlayControler {
 
 
     //初始化子弹
-    private Bullet initBullet(int bulletType){
+    private MyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
-        Bullet bullet = new Bullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
+        MyBullet myBullet = new MyBullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
         //初始化坦克的性能
-        bullet.setBulletDegree(tankDegree);
-        bullet.setBulletDistance(distance);
+        myBullet.setBulletDegree(tankDegree);
+        myBullet.setBulletDistance(distance);
         //计算并初始化子弹的路径
-        bullet.setFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+        myBullet.setFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                             this.gameDto.getMyTank().getWeaponPoxition_y(),
                                             distance,
                                             tankDegree,
                                             false,this.gameDto.getMyTank().getSelectedBullets()));
         //允许绘制路径
-        bullet.setDrawFlag(true);
+        myBullet.setDrawFlag(true);
         //初始化坦克的位置
         //bullet.setBulletPosition_x(this.gameDto.getMyTank().getWeaponPoxition_x());
         //bullet.setBulletPosition_y(this.gameDto.getMyTank().getWeaponPoxition_y());
-        return bullet;
+        return myBullet;
     }
 
 

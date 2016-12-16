@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import yong.tank.modal.Blood;
+import yong.tank.modal.MyBlood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
 import yong.tank.modal.MyTank;
@@ -20,7 +20,7 @@ public class GameDto {
     private int tankType ;
     private int mapType ;
     private MyTank myTank;
-    private Blood blood;
+    private MyBlood myBlood;
     //这里最好每一个modal，都会在里面.....
     private PlayerPain playerPain;
     private List<Explode> explodes;
@@ -35,12 +35,12 @@ public class GameDto {
         explodes = new ArrayList<Explode>();
     }
 
-    public Blood getBlood() {
-        return blood;
+    public MyBlood getMyBlood() {
+        return myBlood;
     }
 
-    public void setBlood(Blood blood) {
-        this.blood = blood;
+    public void setMyBlood(MyBlood myBlood) {
+        this.myBlood = myBlood;
     }
 
     public PlayerPain getPlayerPain() {

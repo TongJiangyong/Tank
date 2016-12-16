@@ -34,7 +34,7 @@ public class BloodThread implements Runnable {
                 synchronized (holder){
                     canvas=this.holder.lockCanvas();
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    gameDto.getBlood().drawSelf(canvas);
+                    gameDto.getMyBlood().drawSelf(canvas);
                 }
                 }
             catch (Exception e) {
