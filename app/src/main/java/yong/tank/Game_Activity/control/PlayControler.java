@@ -122,6 +122,7 @@ public class PlayControler {
                             countBulletPath(this.gameDto.getMyTank().getTankCenter(),dx,dy);
                             //TODO 没办法，传入负值才行...,所以在setting函数中设为负数了
                             this.gameDto.getMyTank().weaponMove(tankDegree);
+                            this.gameDto.getMyTank().setFirePower(distance);
                             this.gameDto.getMyTank().setPreFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                                                                         this.gameDto.getMyTank().getWeaponPoxition_y(),
                                                                                         distance,

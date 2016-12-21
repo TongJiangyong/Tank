@@ -3,6 +3,7 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import java.io.Serializable;
 import java.util.List;
 
 import yong.tank.tool.StaticVariable;
@@ -11,8 +12,8 @@ import yong.tank.tool.StaticVariable;
  * Created by hasee on 2016/11/1.
  */
 
-public class Bonus {
-    private Bitmap bonusPicture;
+public class Bonus implements Serializable {
+    private transient Bitmap bonusPicture;
     private int bonusDirection= 0;  //0为左 ，1为右边
     private int bonus_x;
     private int bonus_y;
@@ -20,9 +21,9 @@ public class Bonus {
     private static String TAG = "Bonus";
     private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
     //bonus的路径点
-    private List<Point> bonusPath;
+    private transient List<Point> bonusPath;
     //bonus是否需要继续绘制非flag
-    private boolean isDrawFlag=true;
+    private transient boolean isDrawFlag=true;
     private Point bonusCenter = new Point();
     private int bonusType; //注意，这里的type和子弹的类型有关系，击中bonus后，产生相应的变化
     public Bonus(Bitmap bonusPicture, List<Point> bonusPath,int bonusType) {

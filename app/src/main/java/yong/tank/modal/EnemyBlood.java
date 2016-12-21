@@ -13,24 +13,28 @@ import yong.tank.tool.Tool;
  */
 
 public class EnemyBlood extends Blood{
-
+    public  transient int bloodBlock_x=0 ;
+    public transient int bloodBlock_y=0;
     public EnemyBlood(Bitmap blood, Bitmap power, Bitmap bloodBlock, float bloodNum, float powerNum) {
         super(blood, power, bloodBlock, bloodNum, powerNum);
+        //bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH-bloodBlock.getWidth()-5);
+        bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,485);
+        bloodBlock_y=Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
     }
 
     //这里配置一个其他的drawEnermy方法进行配置，可能会更好，或者将静态量提取出drawSelf出来
     public void drawSelf(Canvas canvas) {
         //计算血条的比例
-        Rect src_blood = new Rect(0, 0, (int)(blood.getWidth()*bloodNum), blood.getHeight());
-        Rect des_blood = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,56),
+        Rect src_blood = new Rect((int)(blood.getWidth()*(1-bloodNum)), 0, blood.getWidth(), blood.getHeight());
+        Rect des_blood = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,5)+(int)(blood.getWidth()*(1-bloodNum)),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,29),
-                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,56)+(int)(blood.getWidth()*bloodNum),
+                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,5)+blood.getWidth(),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,29)+blood.getHeight());
         //计算power的比例
         Rect src_power = new Rect(0, 0, (int)(power.getWidth()*powerNum), power.getHeight());
-        Rect des_power = new Rect(Tool.dip2px(StaticVariable.LOCAL_DENSITY,59),
+        Rect des_power = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41),
-                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,59)+(int)(power.getWidth()*powerNum),
+                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15)+(int)(power.getWidth()*powerNum),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41)+power.getHeight());
         //绘制装填进度条
         canvas.drawBitmap(power,src_power,des_power, null);

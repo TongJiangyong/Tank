@@ -3,20 +3,16 @@ package yong.tank.modal.abstractGoup;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import yong.tank.tool.StaticVariable;
-import yong.tank.tool.Tool;
+import java.io.Serializable;
 
 /**
  * Created by hasee on 2016/11/1.
  */
 
-public abstract  class Blood {
-    public Bitmap blood;
-    public Bitmap power;
-    public Bitmap bloodBlock;
-    //blood相关的硬编码 硬编码已经调整，暂时不用管
-    public int bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
-    public int bloodBlock_y=Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
+public abstract  class Blood implements Serializable {
+    public transient Bitmap blood;
+    public transient Bitmap power;
+    public transient Bitmap bloodBlock;
     public double bloodNum;
     public double powerNum;
     public Boolean allowFire = true;       //子弹装填时间使能 （时间开关）

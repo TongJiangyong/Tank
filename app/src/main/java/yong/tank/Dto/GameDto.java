@@ -24,13 +24,13 @@ public class GameDto implements Serializable{
     private int mapType ;
     private MyTank myTank;
     private MyBlood myBlood;
-    private EnemyTank enemyTank;
-    private EnemyBlood enemyBlood;
+    private transient EnemyTank enemyTank;
+    private transient EnemyBlood enemyBlood;
     //这里最好每一个modal，都会在里面.....
-    private PlayerPain playerPain;
-    private List<Explode> explodes;
+    private transient PlayerPain playerPain;
+    private List<Explode> explodes;   //爆炸场景为在lcoal进行绘制
     private Bonus bonus = null;
-    private Map<Integer,SelectButton> selectButtons;
+    private transient Map<Integer,SelectButton> selectButtons;
 
     public MyTank getMyTank() {
         return myTank;

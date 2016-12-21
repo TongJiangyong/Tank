@@ -37,6 +37,9 @@ public class GameThread implements Runnable {
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
                     //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
                     gameDto.getMyTank().drawSelf(canvas);
+                    if(gameDto.getEnemyTank()!=null){
+                        gameDto.getEnemyTank().drawSelf(canvas);
+                    }
                 }
                 }
             catch (Exception e) {

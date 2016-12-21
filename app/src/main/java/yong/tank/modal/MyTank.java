@@ -4,6 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import yong.tank.modal.abstractGoup.Bullet;
 import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
@@ -12,11 +17,17 @@ import yong.tank.tool.Tool;
  * Created by hasee on 2016/10/27.
  */
 //TODO 写成抽象方法，然后重写drawSelf方法？类似处理包括 bullet mytank blood.....考虑一下这种做法....可信性比较好.....
-public class MyTank extends Tank {
+public class MyTank extends Tank implements Serializable{
 
-
+    //这里好好学习一下
+    public List<MyBullet> bulletsFire= new ArrayList<MyBullet>(3);
     public MyTank(Bitmap tankPicture, Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
         super(tankPicture, armPicture, tankType, tankBascInfo);
+        bulletsFire = new ArrayList<MyBullet>(3);//暂时发送子弹数为3？但是这样做好像没用.....
+        this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH /4-this.tankPicture.getWidth()/2;
+        //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
+        //这是测试用的tank位置
+        this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
     }
 
     public void drawSelf(Canvas canvas){
@@ -32,9 +43,6 @@ public class MyTank extends Tank {
         }
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
-        //Bitmap armPicture_tmp_2 = Tool.reBuildImg(armPicture_tmp,0,1,1,true,false);
-        //TODO 注意这两种方法，硬编码可以让不同分辨率的屏幕适应......
-//        Log.i(TAG,"width:"+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22));
         int weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*2/5;
         int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22);
         canvas.drawBitmap(armPicture_tmp,
@@ -52,7 +60,7 @@ public class MyTank extends Tank {
         //TODO 绘制预发射的子弹路径 绘制点的方法即可
         if(preFirePath!=null){
             Paint preFirePathPaint = new Paint();
-            preFirePathPaint.setStrokeWidth(5);
+            preFirePathPaint.setStrokeWidth(3);
             for(int i=0;i<preFirePath.size();i++)
             {
                 canvas.drawPoint(preFirePath.get(i).getX(), preFirePath.get(i).getY(), preFirePathPaint);
@@ -71,4 +79,20 @@ public class MyTank extends Tank {
             }
         }
     }
+
+
+    public List<MyBullet> getBulletsFire() {
+        return bulletsFire;
+    }
+
+    public void setBulletsFire(List<MyBullet> bulletsFire) {
+        this.bulletsFire = bulletsFire;
+    }
+
+    public void addBuleetFire(Bullet bullet) {
+        //这里学习体会一下
+        this.getBulletsFire().add((MyBullet) bullet);
+    }
+
+
 }

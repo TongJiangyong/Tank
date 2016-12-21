@@ -3,9 +3,8 @@ package yong.tank.modal.abstractGoup;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
 import yong.tank.modal.Point;
@@ -16,25 +15,26 @@ import yong.tank.tool.StaticVariable;
  * Created by hasee on 2016/10/27.
  */
 
-public abstract class Tank {
-    public Bitmap tankPicture;
-    private Bitmap armPicture;
+public abstract class Tank implements Serializable{
+    public transient Bitmap tankPicture;
+    private transient Bitmap armPicture;
     private int tankType;
-    public TankBascInfo tankBascInfo;
+    public transient TankBascInfo tankBascInfo;
     public int tankPosition_x = 0;
     public int tankPosition_y =0;
     public int tankDirectrion=0;
+    private double firePower = 0; //发射的距离角度
     private Point tankCenter = new Point();
-    private static String TAG = "Tank";
+    private transient static String TAG = "Tank";
     public int weaponDegree =-10; //armpicture为内置的.....
     public int weaponPoxition_x =0;
     public int weaponPoxition_y =0;
-    private Boolean enableFire = false;     //允许发射使能（总开关）
-    private Boolean fireAction = false;      //tank发射动作使能 （动作开关）
+    private transient Boolean enableFire = false;     //允许发射使能（总开关）
+    private transient Boolean fireAction = false;      //tank发射动作使能 （动作开关）
     //预发射路径点
-    public List<Point> preFirePath;
+    public transient List<Point> preFirePath;
     //已经发射的子弹，严格控制子弹加入
-    public List<Bullet> bulletsFire = new ArrayList<>(3);//暂时发送子弹数为3？但是这样做好像没用.....
+
     //tank所拥有的子弹种类
     /**  类型   数量
      *  0       100000
@@ -45,9 +45,9 @@ public abstract class Tank {
      *  暂时只允许坦克只拥有两种子弹
      * **/
     //坦克的当前发射子弹类型
-    private int selectedBullets= StaticVariable.ORIGIN;
+    private transient int selectedBullets= StaticVariable.ORIGIN;
     //坦克的当前发射子弹数量
-    private int selectedBulletsNum = StaticVariable.TANK_BULLET_YPTE[0][1];
+    private transient int selectedBulletsNum = StaticVariable.TANK_BULLET_YPTE[0][1];
 
     //坦克的当前所拥有的发射类型和该类型的子弹数量
     public Tank(Bitmap tankPicture,Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
@@ -55,11 +55,7 @@ public abstract class Tank {
             this.tankType = tankType;
             this.tankBascInfo = tankBascInfo;
             this.armPicture=armPicture;
-            this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH /4-this.tankPicture.getWidth()/2;
-            //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
-            //这是测试用的tank位置
-            this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
-            Log.w(TAG,"current bullet num:"+selectedBulletsNum);
+            //Log.w(TAG,"current bullet num:"+selectedBulletsNum);
             }
 
     //TODO  modify this method
@@ -123,13 +119,7 @@ public abstract class Tank {
             this.weaponDegree = weaponDegree;
             }
 
-    public List<Bullet> getBulletsFire() {
-            return bulletsFire;
-            }
 
-    public void setBulletsFire(List<Bullet> bulletsFire) {
-            this.bulletsFire = bulletsFire;
-            }
 
     public int getSelectedBullets() {
             return selectedBullets;
@@ -220,9 +210,6 @@ public abstract class Tank {
             this.preFirePath = preFirePath;
             }
 
-    public void addBuleetFire(Bullet bullet) {
-            this.getBulletsFire().add(bullet);
-            }
 
     public int getSelectedBulletsNum() {
             return selectedBulletsNum;
@@ -232,6 +219,14 @@ public abstract class Tank {
             this.selectedBulletsNum = selectedBulletsNum;
             }
 
+    public double getFirePower() {
+        return firePower;
+    }
+
+    public void setFirePower(double firePower) {
+        this.firePower = firePower;
+    }
+
     //x，y的坐标在第3象限外
     public boolean isOutDirection(int dx, int dy) {
             if(dx<=this.getTankCenter().getX()&&dy>=this.getTankCenter().getY()){
@@ -240,4 +235,5 @@ public abstract class Tank {
             return false;
             }
             }
+    public  abstract void addBuleetFire(Bullet bullet);
 }

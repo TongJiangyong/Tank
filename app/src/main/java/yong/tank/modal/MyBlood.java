@@ -13,7 +13,9 @@ import yong.tank.tool.Tool;
  */
 
 public class MyBlood extends Blood{
-
+    //blood相关的硬编码 硬编码已经调整，暂时不用管
+    public  transient int bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
+    public transient int bloodBlock_y=Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
     public MyBlood(Bitmap blood, Bitmap power, Bitmap bloodBlock, float bloodNum, float powerNum) {
         super(blood, power, bloodBlock, bloodNum, powerNum);
     }
@@ -28,9 +30,9 @@ public class MyBlood extends Blood{
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,29)+blood.getHeight());
         //计算power的比例
         Rect src_power = new Rect(0, 0, (int)(power.getWidth()*powerNum), power.getHeight());
-        Rect des_power = new Rect(Tool.dip2px(StaticVariable.LOCAL_DENSITY,59),
+        Rect des_power = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,58),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41),
-                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,59)+(int)(power.getWidth()*powerNum),
+                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,58)+(int)(power.getWidth()*powerNum),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41)+power.getHeight());
         //绘制装填进度条
         canvas.drawBitmap(power,src_power,des_power, null);

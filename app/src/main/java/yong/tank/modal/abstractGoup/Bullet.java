@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Path;
 
+import java.io.Serializable;
 import java.util.List;
 
 import yong.tank.modal.BulletBascInfo;
@@ -14,22 +15,22 @@ import yong.tank.modal.Point;
  * Created by hasee on 2016/11/8.
  */
 
-public abstract class Bullet {
-    private  BulletBascInfo bulletBascInfo;
+public abstract class Bullet implements Serializable{
+    private  transient BulletBascInfo bulletBascInfo;
+    public transient  Bitmap bulletPicture;
+    //发射路径点
+    public transient List<Point> firePath;
     public int bulletPosition_x;
     public int bulletPosition_y;
     //用来决定距离的....
     public double bulletDistance;
     public int bulletDegree; //armpicture为内置的.....
-    public Bitmap bulletPicture;
-    private static String TAG = "Bullet";
-    public Matrix matrix = new Matrix(); // 预备用作旋转的类
+    private transient static String TAG = "Bullet";
+    public transient Matrix matrix = new Matrix(); // 预备用作旋转的类
     public boolean drawFlag=false;
     public int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
     //测试绘制路径
-    private Path path = new Path();
-    //发射路径点
-    public List<Point> firePath;
+    private transient Path path = new Path();
     double bulletV_x=0;
     double bulletV_y=0;
     public Bullet(Bitmap bulletPicture, BulletBascInfo bulletBascInfo) {

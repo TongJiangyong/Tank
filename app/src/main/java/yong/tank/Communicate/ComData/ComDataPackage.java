@@ -2,7 +2,7 @@ package yong.tank.Communicate.ComData;
 
 import com.google.gson.Gson;
 
-import yong.tank.Dto.testDto;
+import yong.tank.Dto.GameDto;
 
 /**
  * Created by hasee on 2016/11/26.
@@ -18,8 +18,8 @@ public class ComDataPackage {
     public static ComDataF packageToF (String flag,ComDataS comDataS){
         return new ComDataF(flag,comDataS);
     }
-    public static testDto packageToObject (String info){
-        return gson.fromJson(info, testDto.class);
+    public static GameDto packageToObject (String info){
+        return gson.fromJson(info, GameDto.class);
     }
 
     public static ComDataF packageToF (String flag,String commad,String info){

@@ -176,9 +176,7 @@ public class StaticVariable {
     public static String SERVER_IP = "192.168.1.122";
     //public static String SERVER_IP = "115.154.191.5";
     public static int SERVER_PORT =  9999;
-    //定义的command：
-    public static String COMMAND_MSG =  "9";
-    public static String COMMAND_INFO =  "8";
+
 
     //定义蓝牙相关的量：
     public static final String BLUE_DEVICE_NAME = "YONG";
@@ -203,6 +201,11 @@ public class StaticVariable {
     //blue的toast
     public final static int BLUE_TOAST = 100;
 
+    //本地初始化成功
+    public final static int LOCAL_INIT_OVER = 11;
+    //开始游戏
+    public final static int GAME_STARTED = 12;
+
     /* 信息交互coomand相关的代码 */
     public final static String INIT_SEND_ID_SERVER ="1"; //发送数据到server端
     public final static String INIT_PASSIVE_REQUEST_CONNECT ="2"; //passive发送连接命令到activity端，并传递自身的ID号、确认信息
@@ -215,6 +218,11 @@ public class StaticVariable {
     public final static String INIT_ACTIVITE_RESPONSE_GAMEOVER ="9";        //activity发送一轮游戏结束后的命令
     public final static String RESPONSE_FINISHED_CONNECT_DIRECTIRY ="10";        //发送断开命令------互相直接发送
     public final static String RESPONSE_FINISHED_CONNECT_UNDIRECTRIY ="11";        //发送断开命令------服务器发送
+
+    //定义的command：
+    public  static String COMMAND_MSG =  "12";
+    public  static String COMMAND_INFO =  "13";
+
     /* 网络连接中，另一个设备的ID*/
     public static String REMOTE_DEVICE_ID = null;
    /* 与存储相关的数据 */

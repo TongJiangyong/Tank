@@ -4,17 +4,19 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
 
+import java.io.Serializable;
+
 /**
  * Created by hasee on 2016/11/1.
  */
 
-public class Explode {
-    private Bitmap explodeFrame[];
+public class Explode implements Serializable {
+    private transient Bitmap explodeFrame[];
     private int currentFrame= 0;
     private int explodeType= 0;  //0为ground ，1为tank
     private int explode_x;
     private int explode_y;
-    private static String TAG = "Explode";
+    private transient static String TAG = "Explode";
     //TODO 以后加上角度
     public Explode(Bitmap[] explodeFrame, int explode_x, int explode_y,int explodeType) {
         this.explodeFrame = explodeFrame;

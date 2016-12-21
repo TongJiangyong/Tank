@@ -110,6 +110,11 @@ public class GamePresenter {
                 case StaticVariable.MSG_COMMUNICATE_OUT:
                     communicateOut();
                     break;
+                //本地初始化完成.....
+                case StaticVariable.LOCAL_INIT_OVER:
+                    Log.i(TAG,"本地初始化完成。。。。。");
+                    gameActivity.initCommunicate();
+                    break;
             }
         }
     };
@@ -238,6 +243,11 @@ public class GamePresenter {
     }
 
     public void prepareLocal(ClientCommunicate clientCommunicate) {
+        this.clientCommunicate = clientCommunicate;
+        //设置通讯的handler....
+        this.clientCommunicate.setMyHandle(myHandler);
+        //启动蓝牙通讯
+        this.clientCommunicate.startCommunicate();
 
     }
 

@@ -25,17 +25,20 @@ import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Dto.GameDto;
-import yong.tank.Dto.testDto;
 import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.R;
-import yong.tank.modal.MyBlood;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.DeviceInfo;
+import yong.tank.modal.EnemyBlood;
+import yong.tank.modal.EnemyTank;
 import yong.tank.modal.Explode;
+import yong.tank.modal.MyBlood;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
 import yong.tank.modal.Point;
 import yong.tank.modal.User;
+import yong.tank.modal.abstractGoup.Blood;
+import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
@@ -52,16 +55,20 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private Timer timerBonus;
     private Timer timerCommunnicate;
     private LocalRecord<User> localUser = new LocalRecord<User>();
-    private Queue<testDto> testDtos = new LinkedList<testDto>();
-    private boolean connectFlag =false;
+    private Queue<GameDto> remoteGameDtos = new LinkedList<GameDto>();
+    private boolean remoteDtoInitFlag =false;
     //TODO 测试通讯的代码
     private ClientCommunicate clientCommunicate;
     private Gson gson = new Gson();
 
+    //这是一个专门用于启动程序的handler......，因为架构设计出错，导致service和actiactivity层之间要建立联系，非常不对.....
+    private Handler gameActivityHandler;
 
-    public GameService(GameDto gameDto,Context context) {
+
+    public GameService(GameDto gameDto,Context context,Handler gameActivityHandler) {
         this.gameDto = gameDto;
         this.context = context;
+        this.gameActivityHandler=gameActivityHandler;
 
     }
 
@@ -89,9 +96,9 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             thread.start();
             //启动bonus的线程
             this.startMakeBonus();
-            //启动对应模式的communicate线程
-            clientCommunicate.startCommunicate();
-            //在这里启动数据交互线程，暂时学习一下
+            //启动对应模式的communicate线程 这里可以不同了。。。。
+            //clientCommunicate.startCommunicate();
+            //在这里启动数据交互线程，暂时学习一下 ，现在已经没用了
             this.startCommunicateThread();
         }else{
             Log.w(TAG,"gameThread is not null");
@@ -293,8 +300,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         this.clientCommunicate.addMsgObserver(this);
         this.clientCommunicate.addCommandObserver(this);
         //启动一个消耗的线程
-        Timer timer  = new Timer();
-        timer.schedule(new consumeThread(),3000,20);
+        //Timer timer  = new Timer();
+        //timer.schedule(new consumeThread(),3000,20);
     }
 
     //互相communicate的线程
@@ -302,13 +309,13 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public class consumeThread extends TimerTask {
         @Override
         public void run() {
-            if(testDtos.size()!=0){
+            if(remoteGameDtos.size()!=0){
 
-                testDtos.poll();
-                Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
+                remoteGameDtos.poll();
+                Log.w(TAG,"队列的剩余大小为:"+remoteGameDtos.size());
 
             }else{
-                Log.w(TAG,"队列为空");
+                //Log.w(TAG,"队列为空");
             }
 
         }
@@ -331,21 +338,24 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
     public void initAllDataInfo() {
         //TODO 完成游戏启动前自身数据的初始化
-        this.initLocal();
+        this.initLocalDto();
         //TODO 确定通信连接后，完成远程连接工作后其他数据的初始化
-        if(StaticVariable.CHOSED_MODE!=StaticVariable.GAME_MODE.LOCAL){
-            this.initRemoteActivity();
-        }else{
+        Log.i(TAG,"game_mode is :"+StaticVariable.CHOSED_MODE );
+        if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL){
+            Log.i(TAG,"START GAME local。。。。。。");
             this.initLocalActivity();
+        }else{
+            Log.i(TAG,"START GAME remote。。。。。。");
+            this.initRemoteActivity();
         }
 
     }
 
 
     /**
-     * 本地初始化相关的代码
+     * 本地初始化本地dto相关的代码
      */
-    private void initLocal() {
+    private void initLocalDto() {
         //TODO 初始化explode
         for(int i=0;i<StaticVariable.EXPLODESPICTURE_GROUND.length;i++){
             StaticVariable.EXPLODESONGROND[i]=BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.EXPLODESPICTURE_GROUND[i]);
@@ -354,25 +364,44 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             StaticVariable.EXPLODESONTANK[i]=BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.EXPLODESPICTURE_TANKE[i]);
         }
         //TODO 测试初始化tank  测试添加的东西在gameservice中试试
-        MyTank myTank =initTank(this.gameDto.getTankType());
+        MyTank myTank =(MyTank) initTank(this.gameDto.getTankType(),true);
         gameDto.setMyTank(myTank);
         //TODO 测试初始化玩家控制图标
         PlayerPain playerPain = new PlayerPain();
         gameDto.setMyTank(myTank);
         gameDto.setPlayerPain(playerPain);
         //TODO 测试初始化装载血条的视图
-        MyBlood myBlood = initBlood(true);
+        MyBlood myBlood = (MyBlood) initBlood(true);
         gameDto.setMyBlood(myBlood);
     }
+    /**
+     * 本地初始化远程dto相关的代码
+     */
+    private void initRemoteDto(GameDto gameDtoTemp) {
+        EnemyTank enemyTank = (EnemyTank) initTank(gameDtoTemp.getTankType(),false);
+        EnemyBlood enemyBlood = (EnemyBlood)initBlood(false);
+        gameDto.setEnemyBlood(enemyBlood);
+        gameDto.setEnemyTank(enemyTank);
+    }
 
-    private MyTank initTank(int tankType){
+    private Tank initTank(int tankType,Boolean isMyTank){
         Bitmap tankPicture_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.TANKBASCINFO[tankType].getPicture());
-        Bitmap tankPicture = Tool.reBuildImg(tankPicture_temp,0,1,1,false,true);
-        Bitmap armPicture = BitmapFactory.decodeResource(this.context.getResources(), R.mipmap.gun);
-        MyTank tank = new MyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
+        Bitmap tankPicture=null;
+        Bitmap armPicture=null;
+        Tank tank=null;
+        if(isMyTank){
+            armPicture = BitmapFactory.decodeResource(this.context.getResources(), R.mipmap.gun);
+            tankPicture= Tool.reBuildImg(tankPicture_temp,0,1,1,false,true);
+            tank = new MyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
+        }else{
+            armPicture = BitmapFactory.decodeResource(this.context.getResources(), R.mipmap.gun_symmetry);
+            tankPicture= Tool.reBuildImg(tankPicture_temp,0,1,1,false,false);
+            tank = new EnemyTank(tankPicture,armPicture,tankType, StaticVariable.TANKBASCINFO[tankType]);
+        }
+
         return tank;
     }
-    private MyBlood initBlood(Boolean isMyBlood){
+    private Blood initBlood(Boolean isMyBlood){
         //TODO 如果是true会找其他图片
         //TODO 这里暂时先别做.....以后再改....
         Bitmap blood_picture=null;
@@ -381,8 +410,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         power_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.POWERR);
         Bitmap bloodBlock_picture=null;
         bloodBlock_picture = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BLOODBLOCK);
-        MyBlood myBlood = new MyBlood(blood_picture, power_picture, bloodBlock_picture,1,1);
-        return myBlood;
+        Blood blood =null;
+        if(isMyBlood){
+            blood = new MyBlood(blood_picture, power_picture, bloodBlock_picture,1,1);
+        }else{
+            Bitmap bloodBlock_picture_temp= Tool.reBuildImg(bloodBlock_picture,0,1,1,false,true);
+            blood = new EnemyBlood(blood_picture, power_picture, bloodBlock_picture_temp,1,1);
+        }
+        return blood;
     }
 
 
@@ -398,21 +433,38 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         }
     }
 
-
     private void initLocalActivity() {
+        //local暂时直接开始游戏：
+        Message msgInfo = gameActivityHandler.obtainMessage();
+        msgInfo.what = StaticVariable.GAME_STARTED;
+        gameActivityHandler.sendMessage(msgInfo);
     }
 
     /*****************************************这里是与通信相关的方法*****时间差大概在10~30ms之间**********************************/
 
     //主要用来向buffer中填充数据
     @Override
-    public void infoRecived(testDto testDto) {
-        testDtos.offer(testDto);
-/*        testDto testDto_temp = testDtos.poll();
-        if(testDto_temp!=null){
-            Log.w(TAG,"consumeThread 使用队列:"+testDto_temp.toString()+" 时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
-            Log.w(TAG,"队列的剩余大小为:"+testDtos.size());
-        }*/
+    public void infoRecived(GameDto gameDtoReviced) {
+        remoteGameDtos.offer(gameDtoReviced);   //入列
+        GameDto gameDtoTemp = remoteGameDtos.poll();
+        //在这里初始化Enermy坦克的信息
+        if(gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& gameDtoTemp.getEnemyTank()==null&&gameDtoTemp.getEnemyBlood()==null){
+            //初始化敌方的变量......
+            initRemoteDto(gameDtoTemp);
+            this.remoteDtoInitFlag = true;
+        }
+
+        //如果初始化完成，即开始进行设置工作
+        if(this.remoteDtoInitFlag){
+            /**设置EnemyTank相关的属性**/
+            //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
+            this.gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
+            this.gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
+            this.gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y());
+            /**设置EnemyBlood相关的属性**/
+            this.gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
+        }
+
     }
 
     /**

@@ -1,13 +1,16 @@
 package yong.tank.Communicate.LocalCommunicate;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Dto.GameDto;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/26.
@@ -20,20 +23,20 @@ import yong.tank.Dto.GameDto;
 public class ClientLocal implements  Runnable,ClientCommunicate {
     private AImaker aImaker;
     private static String TAG ="ClientLocal";
-    private boolean connectFlag =false;
-    private int connectCount = 0;
     private GameDto gameDto;
     private Handler mHandler;
+    private Context context;
     //穿进来要建立拿一个tank的对象信息即可
-    public ClientLocal(GameDto gameDto) {
+    public ClientLocal(GameDto gameDto,Context context) {
         this.gameDto = gameDto;
+        this.context = context;
     }
 
     public void run() {
         //TODO 这里启动AI的线程
         //线程的主要作用 1、每隔20ms，发送一次gameDto的数据信息
         //2、自动检测子弹使能的时间，如果有子弹使能，则发射子弹（一律为普通弹）
-        aImaker = new AImaker(gameDto,mHandler);
+        aImaker = new AImaker(context,gameDto,mHandler);
         new Thread(aImaker).start();
     }
 
@@ -45,6 +48,9 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
     public void startCommunicate() {
         //启动自身....
         new Thread(this).start();
+        Message msgInfo = mHandler.obtainMessage();
+        msgInfo.what = StaticVariable.LOCAL_INIT_OVER;
+        mHandler.sendMessage(msgInfo);
     }
 
     //开始启动AI

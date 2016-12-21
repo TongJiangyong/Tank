@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,7 +53,20 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private ClientCommunicate clientCommunicate;
     private GamePresenter gamePresenter;
     private boolean startFlag =false;
-    private Handler gameActivityHandler = new Handler();
+
+    //启动游戏正式开始的handler
+    private  Handler gameActivityHandler = new Handler() {
+        public void handleMessage (Message msg) {//此方法在ui线程运行
+            switch(msg.what){
+                case StaticVariable.GAME_STARTED:
+                    Log.i(TAG,"接受两次....");
+                    startGame();
+                    break;
+            }
+
+        }
+
+    };
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -73,8 +87,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
         msgView = (ImageView)findViewById(R.id.msgView);
         msgText = (TextView)findViewById(R.id.msgText);
         msgSend = (Button)findViewById(R.id.msgSend);
-        if(StaticVariable.CHOSED_MODE !=StaticVariable.GAME_MODE.LOCAL){
-            msgButton.setVisibility(View.VISIBLE);
+        if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
+            msgButton.setVisibility(View.GONE);
         }
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
@@ -89,7 +103,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/
-        gameService = new GameService(gameDto,this);
+        gameService = new GameService(gameDto,this,gameActivityHandler);
         gameControler = new GameControler(gameService,this,views);
         /*********设置玩家控制器**********/
         playControler = new PlayControler(this,gameDto,gameControler);
@@ -116,7 +130,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
             this.gamePresenter.prepareBlue(this.clientCommunicate);
         }else{
             //如果是本地模式
-            this.clientCommunicate = new ClientLocal(gameDto);
+            this.clientCommunicate = new ClientLocal(gameDto,this);
             //进入本地模式的确认连接步骤 可以不做
             this.gamePresenter.prepareLocal(this.clientCommunicate);
         }
@@ -260,8 +274,14 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
     //开始游戏
     public void startGame(){
+        //允许游戏操作...
         gameControler.startGame();
+        //允许按钮操作
+        this.startFlag = true;
+        Log.i(TAG,"开始游戏.....");
         this.showToast("开始游戏...");
     }
+
+
 
 }
