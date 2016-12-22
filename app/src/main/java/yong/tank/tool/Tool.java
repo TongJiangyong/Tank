@@ -268,7 +268,7 @@ public class Tool {
     //路径计算好以后，怎么给子弹
     //写成一个函数，然后计算返回一系列的点和角度即可.....List<Point>
     //这里感觉不对，以后做处理看看....先处理互相传输数据的模式......
-    public static List<Point> getBulletPath(int init_x,int init_y,double bulletDistance,int bulletDegree,boolean isPreView,int selectedBullets) {
+    public static List<Point> getMyBulletPath(int init_x, int init_y, double bulletDistance, int bulletDegree, boolean isPreView, int selectedBullets) {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<Point>();
         //this.gameDto.getMyTank().getSelectedBullets()
@@ -284,6 +284,38 @@ public class Tool {
             //这里计算时，采用向下为正，向右为正的方法
             bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
             int newPosition_x = (init_x + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_x * StaticVariable.INTERVAL_TIME)));
+            //bulletPosition_x+=v_x*t;
+            int newPosition_y = (init_y + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2)));
+            //bulletPosition_y+=v_y*t-g*t*t/2;
+            double test = bulletV_y / bulletV_x;
+            bulletDegree = (int) Math.toDegrees(Math.atan(test));
+            Point point = new Point(init_x,init_y, bulletDegree,false);
+            //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
+            bulletPath.add(point);
+            init_x=newPosition_x;
+            init_y=newPosition_y;
+            //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            //time = time + StaticVariable.INTERVAL;
+        }
+        return bulletPath;
+    }
+
+    public static List<Point> getEnermyBulletPath(int init_x, int init_y, double bulletDistance, int bulletDegree, boolean isPreView, int selectedBullets) {
+        //这里关联speed和distance，暂时不处理
+        List<Point> bulletPath = new ArrayList<Point>();
+        //this.gameDto.getMyTank().getSelectedBullets()
+        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[selectedBullets].getSpeed()*bulletDistance*Math.cos(Math.toRadians(Math.abs(bulletDegree)));
+        double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[selectedBullets].getSpeed()*bulletDistance*Math.sin(Math.toRadians(Math.abs(bulletDegree)));
+        int pathNum = 0;
+        if (isPreView) {
+            pathNum = StaticVariable.PREVIEWPATHLENGTH;
+        } else {
+            pathNum = StaticVariable.PATHLENGTH;
+        }
+        for (int i = 0; i < pathNum; i++) {
+            //这里计算时，采用向下为正，向右为正的方法
+            bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
+            int newPosition_x = (init_x - Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_x * StaticVariable.INTERVAL_TIME)));
             //bulletPosition_x+=v_x*t;
             int newPosition_y = (init_y + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2)));
             //bulletPosition_y+=v_y*t-g*t*t/2;

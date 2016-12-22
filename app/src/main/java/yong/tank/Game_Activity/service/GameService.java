@@ -155,16 +155,48 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                         //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
                         //这里设置continue语句来解决这个问题.....
                         //测试击中bonus后用的方法
-                        if (testFireBonus(i)){
+                        if (myFireBonus(i)){
                             continue;
                         }
                         //测试爆炸用的方法
-                        if(testExplode(i)){
+                        if(myTankExplode(i)){
                             continue;
                         }
 
                     }
                 }
+                if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
+                    if(remoteDtoInitFlag){
+                        //TODO 检查一下，这个enermyNum为啥为0
+                        int enermyNum=gameDto.getEnemyTank().getBulletsFire().size();
+                        //Log.i(TAG,"enermyNum is :"+enermyNum);
+                        //TODO 这里加上并测试本地模式的程序流程
+                        if(enermyNum!=0){
+                            for(int i=(enermyNum-1);i>=0;i--){
+                                //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+/*                                int numFire = gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().size();
+                                Log.i(TAG,"BulletsFire num is :"+numFire);
+                               for(int j=0;j<numFire;j++){
+                                   Log.i(TAG,"getFirePath position is :"+gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().get(j).getX()+","+gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().get(j).getY());
+                                }*/
+                                if(enermyTankExplode(i)){
+                                    continue;
+                                };
+                                //这里设置continue语句来解决这个问题.....
+                                //测试击中bonus后用的方法
+/*                            if (testFireBonus(i)){
+                                continue;
+                            }
+                            //测试爆炸用的方法
+                            if(testExplode(i)){
+                                continue;
+                            }*/
+
+                            }
+                        }
+                    }
+                }
+
                 try {
                     //逻辑用的时间短一点....
                     Thread.sleep(20);
@@ -182,7 +214,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
     //测试击中bonus的反应
     //1、停止bonus 2、设置selectView 3、削减血条 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
-    private boolean testFireBonus(int bullet){
+    private boolean myFireBonus(int bullet){
         if(gameDto.getBonus()!=null){
             if(gameDto.getBonus().isInBonusScope(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                  gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
@@ -238,8 +270,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
 
-    //测试爆炸用的方法
-    private boolean testExplode(int bullet) {
+    //自身测试爆炸用的方法
+    private boolean myTankExplode(int bullet) {
         //TODO 测试explode
         //如果打中地面
         if(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.LOCAL_SCREEN_HEIGHT /7*5){
@@ -247,6 +279,22 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
                     StaticVariable.EXPLODE_TYPE_GROUND);
             gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
+            return true;
+            //如果打中坦克
+        }
+        return false;
+    }
+
+
+    //敌方测试爆炸用的方法
+    private boolean enermyTankExplode(int bullet) {
+        //TODO 测试explode
+        //如果打中地面
+        if(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.LOCAL_SCREEN_HEIGHT /7*5){
+            addExplode(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                    gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.EXPLODE_TYPE_GROUND);
+            gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;
             //如果打中坦克
         }
@@ -448,9 +496,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         remoteGameDtos.offer(gameDtoReviced);   //入列
         GameDto gameDtoTemp = remoteGameDtos.poll();
         //在这里初始化Enermy坦克的信息
-        if(gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& gameDtoTemp.getEnemyTank()==null&&gameDtoTemp.getEnemyBlood()==null){
+        if(gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& this.gameDto.getEnemyTank()==null&&this.gameDto.getEnemyBlood()==null){
             //初始化敌方的变量......
+            //Log.i(TAG,"初始化敌方的变量......");
             initRemoteDto(gameDtoTemp);
+            //允许地方坦克发射
+            gameDto.getEnemyTank().setEnableFire(true);
             this.remoteDtoInitFlag = true;
         }
 

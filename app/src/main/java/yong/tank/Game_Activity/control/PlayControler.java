@@ -123,7 +123,7 @@ public class PlayControler {
                             //TODO 没办法，传入负值才行...,所以在setting函数中设为负数了
                             this.gameDto.getMyTank().weaponMove(tankDegree);
                             this.gameDto.getMyTank().setFirePower(distance);
-                            this.gameDto.getMyTank().setPreFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+                            this.gameDto.getMyTank().setPreFirePath(Tool.getMyBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                                                                         this.gameDto.getMyTank().getWeaponPoxition_y(),
                                                                                         distance,
                                                                                         tankDegree,
@@ -244,8 +244,9 @@ public class PlayControler {
         //初始化坦克的性能
         myBullet.setBulletDegree(tankDegree);
         myBullet.setBulletDistance(distance);
+        //Log.i(TAG,"distance test is :"+distance+" ******************");
         //计算并初始化子弹的路径
-        myBullet.setFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
+        myBullet.setFirePath(Tool.getMyBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                             this.gameDto.getMyTank().getWeaponPoxition_y(),
                                             distance,
                                             tankDegree,

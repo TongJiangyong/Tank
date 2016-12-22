@@ -22,7 +22,6 @@ import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Communicate.InterfaceGroup.Subject;
 import yong.tank.Dto.GameDto;
 import yong.tank.modal.EnemyBullet;
-import yong.tank.modal.abstractGoup.Bullet;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
@@ -55,20 +54,32 @@ public class AImaker implements Runnable , Subject {
 
         while(this.threadFlag){
             try {
-                //休眠20ms
-/*                if(){
-                    //TODO 产生一个新的子弹，计算子弹发射路径 这里一定要注意和其他两种模式的区别，即
-                    //其他两种模式的子弹，都是只传输当前坐标，但是lcoal模式的子弹，要设置好所有的路径，......！！！！
-                }*/
-                String gameDtoString = gson.toJson(this.gameDto);
-                //TODO 发送gameDto数据 这里随便给个0
-                ComDataF comDataF = ComDataPackage.packageToF ("0",StaticVariable.COMMAND_INFO,gameDtoString);
-                this.notifyWatchers(comDataF);
-                try {
-                    Log.w(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+               if(this.gameDto.getEnemyTank()!=null&&this.gameDto.getEnemyBlood()!=null){
+                   if(this.gameDto.getEnemyTank().getEnableFire()&&this.gameDto.getEnemyBlood().getAllowFire()&&this.gameDto.getEnemyTank().getWeaponPoxition_x()!=0){
+                       //enermy开火
+                       Log.i(TAG,"enermy Fired_2************************");
+                       tankOnFire();
+                   }
                 }
+                //TODO 捕捉转化的try catch
+                ComDataF comDataF =null;
+                String gameDtoString =null;
+                try{
+                gameDtoString = gson.toJson(this.gameDto);
+                //TODO 发送gameDto数据 这里随便给个0
+                comDataF = ComDataPackage.packageToF ("0",StaticVariable.COMMAND_INFO,gameDtoString);
+                }catch (Exception e){
+                    Log.i(TAG,"Error:" +e);
+                }
+                if(comDataF!=null){
+                    this.notifyWatchers(comDataF);
+                    try {
+                        Log.w(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 Log.w(TAG,"发送数据时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
                 Thread.sleep(20);
             } catch (InterruptedException e) {
@@ -78,6 +89,28 @@ public class AImaker implements Runnable , Subject {
 
     }
 
+    //Aimaker发射子弹.....
+    public void tankOnFire(){
+        //***************发射子弹*************
+        EnemyBullet enemyBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
+        //在tank中加入子弹
+        Log.i(TAG,"getFirePath is *************************:"+enemyBullet.getFirePath().size());
+        for(int i=0;i<enemyBullet.getFirePath().size();i++){
+            Log.i(TAG,"getFirePath position is :"+enemyBullet.getFirePath().get(i).getX()+","+enemyBullet.getFirePath().get(i).getY());
+        }
+        this.gameDto.getEnemyTank().addBuleetFire(enemyBullet);
+        Log.i(TAG,"enermyNum is*************************:"+gameDto.getEnemyTank().getBulletsFire().size());
+        //***************重置装填的时间*************
+        //如果子弹的类型不是连续弹，则设置装填时间
+        if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
+        {
+            this.gameDto.getEnemyBlood().setPowerNum(1);
+        }else{
+            this.gameDto.getEnemyBlood().setPowerNum(0);
+            //设置禁止发射,直到装填时间回复
+            this.gameDto.getEnemyBlood().setAllowFire(false);
+        }
+    }
 
     //初始化子弹
     //TODO 注意在local模式在，子弹的路径采用完全不同的计算法方法....即使用必中的发射方法  .......
@@ -85,10 +118,10 @@ public class AImaker implements Runnable , Subject {
     // 这里做将初速度随机增减处理后，计算坐标即可.....
     //对AI模式，子弹的处理....同AI模式即可，即，通过传递真实的子弹路径即可
     //对非AI模式，子弹的处理为每次赋值，都创建新的bullet的list对象即可......
-    private Bullet initBullet(int bulletType){
+    private EnemyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
-        Bullet enemyBullet = new EnemyBullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
+        EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;
@@ -97,16 +130,24 @@ public class AImaker implements Runnable , Subject {
         //TODO 这里将distance做随机处理
         if(initDistance<=0){
             //小于0则设定一个固定值
+            initDistance= 0.5;
         }
+        Log.i(TAG,"initDegree is *************************:"+initDegree);
+        Log.i(TAG,"initDistance is *************************:"+initDistance);
+        Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
+        Log.i(TAG,"init y is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_y());
+        //注意这里，角度为负数
         enemyBullet.setBulletDegree(initDegree);
         enemyBullet.setBulletDistance(initDistance);
 
         //计算并初始化子弹的路径
-        enemyBullet.setFirePath(Tool.getBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
-                this.gameDto.getMyTank().getWeaponPoxition_y(),
+        enemyBullet.setFirePath(Tool.getEnermyBulletPath(this.gameDto.getEnemyTank().getWeaponPoxition_x(),
+                this.gameDto.getEnemyTank().getWeaponPoxition_y(),
                 initDistance,
                 initDegree,
                 false,this.gameDto.getMyTank().getSelectedBullets()));
+        //允许发射....
+        enemyBullet.setDrawFlag(true);
         //初始化坦克的位置
         //bullet.setBulletPosition_x(this.gameDto.getMyTank().getWeaponPoxition_x());
         //bullet.setBulletPosition_y(this.gameDto.getMyTank().getWeaponPoxition_y());

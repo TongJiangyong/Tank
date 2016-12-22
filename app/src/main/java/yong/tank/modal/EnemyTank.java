@@ -32,7 +32,6 @@ public class EnemyTank extends Tank implements Serializable{
 
 
     public void drawSelf(Canvas canvas){
-
         //TODO 考虑策略模式优化
         if((tankPosition_x+this.tankPicture.getWidth())>StaticVariable.LOCAL_SCREEN_WIDTH){
             this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH-this.tankPicture.getWidth();
@@ -53,35 +52,24 @@ public class EnemyTank extends Tank implements Serializable{
         //坦克画在arm的后面
 
         // TODO 这里weapon的点要更精细一点
-        this.weaponPoxition_x = weaponPoxitionTemp_x+armPicture_tmp.getWidth();
+        this.weaponPoxition_x = weaponPoxitionTemp_x;
         this.weaponPoxition_y = weaponPoxitionTemp_y;
 
-        //TODO 绘制预发射的子弹路径 绘制点的方法即可
-/*        if(preFirePath!=null){
-            Paint preFirePathPaint = new Paint();
-            preFirePathPaint.setStrokeWidth(5);
-            for(int i=0;i<preFirePath.size();i++)
-            {
-                canvas.drawPoint(preFirePath.get(i).getX(), preFirePath.get(i).getY(), preFirePathPaint);
-            }
-            this.drawPreFireCircle(canvas);
-        }*/
-
-        //绘制所有的子弹
-/*        if(bulletsFire.size()==0){
+        /**绘制所有的子弹**/
+        if(bulletsFire.size()==0){
         }else{
-            //注意多线程的处理
-            for (int i = bulletsFire.size() -1; i >= 0; i--)
-            {
+            //这里值得注意的是，模式不同，绘制子弹的方法也不同
+            for (int i = bulletsFire.size() -1; i >= 0; i--) {
                 //绘制子弹
+                //Log.i(TAG,"enermy draw Bullet*****************");
                 bulletsFire.get(i).drawSelf(canvas);
             }
-        }*/
+        }
     }
 
     @Override
     public void addBuleetFire(Bullet bullet) {
-
+        this.getBulletsFire().add((EnemyBullet) bullet);
     }
 
 
