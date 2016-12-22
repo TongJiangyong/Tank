@@ -42,10 +42,10 @@ public class GameControler {
         //启动关闭程序的界面
         for(ViewBase v: this.views){
             //以后再开启
-            //v.stopThread();
+            v.stopThread();
         }
         //停止程序的逻辑
-        //this.gameService.gameStop();
+        this.gameService.gameStop();
     }
 
     public GameService getGameService() {

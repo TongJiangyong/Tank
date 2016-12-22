@@ -51,13 +51,11 @@ public class AImaker implements Runnable , Subject {
 
     public void run() {
         //TODO 初始化要完成的工作........，即付给remote相应的变量.....
-
         while(this.threadFlag){
             try {
                if(this.gameDto.getEnemyTank()!=null&&this.gameDto.getEnemyBlood()!=null){
                    if(this.gameDto.getEnemyTank().getEnableFire()&&this.gameDto.getEnemyBlood().getAllowFire()&&this.gameDto.getEnemyTank().getWeaponPoxition_x()!=0){
                        //enermy开火
-                       Log.i(TAG,"enermy Fired_2************************");
                        tankOnFire();
                    }
                 }
@@ -80,7 +78,7 @@ public class AImaker implements Runnable , Subject {
                     }
                 }
 
-                Log.w(TAG,"发送数据时间为："+"服务器处理数据的时间："+formatTime.format(new Date()));
+                Log.w(TAG,"发送数据时间为："+formatTime.format(new Date()));
                 Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -94,12 +92,12 @@ public class AImaker implements Runnable , Subject {
         //***************发射子弹*************
         EnemyBullet enemyBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
         //在tank中加入子弹
-        Log.i(TAG,"getFirePath is *************************:"+enemyBullet.getFirePath().size());
-        for(int i=0;i<enemyBullet.getFirePath().size();i++){
+        //Log.i(TAG,"getFirePath is *************************:"+enemyBullet.getFirePath().size());
+/*        for(int i=0;i<enemyBullet.getFirePath().size();i++){
             Log.i(TAG,"getFirePath position is :"+enemyBullet.getFirePath().get(i).getX()+","+enemyBullet.getFirePath().get(i).getY());
-        }
+        }*/
         this.gameDto.getEnemyTank().addBuleetFire(enemyBullet);
-        Log.i(TAG,"enermyNum is*************************:"+gameDto.getEnemyTank().getBulletsFire().size());
+        //Log.i(TAG,"enermyNum is*************************:"+gameDto.getEnemyTank().getBulletsFire().size());
         //***************重置装填的时间*************
         //如果子弹的类型不是连续弹，则设置装填时间
         if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
@@ -132,10 +130,10 @@ public class AImaker implements Runnable , Subject {
             //小于0则设定一个固定值
             initDistance= 0.5;
         }
-        Log.i(TAG,"initDegree is *************************:"+initDegree);
-        Log.i(TAG,"initDistance is *************************:"+initDistance);
-        Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
-        Log.i(TAG,"init y is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_y());
+        //Log.i(TAG,"initDegree is *************************:"+initDegree);
+        //Log.i(TAG,"initDistance is *************************:"+initDistance);
+        //Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
+        //Log.i(TAG,"init y is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_y());
         //注意这里，角度为负数
         enemyBullet.setBulletDegree(initDegree);
         enemyBullet.setBulletDistance(initDistance);

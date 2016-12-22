@@ -94,26 +94,15 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             gameThread= new GameThread();
             Thread thread = new Thread(gameThread);
             thread.start();
-            //启动bonus的线程
-            this.startMakeBonus();
-            //启动对应模式的communicate线程 这里可以不同了。。。。
-            //clientCommunicate.startCommunicate();
-            //在这里启动数据交互线程，暂时学习一下 ，现在已经没用了
-            this.startCommunicateThread();
+            //如果是主动模式则启动bonus的线程
+            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                this.startMakeBonus();
+            }
         }else{
             Log.w(TAG,"gameThread is not null");
         }
     }
 
-    private void startCommunicateThread() {
-        timerCommunnicate = new Timer();
-        //CommunicateThread communicateThread = new CommunicateThread();
-        //schedule(TimerTask task, long delay, long period)
-        //等待试试10s后开始调度，每隔10s产生一个
-        Log.w(TAG,"start to communicate");
-        //就用100ms进行测试
-        //timerBonus.schedule(communicateThread,5000,100);
-    }
 
     public void startMakeBonus(){
         timerBonus = new Timer();
@@ -165,6 +154,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
                     }
                 }
+                //下面是本地模式的相关代码
                 if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
                     if(remoteDtoInitFlag){
                         //TODO 检查一下，这个enermyNum为啥为0
@@ -174,24 +164,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                         if(enermyNum!=0){
                             for(int i=(enermyNum-1);i>=0;i--){
                                 //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
-/*                                int numFire = gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().size();
-                                Log.i(TAG,"BulletsFire num is :"+numFire);
-                               for(int j=0;j<numFire;j++){
-                                   Log.i(TAG,"getFirePath position is :"+gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().get(j).getX()+","+gameDto.getEnemyTank().getBulletsFire().get(i).getFirePath().get(j).getY());
-                                }*/
+                                if(enermyFireBonus(i)){
+                                    continue;
+                                }
                                 if(enermyTankExplode(i)){
                                     continue;
-                                };
-                                //这里设置continue语句来解决这个问题.....
-                                //测试击中bonus后用的方法
-/*                            if (testFireBonus(i)){
-                                continue;
-                            }
-                            //测试爆炸用的方法
-                            if(testExplode(i)){
-                                continue;
-                            }*/
-
+                                }
                             }
                         }
                     }
@@ -212,7 +190,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         }
 
     }
-    //测试击中bonus的反应
+    //测试我的坦克击中bonus的反应
     //1、停止bonus 2、设置selectView 3、削减血条 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
     private boolean myFireBonus(int bullet){
         if(gameDto.getBonus()!=null){
@@ -241,20 +219,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     this.gameDto.getMyTank().setSelectedBullets(bulletType);
                     this.gameDto.getMyTank().setSelectedBulletsNum(StaticVariable.BUTTON_NUM_ORIGN);
                 }
-                //***************削减血条***************
-                double boldSubtraction =gameDto.getMyTank().getBulletsFire().get(bullet).getBulletBascInfo().getPower();
-                //TODO 这里好好想一下，如何实现注册，然后回调函数.....
-                gameDto.getMyBlood().subtractionBlood(boldSubtraction);
-                if(gameDto.getMyBlood().getBloodNum()<0){
-                    //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
-                    Message msgInfo = myHandler.obtainMessage();
-                    msgInfo.what = StaticVariable.MSG_TOAST;
-                    Bundle bundleMsg = new Bundle();
-                    bundleMsg.putString("message","血条已空");  //设置子弹数量
-                    msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
-                    myHandler.sendMessage(msgInfo);
-                    gameDto.getMyBlood().setBloodNum(1);
-                }
                 //***************设置bonus停止***************
                 gameDto.getBonus().setIsBonusFired(true);
                 gameDto.setBonus(null);
@@ -269,26 +233,110 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         return false;
     }
 
+    //测试敌方坦克击中bonus的反应
+    //1、停止bonus 4/产生爆炸并移除子弹
+    private boolean enermyFireBonus(int bullet){
+        if(gameDto.getBonus()!=null){
+            if(gameDto.getBonus().isInBonusScope(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                    gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
+                //***************设置bonus停止***************
+                gameDto.getBonus().setIsBonusFired(true);
+                gameDto.setBonus(null);
+                //***************产生爆炸***************
+                addExplode(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                        gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                        StaticVariable.EXPLODE_TYPE_TANK);
+                gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
+                return true;
+            }
+        }
+        return false;
+    }
 
-    //自身测试爆炸用的方法
+
+    //我方坦克的子弹击中效果
     private boolean myTankExplode(int bullet) {
-        //TODO 测试explode
-        //如果打中地面
+        //如果发现子弹已经停止绘制，则移除
+        if(!gameDto.getMyTank().getBulletsFire().get(bullet).isDrawFlag()){
+            gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
+            return true;
+        }
+        //如果打中地方坦克   1、产生爆炸 2、移除子弹 3、检查游戏是否结束
+        if(gameDto.getEnemyTank().isInCircle(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
+            /*设置敌方坦克的血条*/
+            //***************削减血条***************
+            double boldSubtraction =gameDto.getMyTank().getBulletsFire().get(bullet).getBulletBascInfo().getPower();
+            //TODO 这里好好想一下，如何实现注册，然后回调函数.....
+            gameDto.getEnemyBlood().subtractionBlood(boldSubtraction);
+            //***************产生爆炸，移除子弹***************
+            addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                    gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.EXPLODE_TYPE_TANK);
+            gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
+            //***************提示地方坦克的血量,并检查游戏是否结束***************
+            if(gameDto.getEnemyBlood().getBloodNum()<0){
+                //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
+                Message msgInfo = myHandler.obtainMessage();
+                msgInfo.what = StaticVariable.MSG_TOAST;
+                Bundle bundleMsg = new Bundle();
+                bundleMsg.putString("message","敌方坦克血条已空，我方胜利");  //设置子弹数量
+                msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
+                myHandler.sendMessage(msgInfo);
+                //测试，用于重启游戏
+                gameDto.getEnemyBlood().setBloodNum(1);
+            }
+            return true;
+        }
+
+        //如果打中地面 1、产生爆炸 2、移除子弹
         if(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.LOCAL_SCREEN_HEIGHT /7*5){
             addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                     gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
                     StaticVariable.EXPLODE_TYPE_GROUND);
             gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;
-            //如果打中坦克
         }
         return false;
     }
 
 
-    //敌方测试爆炸用的方法
+    //敌方坦克的子弹击中效果
+    // 包括1、判断是否应该移除子弹 2、增加爆炸的效果.....
     private boolean enermyTankExplode(int bullet) {
         //TODO 测试explode
+        //如果发现子弹已经停止绘制，则移除
+        if(!gameDto.getEnemyTank().getBulletsFire().get(bullet).isDrawFlag()){
+            gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
+            return true;
+        }
+        //如果打中我方坦克
+        if(gameDto.getMyTank().isInCircle(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
+            /*设置敌方坦克的血条*/
+            //***************削减血条***************
+            double boldSubtraction =gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletBascInfo().getPower();
+            //TODO 这里好好想一下，如何实现注册，然后回调函数.....
+            gameDto.getMyBlood().subtractionBlood(boldSubtraction);
+            //***************产生爆炸，移除子弹***************
+            addExplode(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
+                    gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.EXPLODE_TYPE_TANK);
+            gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
+            //***************提示地方坦克的血量,并检查游戏是否结束***************
+            if(gameDto.getMyBlood().getBloodNum()<0){
+                //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
+                Message msgInfo = myHandler.obtainMessage();
+                msgInfo.what = StaticVariable.MSG_TOAST;
+                Bundle bundleMsg = new Bundle();
+                bundleMsg.putString("message","我方坦克血条已空，敌方胜利");  //设置子弹数量
+                msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
+                myHandler.sendMessage(msgInfo);
+                //测试，用于重启游戏
+                gameDto.getMyBlood().setBloodNum(1);
+            }
+            return true;
+        }
         //如果打中地面
         if(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y()> StaticVariable.LOCAL_SCREEN_HEIGHT /7*5){
             addExplode(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
@@ -296,7 +344,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     StaticVariable.EXPLODE_TYPE_GROUND);
             gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;
-            //如果打中坦克
         }
         return false;
     }
@@ -347,9 +394,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         this.clientCommunicate.addInfoObserver(this);
         this.clientCommunicate.addMsgObserver(this);
         this.clientCommunicate.addCommandObserver(this);
-        //启动一个消耗的线程
-        //Timer timer  = new Timer();
-        //timer.schedule(new consumeThread(),3000,20);
+        //下面是与非本地模式相关的代码,即启动先关的消耗线程即可.......
+        if(!(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL)){
+            //启动一个消耗的线程
+            Timer timer = new Timer();
+            timer.schedule(new consumeThread(), 3000, 20);
+        }
     }
 
     //互相communicate的线程
@@ -494,28 +544,31 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     @Override
     public void infoRecived(GameDto gameDtoReviced) {
         remoteGameDtos.offer(gameDtoReviced);   //入列
-        GameDto gameDtoTemp = remoteGameDtos.poll();
-        //在这里初始化Enermy坦克的信息
-        if(gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& this.gameDto.getEnemyTank()==null&&this.gameDto.getEnemyBlood()==null){
-            //初始化敌方的变量......
-            //Log.i(TAG,"初始化敌方的变量......");
-            initRemoteDto(gameDtoTemp);
-            //允许地方坦克发射
-            gameDto.getEnemyTank().setEnableFire(true);
-            this.remoteDtoInitFlag = true;
-        }
+        //下面是与本地模式相关的代码
+        if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
+            GameDto gameDtoTemp = remoteGameDtos.poll();
+            //在这里初始化Enermy坦克的信息
+            if(gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& this.gameDto.getEnemyTank()==null&&this.gameDto.getEnemyBlood()==null){
+                //初始化敌方的变量......
+                //Log.i(TAG,"初始化敌方的变量......");
+                initRemoteDto(gameDtoTemp);
+                //允许地方坦克发射
+                gameDto.getEnemyTank().setEnableFire(true);
+                this.remoteDtoInitFlag = true;
+            }
 
-        //如果初始化完成，即开始进行设置工作
-        if(this.remoteDtoInitFlag){
-            /**设置EnemyTank相关的属性**/
-            //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
-            this.gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
-            this.gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
-            this.gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y());
-            /**设置EnemyBlood相关的属性**/
-            this.gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
-        }
+            //如果初始化完成，即开始进行设置工作
+            if(this.remoteDtoInitFlag){
+                /**设置EnemyTank相关的属性**/
+                //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
+                this.gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
+                this.gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
+                this.gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y());
+                /**设置EnemyBlood相关的属性**/
+                //this.gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
+            }
 
+        }
     }
 
     /**

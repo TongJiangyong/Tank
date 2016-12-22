@@ -2,7 +2,6 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 
 import yong.tank.modal.abstractGoup.Bullet;
 import yong.tank.tool.StaticVariable;
@@ -28,7 +27,7 @@ public class EnemyBullet extends Bullet{
                 bulletPosition_x=firePath.get(pathPosition).getX();
                 bulletPosition_y=firePath.get(pathPosition).getY();
                 canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
-                Log.w(TAG, "X:" + firePath.get(pathPosition).getX() +" Y:" + firePath.get(pathPosition).getY() + " Degree:" + firePath.get(pathPosition).getDegree()+" position:"+pathPosition);
+                //Log.w(TAG, "X:" + firePath.get(pathPosition).getX() +" Y:" + firePath.get(pathPosition).getY() + " Degree:" + firePath.get(pathPosition).getDegree()+" position:"+pathPosition);
                 pathPosition++;
                 //}
             }
