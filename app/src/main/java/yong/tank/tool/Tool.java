@@ -485,4 +485,5 @@ public class Tool {
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 
+
 }

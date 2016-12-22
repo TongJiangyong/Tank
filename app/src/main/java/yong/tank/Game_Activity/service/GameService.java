@@ -20,6 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import yong.tank.Communicate.ComData.ComDataF;
+import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
@@ -56,7 +57,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     private Timer timerCommunnicate;
     private LocalRecord<User> localUser = new LocalRecord<User>();
     private Queue<GameDto> remoteGameDtos = new LinkedList<GameDto>();
+    //初始化远程DTO信息完成，即已完成全部初始化工作
     private boolean remoteDtoInitFlag =false;
+    //初始化远程交换完成，但是远程DTO等变量还未初始化
+    private boolean remotePrepareInitFlag =false;
+    private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     //TODO 测试通讯的代码
     private ClientCommunicate clientCommunicate;
     private Gson gson = new Gson();
@@ -98,6 +103,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
                 this.startMakeBonus();
             }
+            //如果不是本地模式，则启动一个20ms的数据生产者线程
+            if(StaticVariable.CHOSED_MODE!=StaticVariable.GAME_MODE.LOCAL){
+                Timer timer = new Timer();
+                timer.schedule(new productorThread(), 100, 20);
+            }
         }else{
             Log.w(TAG,"gameThread is not null");
         }
@@ -118,10 +128,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
     public void gameStop(){
         if(gameThread!=null){
+            //关闭bonus线程
+            this.stopMakeBonus();
+            //关闭游戏线程
             gameThread.gameThreadStop();
             //TODO 这里设置一个游戏结束标识符，进行判断,然后置为null
-
-
             //关闭网络
             clientCommunicate.stopCommunicate();
         }else{
@@ -191,7 +202,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
     }
     //测试我的坦克击中bonus的反应
-    //1、停止bonus 2、设置selectView 3、削减血条 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
+    //1、停止bonus 2、设置selectView 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
     private boolean myFireBonus(int bullet){
         if(gameDto.getBonus()!=null){
             if(gameDto.getBonus().isInBonusScope(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
@@ -261,7 +272,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;
         }
-        //如果打中地方坦克   1、产生爆炸 2、移除子弹 3、检查游戏是否结束
+        //如果打中地方坦克   1、产生爆炸 2、移除子弹 3、削减血条  3、检查游戏是否结束
         if(gameDto.getEnemyTank().isInCircle(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                 gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y())){
             /*设置敌方坦克的血条*/
@@ -401,17 +412,70 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             timer.schedule(new consumeThread(), 3000, 20);
         }
     }
+    public class productorThread extends TimerTask {
+        @Override
+        public void run() {
+            //如果初始化prepare完成,就开始传输数据
+            if(remotePrepareInitFlag){
+                ComDataF comDataF =null;
+                String gameDtoString =null;
+                try{
+                    //不断发送信息数据
+                    comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID+"#",StaticVariable.COMMAND_INFO,gson.toJson(gameDto));
+                    clientCommunicate.sendInfo(gson.toJson(comDataF));
+                }catch (Exception e){
+                    Log.i(TAG,"send Error:" +e);
+                }
+            }
+        }
+    }
+
 
     //互相communicate的线程
-    private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     public class consumeThread extends TimerTask {
         @Override
         public void run() {
             if(remoteGameDtos.size()!=0){
+                GameDto gameDtoTemp = remoteGameDtos.poll();
+                //在这里初始化Enermy坦克的信息
+                if(!remoteDtoInitFlag&&gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& gameDto.getEnemyTank()==null&&gameDto.getEnemyBlood()==null){
+                    //初始化敌方的变量......
+                    //Log.i(TAG,"初始化敌方的变量......");
+                    initRemoteDto(gameDtoTemp);
+                    //允许地方坦克发射
+                    gameDto.getEnemyTank().setEnableFire(true);
+                    //初始化成功的标志
+                    remoteDtoInitFlag = true;
+                }
 
-                remoteGameDtos.poll();
-                Log.w(TAG,"队列的剩余大小为:"+remoteGameDtos.size());
+                //如果初始化完成，即开始进行数据消费工作
+                //消费工作分为两类 1、activity的消费工作   2、passive的消费工作 3公共的消费工作
+                if(remoteDtoInitFlag){
+                    /**设置EnemyTank相关的属性**/
+                    //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
+                    //设置WeaponDegree相关的信息
+                    gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
+                    //设置enermy的坦克相关信息
+                    //TODO 注意这里，对坐标进行了转换
+                    gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-gameDtoTemp.getMyTank().getTankPosition_x()*StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH);
+                    gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y()*StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH);
+                    //设置血条相关信息
+                    //设置EnemyBlood相关的属性
+                    gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
+                    //TODO 这里的设置，很有问题，很容易出错，想想解决办法 包括子弹和爆炸、bonus以及属于的问题.....
+                    //设置子弹相关信息
+                    gameDto.getEnemyTank().setBulletsFire(gameDtoTemp.getEnemyTank().getBulletsFire());
+                    gameDto.setExplodes(gameDtoTemp.getExplodes());
 
+                    //activity的消费  //主要有爆炸
+                    if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
+
+
+                    //passive的消费工作  //主要有爆炸、bonus
+                    }else{
+                        gameDto.setBonus(gameDtoTemp.getBonus());
+                    }
+                }
             }else{
                 //Log.w(TAG,"队列为空");
             }
@@ -530,9 +594,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             Tool.sendSelfIdToActive(this.clientCommunicate);
         }
     }
-
+    //local暂时直接开始游戏即可
     private void initLocalActivity() {
-        //local暂时直接开始游戏：
         Message msgInfo = gameActivityHandler.obtainMessage();
         msgInfo.what = StaticVariable.GAME_STARTED;
         gameActivityHandler.sendMessage(msgInfo);
@@ -544,7 +607,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     @Override
     public void infoRecived(GameDto gameDtoReviced) {
         remoteGameDtos.offer(gameDtoReviced);   //入列
-        //下面是与本地模式相关的代码
+        //下面是与本地模式相关的代码 联网和蓝牙模式，采用消费者模式消费数据，不采用这种模式
         if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
             GameDto gameDtoTemp = remoteGameDtos.poll();
             //在这里初始化Enermy坦克的信息
@@ -630,6 +693,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
+                this.remotePrepareInitFlag = true;
 
             }else{
 
@@ -639,7 +703,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
-
+                this.remotePrepareInitFlag = true;
             }else{
 
             }
