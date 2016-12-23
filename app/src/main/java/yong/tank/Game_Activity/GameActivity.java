@@ -106,6 +106,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         gameService = new GameService(gameDto,this,gameActivityHandler);
         gameControler = new GameControler(gameService,this,views);
         /*********设置玩家控制器**********/
+        //这里的设计也非常不好，为了传输子弹，生硬的插入了clientCommunicate......
         playControler = new PlayControler(this,gameDto,gameControler);
         //TODO 所有初始化等工作完成以后，就开始游戏：
         //TODO 这里要设定，只有初始化完全成功后，才能调用statGame方法开始游戏......这个方法，以后再调用
@@ -268,6 +269,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     //开始进行通信初始化的完整流程.......
     public void initCommunicate(){
         this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
+        this.playControler.setClientCommunicate(this.clientCommunicate);
         //初始化全部的数据
         this.gameControler.getGameService().initAllDataInfo();
     }

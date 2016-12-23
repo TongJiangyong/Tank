@@ -79,7 +79,7 @@ public class AImaker implements Runnable , Subject {
                 }
 
                 Log.w(TAG,"发送数据时间为："+formatTime.format(new Date()));
-                Thread.sleep(20);
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -119,7 +119,7 @@ public class AImaker implements Runnable , Subject {
     private EnemyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
-        EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
+        EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,bulletType);
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;

@@ -2,6 +2,7 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ import yong.tank.tool.Tool;
  */
 
 public class EnemyTank extends Tank implements Serializable{
-    private transient static String TAG = "EnemyTank";
+    private  static String TAG = "EnemyTank";
+    private boolean isBulletDrawOver = true;
     //这里好好学习一下
     public List<EnemyBullet> bulletsFire;
     public EnemyTank(Bitmap tankPicture, Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
@@ -54,16 +56,19 @@ public class EnemyTank extends Tank implements Serializable{
         // TODO 这里weapon的点要更精细一点
         this.weaponPoxition_x = weaponPoxitionTemp_x;
         this.weaponPoxition_y = weaponPoxitionTemp_y;
+        Log.i(TAG,"current position:"+weaponPoxition_x);
 
         /**绘制所有的子弹**/
         if(bulletsFire.size()==0){
         }else{
             //这里值得注意的是，模式不同，绘制子弹的方法也不同
+            this.isBulletDrawOver = false;
             for (int i = bulletsFire.size() -1; i >= 0; i--) {
                 //绘制子弹
                 //Log.i(TAG,"enermy draw Bullet*****************");
                 bulletsFire.get(i).drawSelf(canvas);
             }
+            this.isBulletDrawOver = true;
         }
     }
 
@@ -79,5 +84,13 @@ public class EnemyTank extends Tank implements Serializable{
 
     public void setBulletsFire(List<EnemyBullet> bulletsFire) {
         this.bulletsFire = bulletsFire;
+    }
+
+    public boolean isBulletDrawOver() {
+        return isBulletDrawOver;
+    }
+
+    public void setBulletDrawOver(boolean bulletDrawOver) {
+        isBulletDrawOver = bulletDrawOver;
     }
 }

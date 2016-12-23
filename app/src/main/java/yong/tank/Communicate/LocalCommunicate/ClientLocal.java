@@ -56,7 +56,9 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
     //开始启动AI
     @Override
     public void stopCommunicate() {
-
+        if(aImaker!=null){
+            this.aImaker.stopThread();
+        }
     }
 
     //接口方法，什么都不做

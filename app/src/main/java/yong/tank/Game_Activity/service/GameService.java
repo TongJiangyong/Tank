@@ -31,9 +31,11 @@ import yong.tank.R;
 import yong.tank.modal.Bonus;
 import yong.tank.modal.DeviceInfo;
 import yong.tank.modal.EnemyBlood;
+import yong.tank.modal.EnemyBullet;
 import yong.tank.modal.EnemyTank;
 import yong.tank.modal.Explode;
 import yong.tank.modal.MyBlood;
+import yong.tank.modal.MyBullet;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
 import yong.tank.modal.Point;
@@ -42,6 +44,9 @@ import yong.tank.modal.abstractGoup.Blood;
 import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
+
+import static yong.tank.tool.StaticVariable.SCALE_SCREEN_HEIGHT;
+import static yong.tank.tool.StaticVariable.SCALE_SCREEN_WIDTH;
 
 /**
  * Created by hasee on 2016/11/10.
@@ -106,7 +111,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             //如果不是本地模式，则启动一个20ms的数据生产者线程
             if(StaticVariable.CHOSED_MODE!=StaticVariable.GAME_MODE.LOCAL){
                 Timer timer = new Timer();
-                timer.schedule(new productorThread(), 100, 20);
+                timer.schedule(new productorThread(), 100, 30);
             }
         }else{
             Log.w(TAG,"gameThread is not null");
@@ -129,7 +134,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public void gameStop(){
         if(gameThread!=null){
             //关闭bonus线程
-            this.stopMakeBonus();
+            if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
+                this.stopMakeBonus();
+            }
+
             //关闭游戏线程
             gameThread.gameThreadStop();
             //TODO 这里设置一个游戏结束标识符，进行判断,然后置为null
@@ -237,6 +245,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                         gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
                         StaticVariable.EXPLODE_TYPE_TANK);
+
                 gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
                 return true;
             }
@@ -375,6 +384,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     type);
         }
         gameDto.getExplodes().add(explode);//发生爆炸
+        //每次增加爆炸，则向client发送一个bonus
+        if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
+            Tool.sendNewExplode(clientCommunicate,explode);
+        }
     }
 
 
@@ -392,7 +405,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             Bonus bonus = new Bonus(bonusPicture,bonusPath,bonusType);
             //设置bonus
             gameDto.setBonus(bonus);
-
+            //向passive传送bonus
+            if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
+                Tool.sendNewBonus(clientCommunicate,bonus);
+            }
         }
     }
     public ClientCommunicate getClientCommunicate() {
@@ -409,7 +425,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         if(!(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL)){
             //启动一个消耗的线程
             Timer timer = new Timer();
-            timer.schedule(new consumeThread(), 3000, 20);
+            //发送和接收的时间均为33.....
+            timer.schedule(new consumeThread(), 3000, 30);
         }
     }
     public class productorThread extends TimerTask {
@@ -457,23 +474,32 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
                     //设置enermy的坦克相关信息
                     //TODO 注意这里，对坐标进行了转换
-                    gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-gameDtoTemp.getMyTank().getTankPosition_x()*StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH);
-                    gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y()*StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH);
+                    gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-(int)(gameDtoTemp.getMyTank().getTankPosition_x()*SCALE_SCREEN_WIDTH));
+                    gameDto.getEnemyTank().setTankPosition_y((int)(gameDtoTemp.getMyTank().getTankPosition_y()*SCALE_SCREEN_HEIGHT));
                     //设置血条相关信息
                     //设置EnemyBlood相关的属性
                     gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
                     //TODO 这里的设置，很有问题，很容易出错，想想解决办法 包括子弹和爆炸、bonus以及属于的问题.....
                     //设置子弹相关信息
-                    gameDto.getEnemyTank().setBulletsFire(gameDtoTemp.getEnemyTank().getBulletsFire());
-                    gameDto.setExplodes(gameDtoTemp.getExplodes());
-
-                    //activity的消费  //主要有爆炸
-                    if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
-
+                    //gameDto.getEnemyTank().setBulletsFire(gameDtoTemp.getEnemyTank().getBulletsFire());
 
                     //passive的消费工作  //主要有爆炸、bonus
-                    }else{
-                        gameDto.setBonus(gameDtoTemp.getBonus());
+                    if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.PASSIVE){
+                        //对passive端，要设置bonus的相关属性，如果本地的bonus初始化成功，则，开始设置其坐标
+                        if(gameDto.getBonus()!=null&&gameDtoTemp.getBonus()!=null){
+                            gameDto.getBonus().setBonus_x((int)(gameDtoTemp.getBonus().getBonus_x()*SCALE_SCREEN_WIDTH));
+                            gameDto.getBonus().setBonus_y((int)(gameDtoTemp.getBonus().getBonus_y()*SCALE_SCREEN_HEIGHT));
+                        }
+                        //对passive端，设置子弹相关属性
+                        if(gameDtoTemp.getEnemyTank().getBulletsFire().size()!=0){
+                            //直到为true 直到不为负，才给子弹赋值,如果没有绘制完，则会一直在循环体中.....
+                            //这种处理方法很不好，考虑用另一个线程来处理
+                            while(!gameDto.getEnemyTank().isBulletDrawOver());
+                            //TODO 感觉子弹的处理还是会很麻烦
+                            //循环设置子弹的绘制属性，其中循环的参数为获取的子弹链属性
+
+                        }
+
                     }
                 }
             }else{
@@ -540,7 +566,9 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
      * 本地初始化远程dto相关的代码
      */
     private void initRemoteDto(GameDto gameDtoTemp) {
+        //初始化enemyTank
         EnemyTank enemyTank = (EnemyTank) initTank(gameDtoTemp.getTankType(),false);
+        //初始化blood
         EnemyBlood enemyBlood = (EnemyBlood)initBlood(false);
         gameDto.setEnemyBlood(enemyBlood);
         gameDto.setEnemyTank(enemyTank);
@@ -669,6 +697,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
+                SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
+                StaticVariable.SCALE_SCREEN_WIDTH =StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
                 Tool.sendSelfInfoToPassive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");
@@ -681,6 +711,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
+                SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
+                StaticVariable.SCALE_SCREEN_WIDTH =StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");
@@ -733,9 +765,40 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 中断游戏_undirect
                 /*****在这里判断游戏是否主动中断....direction******/
-        }else{
 
+
+        //注意这里是架构有问题，bonus和子弹和爆炸的触发，只能通过这种方式来通知，下面的消息，只有passive能收到
+        // 产生新的子弹
+        }else if(command.equals(StaticVariable.ACTIVITY_MAKE_EXPLODE)){
+            Log.i(TAG,"passive端新建一个explode......");
+            Explode explode=gson.fromJson(comDataF.getComDataS().getObject(), Explode.class);
+            //TODO 这里的坐标注意变化
+            addExplode((int)(explode.getDrawCenter_x()*SCALE_SCREEN_WIDTH),
+                    (int)(explode.getDrawCenter_y()*SCALE_SCREEN_HEIGHT),
+                    explode.getExplodeType());
+         //bonus的触发，通过这种方式，产生新的bonux
+        }else if(command.equals(StaticVariable.ACTIVITY_MAKE_BONUS)){
+            Log.i(TAG,"passive端新建一个bonus......");
+            Bonus bonusTemp = gson.fromJson(comDataF.getComDataS().getObject(), Bonus.class);
+            int bonusType = bonusTemp.getBonusType();
+            Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(),StaticVariable.BONUSPICTURE[bonusType]);//0~length-1之间的数
+            Bonus bonus = new Bonus(bonusPicture,bonusType);
+            //设置bonus
+            gameDto.setBonus(bonus);
+        }else if(command.equals(StaticVariable.MAKE_BULLET)){
+            Log.i(TAG,"passive端新建一个bullet......");
+            //TODO 这里可能有类型转换的错误
+            MyBullet bullet =  gson.fromJson(comDataF.getComDataS().getObject(), MyBullet.class);
+            Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bullet.getBulletType()].getPicture());
+            Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
+            EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,bullet.getBulletType());
+            enemyBullet.setBulletDegree(bullet.getBulletDegree());
+            //允许发射....
+            enemyBullet.setDrawFlag(true);
+            //增加地方子弹
+            this.gameDto.getEnemyTank().addBuleetFire(enemyBullet);
         }
+
     }
 
     /**

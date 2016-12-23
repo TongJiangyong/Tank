@@ -12,8 +12,8 @@ import yong.tank.tool.StaticVariable;
 
 public class EnemyBullet extends Bullet{
     private transient static String TAG = "EnemyBullet";
-    public EnemyBullet(Bitmap bulletPicture, BulletBascInfo bulletBascInfo) {
-        super(bulletPicture, bulletBascInfo);
+    public EnemyBullet(Bitmap bulletPicture, int bulletType) {
+        super(bulletPicture, bulletType);
     }
 
     public void drawSelf(Canvas canvas){

@@ -26,25 +26,39 @@ public class Bonus implements Serializable {
     private transient boolean isDrawFlag=true;
     private Point bonusCenter = new Point();
     private int bonusType; //注意，这里的type和子弹的类型有关系，击中bonus后，产生相应的变化
+    //activity产生的bonus
     public Bonus(Bitmap bonusPicture, List<Point> bonusPath,int bonusType) {
         this.bonusPicture = bonusPicture;
         this.bonusPath = bonusPath;
         this.bonusType = bonusType;
     }
+    //client产生的bonux
+    public Bonus(Bitmap bonusPicture,int bonusType) {
+        this.bonusPicture = bonusPicture;
+        this.bonusType = bonusType;
+    }
 
     public void drawSelf(Canvas canvas) {
-        //TODO 绘制bonus 注意
-        if(bonusPath!=null&&pathPosition<bonusPath.size()&&isDrawFlag&&!isBonusFired){
-            bonus_x=bonusPath.get(pathPosition).getX();
-            bonus_y=bonusPath.get(pathPosition).getY();
-            canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
-            //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
-            pathPosition++;
+        if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+            //TODO 绘制bonus 注意
+            if(bonusPath!=null&&pathPosition<bonusPath.size()&&isDrawFlag&&!isBonusFired){
+                bonus_x=bonusPath.get(pathPosition).getX();
+                bonus_y=bonusPath.get(pathPosition).getY();
+                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
+                //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
+                pathPosition++;
+            }
+        }else{
+            if(isDrawFlag&&!isBonusFired){
+                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
+                //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
+            }
         }
         //如果超出界线，则停止绘制
-            if(bonus_x> StaticVariable.LOCAL_SCREEN_WIDTH ||bonus_x<0){
-                this.setDrawFlag(false);
-            }
+        if(bonus_x> StaticVariable.LOCAL_SCREEN_WIDTH ||bonus_x<0){
+            this.setDrawFlag(false);
+        }
+
     }
 
     public int getBonus_x() {

@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Dto.GameDto;
 import yong.tank.R;
 import yong.tank.modal.MyBullet;
@@ -24,6 +25,7 @@ public class PlayControler {
     private static String TAG ="PlayControler";
     private GameDto gameDto;
     private GameControler gameControler;
+    private ClientCommunicate clientCommunicate;
     private Point startPoint=new Point();
     private Point releasePoint=new Point();
     //坦克的角度
@@ -216,6 +218,8 @@ public class PlayControler {
             MyBullet myBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
             //在tank中加入子弹
             this.gameDto.getMyTank().addBuleetFire(myBullet);
+            //注意在这里，也要互相发送子弹的创建信息
+            Tool.sendNewBullet(this.clientCommunicate,myBullet);
             //***************重置装填的时间*************
             //如果子弹的类型不是连续弹，则设置装填时间
             if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
@@ -240,7 +244,7 @@ public class PlayControler {
     private MyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
-        MyBullet myBullet = new MyBullet(bulletPicture,StaticVariable.BUTTLE_BASCINFOS[bulletType]);
+        MyBullet myBullet = new MyBullet(bulletPicture,bulletType);
         //初始化坦克的性能
         myBullet.setBulletDegree(tankDegree);
         myBullet.setBulletDistance(distance);
@@ -291,5 +295,9 @@ public class PlayControler {
             default:
                 break;
         }
+    }
+
+    public void setClientCommunicate(ClientCommunicate clientCommunicate) {
+        this.clientCommunicate = clientCommunicate;
     }
 }

@@ -16,10 +16,15 @@ import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.SelectTank_Activity.modal.PictureInfo;
+import yong.tank.modal.Bonus;
 import yong.tank.modal.DeviceInfo;
+import yong.tank.modal.Explode;
 import yong.tank.modal.Point;
 import yong.tank.modal.User;
+import yong.tank.modal.abstractGoup.Bullet;
 
+import static yong.tank.tool.StaticVariable.ACTIVITY_MAKE_BONUS;
+import static yong.tank.tool.StaticVariable.ACTIVITY_MAKE_EXPLODE;
 import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT;
 import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER;
 import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED;
@@ -28,6 +33,7 @@ import static yong.tank.tool.StaticVariable.INIT_PASSIVE_REQUEST_CONNECT;
 import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER;
 import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED;
 import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO;
+import static yong.tank.tool.StaticVariable.MAKE_BULLET;
 import static yong.tank.tool.StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY;
 
 /**
@@ -485,5 +491,36 @@ public class Tool {
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 
+
+    /**
+     * ACTIVITY发送生成一个新的bonus命令
+     * @param clientCommunicate
+     */
+    public static void  sendNewBonus(ClientCommunicate clientCommunicate, Bonus bonus){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), ACTIVITY_MAKE_BONUS,gson.toJson(bonus));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+
+    /**
+     * ACTIVITY发送生成一个新的explode命令
+     * @param clientCommunicate
+     */
+    public static void  sendNewExplode(ClientCommunicate clientCommunicate, Explode explode){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), ACTIVITY_MAKE_EXPLODE,gson.toJson(explode));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+
+    /**
+     * ACTIVITY发送生成一个新的子弹命令
+     * @param clientCommunicate
+     */
+    //TODO 这里可能有类型转换的问题，需要测试
+    public static void  sendNewBullet(ClientCommunicate clientCommunicate, Bullet bullet){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), MAKE_BULLET,gson.toJson(bullet));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
 
 }

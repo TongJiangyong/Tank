@@ -140,8 +140,7 @@ public class BluetoothConnected extends Thread implements Subject {
                 // 没有消息写出的时候，线程等待
                 while (isStart) {
                     if (msg != null) {
-                        outupt.write(msg);
-                        outupt.write('\n');
+                        outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;
                     }

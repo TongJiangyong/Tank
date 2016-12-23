@@ -10,6 +10,7 @@ import java.util.List;
 
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.Point;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/8.
@@ -18,6 +19,7 @@ import yong.tank.modal.Point;
 public abstract class Bullet implements Serializable{
     private  transient BulletBascInfo bulletBascInfo;
     public transient  Bitmap bulletPicture;
+    private int bulletType;
     //发射路径点
     public transient List<Point> firePath;
     public int bulletPosition_x;
@@ -33,9 +35,10 @@ public abstract class Bullet implements Serializable{
     private transient Path path = new Path();
     double bulletV_x=0;
     double bulletV_y=0;
-    public Bullet(Bitmap bulletPicture, BulletBascInfo bulletBascInfo) {
+    public Bullet(Bitmap bulletPicture, int bulletType) {
         this.bulletPicture = bulletPicture;
-        this.bulletBascInfo = bulletBascInfo;
+        this.bulletType = bulletType;
+        this.bulletBascInfo = StaticVariable.BUTTLE_BASCINFOS[bulletType];
     }
 
     public abstract  void drawSelf(Canvas canvas);
@@ -113,5 +116,13 @@ public abstract class Bullet implements Serializable{
 
     public BulletBascInfo getBulletBascInfo() {
         return bulletBascInfo;
+    }
+
+    public int getBulletType() {
+        return bulletType;
+    }
+
+    public void setBulletType(int bulletType) {
+        this.bulletType = bulletType;
     }
 }

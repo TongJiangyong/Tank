@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 public class Explode implements Serializable {
     private transient Bitmap explodeFrame[];
-    private int currentFrame= 0;
+    private transient int currentFrame= 0;
     private int explodeType= 0;  //0为ground ，1为tank
     private int explode_x;
     private int explode_y;

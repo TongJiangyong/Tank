@@ -60,6 +60,8 @@ public class StaticVariable {
     //远程设备的基本信息 高宽、密度
     public static int REMOTE_SCREEN_WIDTH;
     public static int REMOTE_SCREEN_HEIGHT;
+    public static float SCALE_SCREEN_HEIGHT;
+    public static float SCALE_SCREEN_WIDTH;
     public static float REMOTE_DENSITY;
     //本地设备的基本信息 高宽、密度
     public static float LOCAL_DENSITY;
@@ -219,9 +221,15 @@ public class StaticVariable {
     public final static String RESPONSE_FINISHED_CONNECT_DIRECTIRY ="10";        //发送断开命令------互相直接发送
     public final static String RESPONSE_FINISHED_CONNECT_UNDIRECTRIY ="11";        //发送断开命令------服务器发送
 
+    public final static String ACTIVITY_MAKE_BONUS ="14";
+    public final static String ACTIVITY_MAKE_EXPLODE ="15";
+    public final static String MAKE_BULLET ="16";
     //定义的command：
-    public  static String COMMAND_MSG =  "12";
-    public  static String COMMAND_INFO =  "13";
+    public  final static String COMMAND_MSG =  "12";
+    public  final static String COMMAND_INFO =  "13";
+
+
+
 
     /* 网络连接中，另一个设备的ID*/
     public static String REMOTE_DEVICE_ID = null;

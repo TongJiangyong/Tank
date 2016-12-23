@@ -3,6 +3,7 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import yong.tank.tool.Tool;
  */
 //TODO 写成抽象方法，然后重写drawSelf方法？类似处理包括 bullet mytank blood.....考虑一下这种做法....可信性比较好.....
 public class MyTank extends Tank implements Serializable{
-
+    private transient static String TAG = "MyTank";
     //这里好好学习一下
     public List<MyBullet> bulletsFire= new ArrayList<MyBullet>(3);
     public MyTank(Bitmap tankPicture, Bitmap armPicture, int tankType, TankBascInfo tankBascInfo) {
@@ -56,7 +57,7 @@ public class MyTank extends Tank implements Serializable{
         // TODO 这里weapon的点要更精细一点
         this.weaponPoxition_x = weaponPoxitionTemp_x+armPicture_tmp.getWidth();
         this.weaponPoxition_y = weaponPoxitionTemp_y;
-
+        Log.i(TAG,"current position:"+weaponPoxition_x);
         //TODO 绘制预发射的子弹路径 绘制点的方法即可
         if(preFirePath!=null){
             Paint preFirePathPaint = new Paint();

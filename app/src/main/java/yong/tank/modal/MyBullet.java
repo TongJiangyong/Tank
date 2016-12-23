@@ -12,8 +12,8 @@ import yong.tank.tool.StaticVariable;
 
 public class MyBullet extends Bullet{
 
-    public MyBullet(Bitmap bulletPicture, BulletBascInfo bulletBascInfo) {
-        super(bulletPicture, bulletBascInfo);
+    public MyBullet(Bitmap bulletPicture, int bulletType) {
+        super(bulletPicture, bulletType);
     }
 
     public void drawSelf(Canvas canvas){
