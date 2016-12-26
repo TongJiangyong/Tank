@@ -45,6 +45,7 @@ import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
+import static yong.tank.tool.StaticVariable.REMOTE_DEVICE_ID;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_HEIGHT;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_WIDTH;
 
@@ -104,7 +105,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             gameThread= new GameThread();
             Thread thread = new Thread(gameThread);
             thread.start();
-            //如果是主动模式则启动bonus的线程
+            //如果是主动模式则启动bonus的线程 本东端不启动bonux
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
                 this.startMakeBonus();
             }
@@ -155,24 +156,25 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
         @Override
         public void run() {
+            gameDto.getMyTank().setEnableFire(true);
             while(threadFlag){
-                gameDto.getMyTank().setEnableFire(true);
-                int num=gameDto.getMyTank().getBulletsFire().size();
-                if(num!=0){
-                    for(int i=(num-1);i>=0;i--){
-                        //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
-                        //这里设置continue语句来解决这个问题.....
-                        //测试击中bonus后用的方法
-                        if (myFireBonus(i)){
-                            continue;
-                        }
-                        //测试爆炸用的方法
-                        if(myTankExplode(i)){
-                            continue;
-                        }
+                    int num=gameDto.getMyTank().getBulletsFire().size();
+                    if(num!=0){
+                        for(int i=(num-1);i>=0;i--){
+                            //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+                            //这里设置continue语句来解决这个问题.....
+                            //测试击中bonus后用的方法
+                            if (myFireBonus(i)){
+                                continue;
+                            }
+                            //测试爆炸用的方法
+                            if(myTankExplode(i)){
+                                continue;
+                            }
 
+                        }
                     }
-                }
+
                 //下面是本地模式的相关代码
                 if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
                     if(remoteDtoInitFlag){
@@ -240,7 +242,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 }
                 //***************设置bonus停止***************
                 gameDto.getBonus().setIsBonusFired(true);
-                gameDto.setBonus(null);
+                //gameDto.setBonus(null);
                 //***************产生爆炸***************
                 addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                         gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
@@ -343,7 +345,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
                     StaticVariable.EXPLODE_TYPE_TANK);
             gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
-            //***************提示地方坦克的血量,并检查游戏是否结束***************
+            //***************提示敌方坦克的血量,并检查游戏是否结束***************
             if(gameDto.getMyBlood().getBloodNum()<0){
                 //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
                 Message msgInfo = myHandler.obtainMessage();
@@ -459,7 +461,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     //初始化敌方的变量......
                     //Log.i(TAG,"初始化敌方的变量......");
                     initRemoteDto(gameDtoTemp);
-                    //允许地方坦克发射
+                    //允许敌方坦克发射
                     gameDto.getEnemyTank().setEnableFire(true);
                     //初始化成功的标志
                     remoteDtoInitFlag = true;
@@ -480,8 +482,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     //设置EnemyBlood相关的属性
                     gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
                     //TODO 这里的设置，很有问题，很容易出错，想想解决办法 包括子弹和爆炸、bonus以及属于的问题.....
-                    //设置子弹相关信息
-                    //gameDto.getEnemyTank().setBulletsFire(gameDtoTemp.getEnemyTank().getBulletsFire());
+                    //设置bonus相关信息 无论主动被动，都需要知道bonus摧毁没有
+                    if(gameDto.getBonus()!=null&&gameDtoTemp.getBonus()!=null){
+                        gameDto.getBonus().setIsBonusFired(gameDtoTemp.getBonus().isBonusFired());
+                    }
 
                     //passive的消费工作  //主要有爆炸、bonus
                     if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.PASSIVE){
@@ -491,13 +495,21 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                             gameDto.getBonus().setBonus_y((int)(gameDtoTemp.getBonus().getBonus_y()*SCALE_SCREEN_HEIGHT));
                         }
                         //对passive端，设置子弹相关属性
-                        if(gameDtoTemp.getEnemyTank().getBulletsFire().size()!=0){
+                        if(gameDtoTemp.getMyTank().getBulletsFire().size()!=0&&gameDto.getEnemyTank().getBulletsFire().size()!=0){
                             //直到为true 直到不为负，才给子弹赋值,如果没有绘制完，则会一直在循环体中.....
+                            //TODO 测试看要不要这句
                             //这种处理方法很不好，考虑用另一个线程来处理
                             while(!gameDto.getEnemyTank().isBulletDrawOver());
-                            //TODO 感觉子弹的处理还是会很麻烦
-                            //循环设置子弹的绘制属性，其中循环的参数为获取的子弹链属性
-
+                            //TODO 感觉子弹的处理还是会很麻烦 这里也有可能出错，即本地的子弹数目不匹配的问题
+                            //循环设置子弹的绘制属性，其中循环的参数为获取的子弹链属性 子弹一定要从低到高设置起来.......
+                            for(int i = 0;i<gameDtoTemp.getMyTank().getBulletsFire().size();i++){
+                                //gameDto.getEnemyTank().getBulletsFire().get(i).setBulletDistance(gameDtoTemp.getMyTank().getBulletsFire().get(i).getBulletDistance());
+                                gameDto.getEnemyTank().getBulletsFire().get(i).setBulletDegree(gameDtoTemp.getMyTank().getBulletsFire().get(i).getBulletDegree());
+                                gameDto.getEnemyTank().getBulletsFire().get(i).setBulletType(gameDtoTemp.getMyTank().getBulletsFire().get(i).getBulletType());
+                                gameDto.getEnemyTank().getBulletsFire().get(i).setBulletPosition_x((int)(gameDtoTemp.getMyTank().getBulletsFire().get(i).getBulletPosition_x()*SCALE_SCREEN_WIDTH));
+                                gameDto.getEnemyTank().getBulletsFire().get(i).setBulletPosition_y((int)(gameDtoTemp.getMyTank().getBulletsFire().get(i).getBulletPosition_y()*SCALE_SCREEN_HEIGHT));
+                                gameDto.getEnemyTank().getBulletsFire().get(i).setDrawFlag(gameDtoTemp.getMyTank().getBulletsFire().get(i).isDrawFlag());
+                            }
                         }
 
                     }
@@ -643,7 +655,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 //初始化敌方的变量......
                 //Log.i(TAG,"初始化敌方的变量......");
                 initRemoteDto(gameDtoTemp);
-                //允许地方坦克发射
+                //允许敌方坦克发射
                 gameDto.getEnemyTank().setEnableFire(true);
                 this.remoteDtoInitFlag = true;
             }
@@ -691,7 +703,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             /** activity接受信息数据，并传输自身的信息数据**/
         }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_PASSIVE_RESPONSE_SELFINFO cmmand:"+comDataF.getComDataS().getCommad());
                //activity接受远程的数据信息
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
@@ -706,7 +718,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             /**  passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，**/
         }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_SELFINFO cmmand:"+comDataF.getComDataS().getCommad());
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
@@ -721,7 +733,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
              /**   activity初始化完成命令，开始进入游戏，并传输初始化完成命令，**/
         }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_PASSIVE_RESPONSE_INIT_FINISHED cmmand:"+comDataF.getComDataS().getCommad());
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
@@ -732,7 +744,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             }
         }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
                 this.remotePrepareInitFlag = true;
@@ -741,7 +753,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             }
         }else if(command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_PASSIVE_RESPONSE_GAMEOVER cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 结束游戏_ACTIVITY
                 /*****在这里判断游戏是否结束....ACTIVITY模式******/
 
@@ -750,7 +762,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             }
         }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER)){
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_GAMEOVER cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 结束游戏_passive
                 /*****在这里判断游戏是否结束....passive模式******/
 
@@ -758,11 +770,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
 
             }
         }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY)) {
-                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:" + comDataF.getComDataS().getCommad());
+                Log.w(TAG, "RESPONSE_FINISHED_CONNECT_DIRECTIRY cmmand:" + comDataF.getComDataS().getCommad());
                  //TODO 中断游戏_direct
                 /*****在这里判断游戏是否主动中断....direction******/
         }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_UNDIRECTRIY)){
-                Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
+                Log.w(TAG,"RESPONSE_FINISHED_CONNECT_UNDIRECTRIY cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 中断游戏_undirect
                 /*****在这里判断游戏是否主动中断....direction******/
 
@@ -770,7 +782,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         //注意这里是架构有问题，bonus和子弹和爆炸的触发，只能通过这种方式来通知，下面的消息，只有passive能收到
         // 产生新的子弹
         }else if(command.equals(StaticVariable.ACTIVITY_MAKE_EXPLODE)){
-            Log.i(TAG,"passive端新建一个explode......");
+            Log.i(TAG,"ACTIVITY_MAKE_EXPLODE passive端新建一个explode......");
             Explode explode=gson.fromJson(comDataF.getComDataS().getObject(), Explode.class);
             //TODO 这里的坐标注意变化
             addExplode((int)(explode.getDrawCenter_x()*SCALE_SCREEN_WIDTH),
@@ -795,7 +807,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             enemyBullet.setBulletDegree(bullet.getBulletDegree());
             //允许发射....
             enemyBullet.setDrawFlag(true);
-            //增加地方子弹
+            //增加敌方子弹
             this.gameDto.getEnemyTank().addBuleetFire(enemyBullet);
         }
 
@@ -807,6 +819,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     @Override
     public void msgRecived(String msg) {
         Log.w(TAG,"reviced msg:"+msg);
+        String orginText = this.gameDto.getMsgText().getText().toString();
+        orginText=orginText+ "\n"+REMOTE_DEVICE_ID+": "+msg;
+        this.gameDto.getMsgText().setText(orginText);
+
     }
 
 }

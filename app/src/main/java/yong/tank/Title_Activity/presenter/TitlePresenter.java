@@ -69,7 +69,7 @@ public class TitlePresenter implements ITitlePresenter {
         //首先出来选择服务器的dialog，跳出来选择
         //TODO 1、判断是否联网 ，2、选择连入的服务器 ，3、判断 是否有用户信息，没有，则区分跳转 4、跳转页面
         ConnectivityManager cwjManager=(ConnectivityManager)this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(cwjManager.getActiveNetworkInfo().isAvailable()){
+        if(cwjManager!=null&&cwjManager.getActiveNetworkInfo().isAvailable()){
             this.serviceChoseDialog();
 
         }else{

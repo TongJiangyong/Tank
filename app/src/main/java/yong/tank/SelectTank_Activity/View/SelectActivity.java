@@ -88,10 +88,11 @@ public class SelectActivity extends Activity implements View.OnClickListener{
                 break;
             case R.id.confirmButton:
                 selectPresent.gotoBattle();
-                //TODO 进入战场后，毁掉自身.....
-                this.finish();
+                    //TODO 进入战场后，毁掉自身.....
                 break;
         }
 
     }
+
+
 }

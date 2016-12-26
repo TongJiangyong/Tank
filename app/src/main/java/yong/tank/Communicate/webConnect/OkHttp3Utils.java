@@ -31,7 +31,7 @@ public class OkHttp3Utils {
                     //.addInterceptor(new MyIntercepter())
                     //.addNetworkInterceptor(new CookiesInterceptor(MyApplication.getInstance().getApplicationContext()))
                     //设置请求读写的超时时间
-                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .connectTimeout(3, TimeUnit.SECONDS)
                     .writeTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     //.cache(cache)

@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import yong.tank.Communicate.ComData.ComDataF;
@@ -23,6 +22,8 @@ import yong.tank.Dto.testDto;
 import yong.tank.Game_Activity.BlutToothActivty;
 import yong.tank.Game_Activity.GameActivity;
 import yong.tank.tool.StaticVariable;
+
+import static yong.tank.tool.StaticVariable.LOCAL_USER_INFO;
 
 /**
  * Created by hasee on 2016/10/27.
@@ -172,17 +173,38 @@ public class GamePresenter {
         //向TCP发送自身Id的注册数据
         clientCommunicate.setMyHandle(myHandler);
         //在这里启动一个线程进行测试编程：.....
-        CommunicateThread communicateThread = new CommunicateThread();
+        //CommunicateThread communicateThread = new CommunicateThread();
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
         Log.w(TAG,"start to communicate");
         //就用100ms进行测试
-        Timer timer  = new Timer();
-        timer.schedule(communicateThread,3000,20);
+        //Timer timer  = new Timer();
+        //timer.schedule(communicateThread,3000,20);
     }
 
     private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        //互相communicate的线程
+
+    //1、判断能否通信，2、打开界面
+    public void msgSend() {
+        //TODO 如果全部初始化完全，可以打开这个 ,即，加一个判断
+        String sendInfo =gameActivity.msg_input.getText().toString();
+        if(sendInfo.length()==0){
+            gameActivity.showToast("发送的信息不能为空....");
+        }else{
+            //发送消息
+            clientCommunicate.sendInfo(sendInfo);
+            //增加显示消息
+            String orginText = gameActivity.msgText.getText().toString();
+            orginText=orginText+ "\n"+LOCAL_USER_INFO+": "+sendInfo;
+            gameActivity.msgText.setText(orginText);
+            //消除input中的信息
+            gameActivity.msg_input.setText("");
+        }
+
+
+    }
+
+    //互相communicate的线程
     public class CommunicateThread extends TimerTask {
             int count  =0;
         @Override
@@ -256,7 +278,7 @@ public class GamePresenter {
 
 
     private void connectError() {
-        Toast.makeText(context.getApplicationContext(),  "与对手连接失败", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context.getApplicationContext(),  "与远程服务器连接失败.....", Toast.LENGTH_SHORT).show();
         //TODO 延迟执行退出程序
     }
 

@@ -1,15 +1,17 @@
 package yong.tank.Dto;
 
+import android.widget.TextView;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import yong.tank.modal.Bonus;
 import yong.tank.modal.EnemyBlood;
 import yong.tank.modal.EnemyTank;
-import yong.tank.modal.MyBlood;
-import yong.tank.modal.Bonus;
 import yong.tank.modal.Explode;
+import yong.tank.modal.MyBlood;
 import yong.tank.modal.MyTank;
 import yong.tank.modal.PlayerPain;
 import yong.tank.modal.SelectButton;
@@ -31,6 +33,7 @@ public class GameDto implements Serializable{
     private List<Explode> explodes;   //爆炸场景为在lcoal进行绘制
     private Bonus bonus = null;
     private transient Map<Integer,SelectButton> selectButtons;
+    private transient TextView msgText;
 
     public MyTank getMyTank() {
         return myTank;
@@ -113,5 +116,13 @@ public class GameDto implements Serializable{
 
     public void setEnemyBlood(EnemyBlood enemyBlood) {
         this.enemyBlood = enemyBlood;
+    }
+
+    public TextView getMsgText() {
+        return msgText;
+    }
+
+    public void setMsgText(TextView msgText) {
+        this.msgText = msgText;
     }
 }

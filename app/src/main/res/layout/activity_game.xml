@@ -41,6 +41,15 @@
 <!--注意控制以下关于msg的控件为隐藏的状态-->
     <!--看来后面的会覆盖在前面-->
 
+    <RelativeLayout android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/msgLayout"
+        android:gravity="top"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone">
+
+
 
     <ImageView
         android:id="@+id/msgView"
@@ -49,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:visibility="gone">
+  >
     </ImageView>
 
     <EditText
@@ -69,7 +78,7 @@
         android:layout_alignStart="@+id/msgView"
         android:layout_toLeftOf="@+id/msgSend"
         android:layout_toStartOf="@+id/msgSend"
-        android:visibility="gone">
+        >
     </EditText>
 
     <Button
@@ -80,9 +89,9 @@
         android:layout_alignBottom="@+id/msgView"
         android:layout_alignRight="@+id/msgView"
         android:layout_alignEnd="@+id/msgView"
-        android:visibility="gone">
+      >
     </Button>
-
+<!--    -->
     <TextView
         android:id="@+id/msgText"
         android:layout_width="200dp"
@@ -94,7 +103,6 @@
         android:text="测试 sdf \n  sdfsdf \n 是否水电费 sdfsdf  \n  \n  \n "
         android:layout_alignTop="@+id/msgView"
         android:layout_alignLeft="@+id/msgView"
-        android:layout_alignStart="@+id/msgView"
-        android:visibility="gone"/> <!--invisible /visibale-->
-
+        android:layout_alignStart="@+id/msgView" /> <!--invisible /visibale-->
+    </RelativeLayout>
 </RelativeLayout>

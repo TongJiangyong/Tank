@@ -17,8 +17,9 @@ public class EnemyBlood extends Blood{
     public transient int bloodBlock_y=0;
     public EnemyBlood(Bitmap blood, Bitmap power, Bitmap bloodBlock, float bloodNum, float powerNum) {
         super(blood, power, bloodBlock, bloodNum, powerNum);
-        //bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH-bloodBlock.getWidth()-5);
-        bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,485);
+        //TODO 可能dip2px只能排除LOCAL_DENSITY的大小，不能排除尺寸的大小，所以不能用注释中的话，只能用
+        //bloodBlock_x= Tool.dip2px(StaticVariable.LOCAL_DENSITY,485);
+        bloodBlock_x=(int)(StaticVariable.LOCAL_SCREEN_WIDTH-bloodBlock.getWidth()-Tool.dip2px(StaticVariable.LOCAL_DENSITY,5));
         bloodBlock_y=Tool.dip2px(StaticVariable.LOCAL_DENSITY,5);
     }
 
@@ -31,11 +32,13 @@ public class EnemyBlood extends Blood{
                 bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,5)+blood.getWidth(),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,29)+blood.getHeight());
         //计算power的比例
-        Rect src_power = new Rect(0, 0, (int)(power.getWidth()*powerNum), power.getHeight());
-        Rect des_power = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15),
+        Rect src_power = new Rect((int)(power.getWidth()*(1-powerNum)), 0, power.getWidth(), power.getHeight());
+        Rect des_power = new Rect(bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15)+(int)(power.getWidth()*(1-powerNum)),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41),
-                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15)+(int)(power.getWidth()*powerNum),
+                bloodBlock_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY,15)+power.getWidth(),
                 bloodBlock_y+Tool.dip2px(StaticVariable.LOCAL_DENSITY,41)+power.getHeight());
+
+
         //绘制装填进度条
         canvas.drawBitmap(power,src_power,des_power, null);
         //绘制框

@@ -8,6 +8,7 @@ import java.io.File;
 import yong.tank.R;
 import yong.tank.modal.BulletBascInfo;
 import yong.tank.modal.TankBascInfo;
+import yong.tank.modal.User;
 
 import static yong.tank.R.mipmap.s;
 
@@ -173,11 +174,7 @@ public class StaticVariable {
     public final static int MSG_COMMUNICATE_ERROR=4;
     //网络主动断开
     public final static int MSG_COMMUNICATE_OUT=5;
-    //设置通讯相关的部分 String ip, int port
-    //public static String SERVER_IP = "192.168.1.102";
-    public static String SERVER_IP = "192.168.1.122";
-    //public static String SERVER_IP = "115.154.191.5";
-    public static int SERVER_PORT =  9999;
+
 
 
     //定义蓝牙相关的量：
@@ -233,6 +230,10 @@ public class StaticVariable {
 
     /* 网络连接中，另一个设备的ID*/
     public static String REMOTE_DEVICE_ID = null;
+    /* 网络连接中，自己的用户信息*/
+    public static User LOCAL_USER_INFO = new User();
+    /* 网络连接中，房间的ID*/
+    public static String REMOTE_ROOM_ID = null;
    /* 与存储相关的数据 */
     public final static String TANK_USER_INFO="tank_userinfo.bat";
     public final static String TANK_RECORD_INFO="tank_recordinfo.bat";
@@ -246,5 +247,12 @@ public class StaticVariable {
     /* 服务器初始化相关的ip */
     //服务器路径
     public static  String API_SERVER = "http://192.168.1.122:8080/webService";
+    //public static  String API_SERVER = "http://192.168.191.1:8080/webService";
     public static  String API_SERVER_XIAN = "http://115.154.191.5:8080/webService";
+    //设置通讯相关的部分 String ip, int port
+    public static String SERVER_IP = "192.168.1.122";
+    //public static String SERVER_IP = "192.168.191.1";
+    //public static String SERVER_IP = "192.168.1.122";
+    //public static String SERVER_IP_XIAN = "115.154.191.5";
+    public static int SERVER_PORT =  9999;
 }

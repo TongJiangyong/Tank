@@ -46,9 +46,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private PlayControler playControler;
     private GameControler gameControler;
     private Button msgButton;
+    private RelativeLayout relativeLayout;
     private Button msgSend;
     private ImageView msgView;
-    private TextView msgText;
+    public TextView msgText;
+    public TextView msg_input;
     private GameService gameService;
     private ClientCommunicate clientCommunicate;
     private GamePresenter gamePresenter;
@@ -83,17 +85,25 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
         //绘制selectView   这里添加selectView之前，还要设置view的基本位置信息，主要在layout中处理位置
         SelectView selectView = (SelectView)findViewById(R.id.selectView);
+        //与msg相关的layout
         msgButton = (Button)findViewById(R.id.msgButton);
         msgView = (ImageView)findViewById(R.id.msgView);
         msgText = (TextView)findViewById(R.id.msgText);
         msgSend = (Button)findViewById(R.id.msgSend);
-        if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
+        msg_input = (TextView)findViewById(R.id.msg_input);
+        relativeLayout = (RelativeLayout)findViewById(R.id.msgLayout);
+/*        if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
             msgButton.setVisibility(View.GONE);
-        }
+        }*/
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
+        msgButton.setOnClickListener(this);
+        msgSend.setOnClickListener(this);
+        //给gameDto设置按钮
         gameDto.setSelectButtons(selectView.getSelectButtons());
+        //给gameDto设置msg显示
+        gameDto.setMsgText(this.msgText);
         List<ViewBase> views=initViews(gameDto);
         for(ViewBase v:views){
             //一定要加上这一句
@@ -140,7 +150,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 
 
-    @Override
+   // public boolean onTouchEvent(MotionEvent event) {
+   @Override
     public boolean onTouchEvent(MotionEvent event) {
         //Toast.makeText(this, "event.getX() "+event.getX(), Toast.LENGTH_SHORT).show();
         if(startFlag){
@@ -155,22 +166,23 @@ public class GameActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         //在这里传入electView,然后进行逻辑处理即可....
+        Log.i(TAG,"onclick info");
         switch (view.getId()) {
             case R.id.msgButton:
                 //显示出msg的界面......
-                if(msgView.getVisibility()==View.GONE){
-                    msgView.setVisibility(View.VISIBLE);
-                    msgText.setVisibility(View.VISIBLE);
-                    msgSend.setVisibility(View.VISIBLE);
+                if(relativeLayout.getVisibility()==View.GONE){
+                    //先这样....以后再有机会处理吧......
+                    relativeLayout.setVisibility(View.VISIBLE);
+
+                    //relativeLayout.setGravity(RelativeLayout.ALIGN_TOP);
                 }else{
-                    msgView.setVisibility(View.GONE);
-                    msgText.setVisibility(View.GONE);
-                    msgSend.setVisibility(View.GONE);
+                    relativeLayout.setVisibility(View.GONE);
                 }
 
                 break;
             case  R.id.msgSend:
                 //TODO deal with send method
+                this.gamePresenter.msgSend();
                 break;
             default:
                 break;
@@ -282,6 +294,47 @@ public class GameActivity extends Activity implements View.OnClickListener {
         this.startFlag = true;
         Log.i(TAG,"开始游戏.....");
         this.showToast("开始游戏...");
+    }
+
+    //关闭游戏
+    public void stopGame(){
+        //允许游戏操作...
+        gameControler.stopGame();
+        //允许按钮操作
+        this.startFlag = false;
+        Log.i(TAG,"结束游戏.....");
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(TAG,"onDestroy");
+        super.onStop();
+        this.stopGame();
+        Log.d(TAG, "onStop()");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG,"onDestroy");
+        this.stopGame();
+        Log.d(TAG, "onDestroy()");
+    }
+
+
+    // 捕获返回键的方法2
+    @Override
+    public void onBackPressed() {
+        Log.d(TAG, "onBackPressed()");
+        super.onBackPressed();
+        this.stopGame();
     }
 
 
