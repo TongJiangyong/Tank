@@ -66,13 +66,14 @@ public class BluetoothConnected extends Thread implements Subject {
         while (readFlag) {
             try {
                 // Read from the InputStream
-                //后期尝试改为byte试试......
-               String msg = input.readLine();
+                //TODO 改写为byte试试......
+               String content = input.readLine();
                 //input.read();
                 Log.w(TAG,"bluetooth Connected and read msg is :"+msg);
-                this.write(msg);
+                //this.write(msg);
                 //传送数据
-                //notifyWatchers(msg);
+                if
+                notifyWatchers(msg);
                 // Send the obtained bytes to the UI Activity
 /*                    mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();*/
@@ -140,6 +141,7 @@ public class BluetoothConnected extends Thread implements Subject {
                 // 没有消息写出的时候，线程等待
                 while (isStart) {
                     if (msg != null) {
+                        Log.i(TAG,"send info is :"+msg);
                         outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;

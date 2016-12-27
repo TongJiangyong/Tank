@@ -36,27 +36,31 @@ public class LoginPresenter{
 
     public void login() {
         ConnectivityManager cwjManager=(ConnectivityManager)this.context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(cwjManager.getActiveNetworkInfo().isAvailable()){
+        if(cwjManager.getActiveNetworkInfo()!=null){
+            if(cwjManager.getActiveNetworkInfo().isAvailable()){
 
-            //获取填写的注册信息
-            String username =loginActivity.accountText.getText().toString();
-            String password =loginActivity.passwordText.getText().toString();
-            if(username.trim().length()==0||password.trim().length()==0){
-                loginActivity.showToast("用户名和密码为空");
+                //获取填写的注册信息
+                String username =loginActivity.accountText.getText().toString();
+                String password =loginActivity.passwordText.getText().toString();
+                if(username.trim().length()==0||password.trim().length()==0){
+                    loginActivity.showToast("用户名和密码为空");
+                }else{
+                    User user = new User();
+                    user.setUsername(username);
+                    user.setPassword(password);
+                    //设置状态为上线
+                    user.setState(1);
+                    loginToWeb(user);
+
+                }
+
             }else{
-                User user = new User();
-                user.setUsername(username);
-                user.setPassword(password);
-                //设置状态为上线
-                user.setState(1);
-                loginToWeb(user);
-
+                loginActivity.showToast("您的设备未联网啊，请检查设备网络状况...");
             }
-
-
         }else{
             loginActivity.showToast("您的设备未联网啊，请检查设备网络状况...");
         }
+
 
     }
 

@@ -2,7 +2,6 @@ package yong.tank.Communicate.InternetCommunicate;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,8 +64,8 @@ public class ClientInputThread implements Runnable,Subject{
                     //数据收到就有问题.....
                     String readline=new String(readBuffer).trim();
                     //需要重新分配，不然会有问题......
-                    readBuffer = new byte[4096];
-                    Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
+                    readBuffer = new byte[StaticVariable.READ_BYTE];
+                    //Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
                     String[] readInfos  =readline.split("&");
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
@@ -135,21 +134,6 @@ public class ClientInputThread implements Runnable,Subject{
 
     @Override
     public void notifyWatchers(ComDataF comDataF) {
-        //再这里解析，并进行遍历传输
-        //Log.w(TAG,msg);
-       //进行包的解析工作
-        //格式为：
-        //msg:{"comDataS":{"commad":"1","object":{"id":12,"name":"test"}},"flag":"654321#"}
-        //解析的逻辑为，将info解析为string，然后统一以string进行处理......
-        //Log.w(TAG,"***********************解析包***********************");
-        //Log.w(TAG, "flag:"+ ComDataPackage.unpackToF(msg,"testTdo").getFlag());
-        //Log.w(TAG, "cmmand:"+ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getCommad());
-        //这个解析多了两毫秒......没办法，就这样吧......
-        //testDto testDto = (testDto)ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getObject();
-        //String test=ComDataPackage.unpackToF(msg,"testTdo").getComDataS().getObject();
-        //testDto testDto = ComDataPackage.packageToObject(test);
-        //Log.w(TAG, "object::"+testDto.toString());
-
         //处理聊天信息
         if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_MSG)){
             for(ObserverMsg o:observerMsgs){

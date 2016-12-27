@@ -78,7 +78,12 @@ public class SelectPresent {
             if(StaticVariable.CHOSED_RULE== StaticVariable.GAME_RULE.ACTIVITY){
                 isOkToGoBattle = false;
                 chooseNameDialog();
+                //如果是被动模式，则加入并更新房间信息
+            }else{
+                isOkToGoBattle = false;
+                updateRoom();
             }
+
 
         }
         //对其它模式来说
@@ -87,8 +92,66 @@ public class SelectPresent {
             intent.putExtra("tankType",this.selectView.getSelectedTank());
             intent.putExtra("mapType",this.selectView.getSelectedMap());
             this.context.startActivity(intent);
+            selectActivity.finish();
         }
 
+    }
+
+    //更新房间信息的步骤为1、从服务器获取房间信息 2、更新服务器的房间信息
+    private void updateRoom() {
+        //获取特定房间信息
+        NetWorks.getRoomInfo("getRoomInfo",StaticVariable.REMOTE_ROOM_ID,new Observer<String>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"getRoomInfo error :"+e);
+                selectActivity.showToast("连接服务器出错-->1");
+            }
+
+            @Override
+            public void onNext(String info) {
+                Log.i(TAG,"recive room info :"+info);
+                Room room = gson.fromJson(info,Room.class);
+                room.setClientUser(StaticVariable.LOCAL_USER_INFO.getId());
+                room.setState(2);
+                room.setCreatTime(null);
+                //发送信息回去
+                updateRoomInfo(room);
+            }
+        });
+
+    }
+
+    private void updateRoomInfo(Room room){
+        //获取特定房间信息
+        NetWorks.updateRoomInfo("updateRoomInfo",gson.toJson(room),new Observer<String>() {
+            @Override
+            public void onCompleted() {}
+
+            @Override
+            public void onError(Throwable e) {
+                Log.i(TAG,"updateRoomInfo error :"+e);
+                selectActivity.showToast("连接服务器出错-->1");
+            }
+
+            @Override
+            public void onNext(String info) {
+                if(info.equals("0")){
+                    Log.i(TAG,"更新服务器房间信息成功");
+                    selectActivity.showToast("加入房间成功....");
+                    Intent intent = new Intent(context, GameActivity.class);
+                    intent.putExtra("tankType",selectView.getSelectedTank());
+                    intent.putExtra("mapType",selectView.getSelectedMap());
+                    context.startActivity(intent);
+                    selectActivity.finish();
+                }else{
+                    Log.i(TAG,"更新服务器房间信息失败");
+                }
+                //发送信息回去
+            }
+        });
     }
 
 
@@ -124,6 +187,7 @@ public class SelectPresent {
                     intent.putExtra("tankType",selectView.getSelectedTank());
                     intent.putExtra("mapType",selectView.getSelectedMap());
                     context.startActivity(intent);
+                    selectActivity.finish();
                 }
 
             }

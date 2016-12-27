@@ -91,10 +91,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
         msgText = (TextView)findViewById(R.id.msgText);
         msgSend = (Button)findViewById(R.id.msgSend);
         msg_input = (TextView)findViewById(R.id.msg_input);
+        //以后改变一下.....
         relativeLayout = (RelativeLayout)findViewById(R.id.msgLayout);
-/*        if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
+       if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
             msgButton.setVisibility(View.GONE);
-        }*/
+        }
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
@@ -282,7 +283,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     public void initCommunicate(){
         this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
         this.playControler.setClientCommunicate(this.clientCommunicate);
-        //初始化全部的数据
+        //初始化全部的数据 ，在这里不同的模式有不同的线路.....
         this.gameControler.getGameService().initAllDataInfo();
     }
 

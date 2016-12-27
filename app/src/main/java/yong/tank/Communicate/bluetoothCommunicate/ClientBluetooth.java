@@ -288,7 +288,7 @@ public class ClientBluetooth implements ClientCommunicate {
 
     @Override
     public void  sendInfo(String info) {
-        Log.w(TAG,"sendInfo "+info);
+        //Log.w(TAG,"sendInfo "+info);
         this.write(info);
     }
 
@@ -361,7 +361,7 @@ public class ClientBluetooth implements ClientCommunicate {
                             case STATE_CONNECTING:
                                 // Situation normal. Start the connected thread.
                                 Log.i(TAG,"connected by others");
-                                StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.PASSIVE;
+                                //StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.ACTIVITY;
                                 connected(socket, socket.getRemoteDevice(),
                                         mSocketType);
                                 break;
@@ -436,8 +436,6 @@ public class ClientBluetooth implements ClientCommunicate {
                 // successful connection or an exception
                 //主动连接状态
                 mmSocket.connect();
-                //启动连接蓝牙后的线程，准备通讯
-                StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.ACTIVITY;
                 connected(mmSocket, mmSocket.getRemoteDevice(),
                         mSocketType);
                 Log.i(TAG,"activity  connected successed");

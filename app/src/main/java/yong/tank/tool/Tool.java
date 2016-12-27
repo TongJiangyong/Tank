@@ -23,18 +23,9 @@ import yong.tank.modal.Point;
 import yong.tank.modal.User;
 import yong.tank.modal.abstractGoup.Bullet;
 
-import static yong.tank.tool.StaticVariable.ACTIVITY_MAKE_BONUS;
-import static yong.tank.tool.StaticVariable.ACTIVITY_MAKE_EXPLODE;
 import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT;
-import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER;
-import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED;
-import static yong.tank.tool.StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO;
 import static yong.tank.tool.StaticVariable.INIT_PASSIVE_REQUEST_CONNECT;
-import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER;
-import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED;
 import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO;
-import static yong.tank.tool.StaticVariable.MAKE_BULLET;
-import static yong.tank.tool.StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -442,7 +433,7 @@ public class Tool {
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
         //传输的数据包括： 高，宽，密度
         DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT);
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
@@ -451,7 +442,7 @@ public class Tool {
      */
     public static void  sendInitFinishedToPassive(ClientCommunicate clientCommunicate){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_INIT_FINISHED,null);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
@@ -460,7 +451,7 @@ public class Tool {
      */
     public static void  sendInitFinishedToActive(ClientCommunicate clientCommunicate){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_INIT_FINISHED,null);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
@@ -469,7 +460,7 @@ public class Tool {
      */
     public static void  sendGameFinishedToActive(ClientCommunicate clientCommunicate){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_GAMEOVER,null);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
@@ -478,7 +469,7 @@ public class Tool {
      */
     public static void  sendGameFinishedToPassive(ClientCommunicate clientCommunicate){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_ACTIVITE_RESPONSE_GAMEOVER,null);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
@@ -487,7 +478,7 @@ public class Tool {
      */
     public static void  sendInterruptToRemote(ClientCommunicate clientCommunicate){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), RESPONSE_FINISHED_CONNECT_DIRECTIRY,null);
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 
@@ -498,7 +489,7 @@ public class Tool {
      */
     public static void  sendNewBonus(ClientCommunicate clientCommunicate, Bonus bonus){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), ACTIVITY_MAKE_BONUS,gson.toJson(bonus));
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.ACTIVITY_MAKE_BONUS,gson.toJson(bonus));
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 
@@ -508,7 +499,7 @@ public class Tool {
      */
     public static void  sendNewExplode(ClientCommunicate clientCommunicate, Explode explode){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), ACTIVITY_MAKE_EXPLODE,gson.toJson(explode));
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.ACTIVITY_MAKE_EXPLODE,gson.toJson(explode));
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 
@@ -519,7 +510,18 @@ public class Tool {
     //TODO 这里可能有类型转换的问题，需要测试
     public static void  sendNewBullet(ClientCommunicate clientCommunicate, Bullet bullet){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), MAKE_BULLET,gson.toJson(bullet));
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.MAKE_BULLET,gson.toJson(bullet));
+        clientCommunicate.sendInfo(gson.toJson(comDataF));
+    }
+
+    /**
+     * 发送msg消息给对方
+     * @param clientCommunicate
+     */
+    //TODO 这里可能有类型转换的问题，需要测试
+    public static void  sendMsg(ClientCommunicate clientCommunicate, String msg){
+        String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.COMMAND_MSG,msg);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
 

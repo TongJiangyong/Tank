@@ -22,6 +22,7 @@ import yong.tank.Dto.testDto;
 import yong.tank.Game_Activity.BlutToothActivty;
 import yong.tank.Game_Activity.GameActivity;
 import yong.tank.tool.StaticVariable;
+import yong.tank.tool.Tool;
 
 import static yong.tank.tool.StaticVariable.LOCAL_USER_INFO;
 
@@ -57,23 +58,23 @@ public class GamePresenter {
                     }
                     StaticVariable.BLUE_STATE = 0;
                     break;
-                //蓝牙主动连接成功
+                //蓝牙主动连接成功 但是自身为被动模式
                 case StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE:
-                    Log.i(TAG,"蓝牙主动连接成功");
+                    Log.i(TAG,"蓝牙主动连接成功，自身为passive模式");
                     StaticVariable.BLUE_STATE = 1;
-                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.ACTIVITY;
-                    gameActivity.showToast("蓝牙主动连接成功");
-                    testDto testDto_1 = new testDto(12,"test");
-                    ComDataF comDataF_1 = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto_1));
-                    clientCommunicate.sendInfo(gson.toJson(comDataF_1));
+                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.PASSIVE;
+                    gameActivity.showToast("蓝牙主动连接成功,自身为passive模式");
+                    //testDto testDto_1 = new testDto(12,"test");
+                    //ComDataF comDataF_1 = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto_1));
+                    //clientCommunicate.sendInfo(gson.toJson(comDataF_1));
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
                     gameActivity.initCommunicate();
                     break;
-                //蓝牙被动连接成功
+                //蓝牙被动连接成功，自生为activity模式
                 case StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE:
                     gameActivity.showToast("蓝牙被动连接成功");
                     StaticVariable.BLUE_STATE = 1;
-                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.PASSIVE;
+                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.ACTIVITY;
                     Log.i(TAG,"blueTooth passivity connect success");
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
                     gameActivity.initCommunicate();
@@ -187,20 +188,21 @@ public class GamePresenter {
     //1、判断能否通信，2、打开界面
     public void msgSend() {
         //TODO 如果全部初始化完全，可以打开这个 ,即，加一个判断
-        String sendInfo =gameActivity.msg_input.getText().toString();
-        if(sendInfo.length()==0){
-            gameActivity.showToast("发送的信息不能为空....");
-        }else{
-            //发送消息
-            clientCommunicate.sendInfo(sendInfo);
-            //增加显示消息
-            String orginText = gameActivity.msgText.getText().toString();
-            orginText=orginText+ "\n"+LOCAL_USER_INFO+": "+sendInfo;
-            gameActivity.msgText.setText(orginText);
-            //消除input中的信息
-            gameActivity.msg_input.setText("");
+        if(StaticVariable.remotePrepareInitFlag){
+            String sendInfo =gameActivity.msg_input.getText().toString();
+            if(sendInfo.length()==0){
+                gameActivity.showToast("发送的信息不能为空....");
+            }else{
+                //发送消息s
+                Tool.sendMsg(this.clientCommunicate,sendInfo);
+                //增加显示消息
+                String orginText = gameActivity.msgText.getText().toString();
+                orginText=orginText+ "\n"+LOCAL_USER_INFO.getUsername()+": "+sendInfo;
+                gameActivity.msgText.setText(orginText);
+                //消除input中的信息
+                gameActivity.msg_input.setText("");
+            }
         }
-
 
     }
 

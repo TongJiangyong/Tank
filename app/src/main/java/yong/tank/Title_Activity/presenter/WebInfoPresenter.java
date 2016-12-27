@@ -137,17 +137,24 @@ public class WebInfoPresenter {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
             String  info=((TextView) v).getText().toString();
             String[] infos =info.split("\\#");
-            String opponentUserId =infos[1].split("\\：")[1];
-            String roomId =infos[2].split("\\：")[1];
+            String roomId=infos[1].split("\\：")[1].trim();
+            String opponentUserId =infos[2].split("\\：")[1].trim();
 
             Intent intent = new Intent(context,SelectActivity.class);
             //确定为被动状态
             StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.PASSIVE;
             intent.putExtra("type", StaticVariable.GAMEMODE[1]); //1为网络模式
             Log.i(TAG,"opponentUserId:"+opponentUserId+" roomId:"+roomId);
-            //passive状态，记录对方的ID
-            StaticVariable.REMOTE_DEVICE_ID =  opponentUserId;
-            context.startActivity(intent);
+            //排除测试房间的影响
+            if (!(roomId.equals("1")||roomId.equals("2"))){
+                //passive状态，记录对方的ID和房间信息
+                StaticVariable.REMOTE_DEVICE_ID =  opponentUserId;
+                StaticVariable.REMOTE_ROOM_ID = roomId;
+                context.startActivity(intent);
+            }else{
+                webInfoActivity.showToast("测试房间，不可选!");
+            }
+
 
             //TODO 跳转连接到相应的房间
 /*            bluetoothadapter.cancelDiscovery();// 取消搜索

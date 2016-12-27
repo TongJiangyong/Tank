@@ -7,6 +7,7 @@ import java.util.List;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Game_Activity.View.ViewBase;
 import yong.tank.Game_Activity.service.GameService;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/11/1.
@@ -46,6 +47,8 @@ public class GameControler {
         }
         //停止程序的逻辑
         this.gameService.gameStop();
+        //恢复初始化变量
+        StaticVariable.remotePrepareInitFlag=false;
     }
 
     public GameService getGameService() {

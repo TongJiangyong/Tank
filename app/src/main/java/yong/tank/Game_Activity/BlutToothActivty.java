@@ -23,9 +23,10 @@ import android.widget.Toast;
 import java.util.Set;
 
 import yong.tank.R;
+import yong.tank.tool.StaticVariable;
 
 public class BlutToothActivty extends Activity {
-
+	private static final String TAG = "BlutToothActivty";
 	private ListView ListOld = null;
 	private ListView ListNew = null;
 	private Button bu_scan = null;
@@ -86,6 +87,7 @@ public class BlutToothActivty extends Activity {
 				bu_can_check.setClickable(false);
 				showToast("等待其他设备接入中.......");
 				Intent intent = new Intent();
+				StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.ACTIVITY;
 				setResult(Activity.DEFAULT_KEYS_SHORTCUT, intent);
 				finish();
 			}
@@ -101,14 +103,16 @@ public class BlutToothActivty extends Activity {
 
 	//*********************************************************************************************************************
 
+	//点击每一个条目的反应
 	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 			bluetoothadapter.cancelDiscovery();// 取消搜索
 			// 获取设备的MAC地址
 			String msg = ((TextView) v).getText().toString();
 			String address = msg.substring(msg.length() - 17);
-
-
+			StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.PASSIVE;
+			//Log.i(TAG,"chooseArreas is :"+StaticVariable.CHOSED_RULE);
+			//设置游戏模式
 			Uri data = Uri.parse(address);
 			Intent intent = new Intent(null,data);
 			// 设备结果并退出Activity

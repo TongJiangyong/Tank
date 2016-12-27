@@ -225,7 +225,9 @@ public class StaticVariable {
     public  final static String COMMAND_MSG =  "12";
     public  final static String COMMAND_INFO =  "13";
 
-
+//定义网络中双方是否初始化完全，DTO未初始化
+    //TODO 注意在断开时，要结束这个变量
+    public static boolean remotePrepareInitFlag =false;
 
 
     /* 网络连接中，另一个设备的ID*/
@@ -255,4 +257,6 @@ public class StaticVariable {
     //public static String SERVER_IP = "192.168.1.122";
     //public static String SERVER_IP_XIAN = "115.154.191.5";
     public static int SERVER_PORT =  9999;
+
+    public static final int READ_BYTE =8192;
 }

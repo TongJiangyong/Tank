@@ -47,6 +47,8 @@ public class NetWorks extends RetrofitUtils {
 
         @POST("WebService")
         Observable<String> updateRoomInfo(@Query("action") String action,@Query("roomInfo") String roomInfo);
+        @POST("WebService")
+        Observable<String> getRoomInfo(@Query("action") String action,@Query("roomId") String roomId);
     }
 
     //测试连接状态
@@ -77,6 +79,11 @@ public class NetWorks extends RetrofitUtils {
     //创建一个新的房间
     public static void addNewRoom(String action,String roomInfo,Observer<String> observer){
         setSubscribe(service.addNewRoom(action,roomInfo),observer);
+    }
+
+    //获取单个房间信息
+    public static void getRoomInfo(String action,String roomId,Observer<String> observer){
+        setSubscribe(service.getRoomInfo(action,roomId),observer);
     }
 
     //更新房间信息

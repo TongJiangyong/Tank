@@ -66,7 +66,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     //初始化远程DTO信息完成，即已完成全部初始化工作
     private boolean remoteDtoInitFlag =false;
     //初始化远程交换完成，但是远程DTO等变量还未初始化
-    private boolean remotePrepareInitFlag =false;
+
     private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     //TODO 测试通讯的代码
     private ClientCommunicate clientCommunicate;
@@ -435,11 +435,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         @Override
         public void run() {
             //如果初始化prepare完成,就开始传输数据
-            if(remotePrepareInitFlag){
+            if(StaticVariable.remotePrepareInitFlag){
                 ComDataF comDataF =null;
                 String gameDtoString =null;
                 try{
                     //不断发送信息数据
+                    //Log.i(TAG,"productor write msg");
                     comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID+"#",StaticVariable.COMMAND_INFO,gson.toJson(gameDto));
                     clientCommunicate.sendInfo(gson.toJson(comDataF));
                 }catch (Exception e){
@@ -475,9 +476,9 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     //设置WeaponDegree相关的信息
                     gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
                     //设置enermy的坦克相关信息
-                    //TODO 注意这里，对坐标进行了转换
+                    //TODO 注意这里，对坐标进行了转换 但是Y坐标为设定为固定值
                     gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-(int)(gameDtoTemp.getMyTank().getTankPosition_x()*SCALE_SCREEN_WIDTH));
-                    gameDto.getEnemyTank().setTankPosition_y((int)(gameDtoTemp.getMyTank().getTankPosition_y()*SCALE_SCREEN_HEIGHT));
+                    gameDto.getEnemyTank().setTankPosition_y(gameDto.getMyTank().getTankPosition_y());
                     //设置血条相关信息
                     //设置EnemyBlood相关的属性
                     gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
@@ -630,12 +631,17 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     //发送ID到server，同时，passive端，首先开始进行主动的通讯工作
     private void initRemoteActivity() {
         Tool.sendSelfIdToServer(this.clientCommunicate);
+        Log.i(TAG,"mode:"+StaticVariable.CHOSED_RULE);
         if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.PASSIVE){
+            Log.i(TAG,"PASSIVE端发起连接.......");
             Tool.sendSelfIdToActive(this.clientCommunicate);
         }
     }
     //local暂时直接开始游戏即可
     private void initLocalActivity() {
+        this.startGame();
+    }
+    private void startGame(){
         Message msgInfo = gameActivityHandler.obtainMessage();
         msgInfo.what = StaticVariable.GAME_STARTED;
         gameActivityHandler.sendMessage(msgInfo);
@@ -737,7 +743,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
-                this.remotePrepareInitFlag = true;
+                StaticVariable.remotePrepareInitFlag = true;
+                this.startGame();
 
             }else{
 
@@ -747,7 +754,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Log.w(TAG,"INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:"+comDataF.getComDataS().getCommad());
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
-                this.remotePrepareInitFlag = true;
+                StaticVariable.remotePrepareInitFlag = true;
+                this.startGame();
             }else{
 
             }
