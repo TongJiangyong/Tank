@@ -10,4 +10,5 @@ public interface ITitlePresenter {
     void toNet();
     void tohelp();
     void serviceChoseDialog();
+    void enableBluetooth();
 }

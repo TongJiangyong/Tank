@@ -54,14 +54,49 @@ public class TitlePresenter implements ITitlePresenter {
     public void toBluetooth(){
         //这一部分，在game的地方配置
         //titleView.showToast("蓝牙模式开发中..");
+        //开启蓝牙
+        bluetoothadpter = BluetoothAdapter.getDefaultAdapter();
+        if(!bluetoothadpter.isEnabled()){
+            titleView.showToast("此程序会默认打开你的蓝牙");
+            //	bluetoothadpter.enable();
+        }
+        Log.i(TAG,"test");
+        if(StaticVariable.BLUE_STATE != 1) {
+            if (bluetoothadpter.getState() == bluetoothadpter.STATE_ON) {
+                this.enableBluetooth();
+            } else {
+                titleView.showToast("等待蓝牙开启...");
+                // 请求打开 Bluetooth
+                Intent requestBluetoothOn = new Intent(
+                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                // 设置 Bluetooth 设备可以被其它 Bluetooth 设备扫描到
+                requestBluetoothOn
+                        .setAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+
+                // 设置 Bluetooth 设备可见时间
+               requestBluetoothOn.putExtra(
+                        BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
+                        StaticVariable.VISIBLE_TIME);
+                // 请求开启 Bluetooth
+                this.context.startActivityForResult(requestBluetoothOn,
+                        StaticVariable.REQUEST_CODE_BLUETOOTH_ON);
+            }
+        }else{
+            titleView.showToast("上次程序未正常关闭.....");
+        }
+
+    }
+
+
+    public void enableBluetooth() {
+        bluetoothadpter.isEnabled();
         Intent intent = new Intent(context,SelectActivity.class);
         //TODO intenet借用
         StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.BLUETOOTH;
         intent.putExtra("type", StaticVariable.GAMEMODE[2]);
         context.startActivity(intent);
     }
-
-
 
 
     @Override

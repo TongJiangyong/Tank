@@ -243,7 +243,7 @@ public class StaticVariable {
     public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
     public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
 
-
+    public final static int VISIBLE_TIME =200;
 
 
     /* 服务器初始化相关的ip */

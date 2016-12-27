@@ -126,46 +126,15 @@ public class GamePresenter {
         //这一部分，在game的地方配置
         //gameActivity.showToast("蓝牙模式开发中..");
         bluetoothadpter = BluetoothAdapter.getDefaultAdapter();
-        if(!bluetoothadpter.isEnabled()){
-            gameActivity.showToast("此程序会默认打开你的蓝牙");
-            //	bluetoothadpter.enable();
-        }
-        // TODO 这里的逻辑整理一下.....
-        if(StaticVariable.BLUE_STATE != 1){
-            if(bluetoothadpter.getState() == bluetoothadpter.STATE_ON){
-                Log.i(TAG,"show device");
-                Intent intent = new Intent(this.context,BlutToothActivty.class);
-                //建立clientBluetooth的对象
-                clientCommunicate.setMyHandle(myHandler);
-                //没办法，为了使用这个starrfor result 只能传入MainActivity
-                //打开蓝牙list的显示线程
-                StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.BLUETOOTH;
-                this.gameActivity.startActivityForResult(intent,StaticVariable.CHOSED_BLUT_DEVICE);
-            }
-            else{
-                gameActivity.showToast("等待蓝牙开启...");
-                // 请求打开 Bluetooth
-                Intent requestBluetoothOn = new Intent(
-                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
-                // 设置 Bluetooth 设备可以被其它 Bluetooth 设备扫描到
-                requestBluetoothOn
-                        .setAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-
-                // 设置 Bluetooth 设备可见时间
-                requestBluetoothOn.putExtra(
-                        BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
-                        200);
-                // 请求开启 Bluetooth
-                this.gameActivity.startActivityForResult(requestBluetoothOn,
-                        StaticVariable.REQUEST_CODE_BLUETOOTH_ON);
-
-            }
+        Log.i(TAG,"show blue device list");
+        Intent intent = new Intent(this.context,BlutToothActivty.class);
+        //建立clientBluetooth的对象
+        clientCommunicate.setMyHandle(myHandler);
+        //没办法，为了使用这个starrfor result 只能传入MainActivity
+        //打开蓝牙list的显示线程
+        StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.BLUETOOTH;
+        this.gameActivity.startActivityForResult(intent,StaticVariable.CHOSED_BLUT_DEVICE);
             //gameActivity.showToast("请先连接蓝牙");
-        }
-        else{
-            gameActivity.showToast("蓝牙程序已启动....不能进入设备选择界面");
-        }
     }
 
 
@@ -221,11 +190,6 @@ public class GamePresenter {
 
 
 
-    public void enableBluetooth() {
-        bluetoothadpter.isEnabled();
-    }
-
-
     public void toBlueTankChose(int resultCode, Intent data) {
         //TODO 准备blue_socket的连接 跳转到tank的选择界面即可.....
         //这个如何和BluetoothChatService结合起来，可以看一些代码
@@ -260,10 +224,11 @@ public class GamePresenter {
 
     public void prepareBlue(ClientCommunicate clientCommunicate) {
         this.clientCommunicate = clientCommunicate;
-        //启动蓝牙通讯
-        this.clientCommunicate.startCommunicate();
         //初始化连接bluetooth------以后再加吧....这只是一个确认作用，但是加上去会很麻烦，确定连接成功就可以通讯
         this.toBluetoothConnectTest();
+        //启动蓝牙通讯
+        this.clientCommunicate.startCommunicate();
+
     }
 
     public void prepareLocal(ClientCommunicate clientCommunicate) {

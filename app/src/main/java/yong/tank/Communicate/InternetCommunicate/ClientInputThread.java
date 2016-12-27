@@ -29,7 +29,7 @@ public class ClientInputThread implements Runnable,Subject{
     public static final String TAG = "ClientInputThread";
     private Charset charset = Charset.forName("UTF-8");
     private Handler myHander;
-    private byte[] readBuffer = new byte[4096];
+    private byte[] readBuffer = new byte[StaticVariable.READ_BYTE];
     // 存放观察者
     private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
@@ -94,6 +94,7 @@ public class ClientInputThread implements Runnable,Subject{
             Message msg = myHander.obtainMessage();
             msg.what = StaticVariable.MSG_COMMUNICATE_ERROR;
             myHander.sendMessage(msg);
+            this.isStart =false;
             e.printStackTrace();
         }
     }

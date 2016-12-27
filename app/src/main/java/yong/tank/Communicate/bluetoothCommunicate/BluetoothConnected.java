@@ -9,10 +9,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +31,12 @@ import yong.tank.tool.StaticVariable;
  */
 public class BluetoothConnected extends Thread implements Subject {
     private final BluetoothSocket mmSocket;
-    private BufferedReader input;
+    private InputStream input;
     private ClientBluetooth clientBluetooth;
     private BlueOutputThread blueOutputThread;
     private Handler myHander;
     private static final String TAG = "BluetoothConnected";
+    private byte[] readBuffer = new byte[StaticVariable.READ_BYTE];
     // 存放观察者
     private List<ObserverMsg> observerMsgs = new ArrayList<ObserverMsg>();
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
@@ -49,7 +49,7 @@ public class BluetoothConnected extends Thread implements Subject {
         myHander=this.clientBluetooth.getMyHandle();
         // Get the BluetoothSocket input and output streams
         try {
-            this.input = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF-8"));
+            this.input = socket.getInputStream();
             //启动另外读的线程即可
             blueOutputThread = new BlueOutputThread(socket);
             new Thread(blueOutputThread).start();
@@ -67,19 +67,38 @@ public class BluetoothConnected extends Thread implements Subject {
             try {
                 // Read from the InputStream
                 //TODO 改写为byte试试......
-               String content = input.readLine();
-                //input.read();
-                Log.w(TAG,"bluetooth Connected and read msg is :"+msg);
-                //this.write(msg);
-                //传送数据
-                if
-                notifyWatchers(msg);
-                // Send the obtained bytes to the UI Activity
-/*                    mHandler.obtainMessage(BluetoothChat.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();*/
+                while(input.read(readBuffer)!=-1){
+                    //数据收到就有问题.....
+                    String readline=new String(readBuffer).trim();
+                    //需要重新分配，不然会有问题......
+                    readBuffer = new byte[StaticVariable.READ_BYTE];
+                    //Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
+                    String[] readInfos  =readline.split("&");
+                    //解析每一个消息
+                    for(int i=0;i<readInfos.length;i++){
+                        //Log.w(TAG, "input Thread 收到的id: "+readInfos[i]);
+                        ComDataF comDataF=null;
+                        try {
+                            comDataF = ComDataPackage.unpackToF(readInfos[i]);
+                            this.notifyWatchers(comDataF);
+                        }
+                        catch (Exception e)
+                        {
+                            System.out.println("input Thread error parse file "+e);
+                            System.out.println("error info is "+readInfos[i]);
+                            continue;
+                        }
+                    }
+                }
+                Message msg = myHander.obtainMessage();
+                msg.what = StaticVariable.BLUE_COMMUNICATE_ERROR;
+                myHander.sendMessage(msg);
             }catch (Exception e) {
                 Log.e(TAG, "bluetooth read error", e);
                 clientBluetooth.connectionLost();
+                Message msg = myHander.obtainMessage();
+                msg.what = StaticVariable.BLUE_COMMUNICATE_ERROR;
+                myHander.sendMessage(msg);
                 readFlag =false;
                 // Start the service over to restart listening mode
                 break;

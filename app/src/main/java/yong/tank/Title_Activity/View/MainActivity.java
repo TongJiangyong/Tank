@@ -83,6 +83,27 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Log.w(TAG,"TESTBLUE");
+        // 蓝牙启动后返回的result
+        if (requestCode == StaticVariable.REQUEST_CODE_BLUETOOTH_ON) {
+            Log.i(TAG,"requestCode:"+requestCode);
+            Log.i(TAG,"resultCode:"+resultCode);
+            switch (resultCode) {
+                // 点击确认按钮 注意这里的值与设备可见时间一致
+                case StaticVariable.VISIBLE_TIME:
+                    Log.i(TAG,"enable RESULT_OK");
+                    titlePresenter.enableBluetooth();
+                    break;
+                // 点击取消按钮或点击返回键
+                case Activity.RESULT_CANCELED:
+                    Log.i(TAG,"enable RESULT_CANCELED");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
 }
