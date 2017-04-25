@@ -16,8 +16,6 @@ import yong.tank.Title_Activity.View.WebInfoActivity;
 import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 
-import static yong.tank.tool.StaticVariable.LOCAL_USER_INFO;
-
 /**
  * Created by hasee on 2016/10/27.
  * 处理登陆相关的方法
@@ -104,13 +102,11 @@ public class LoginPresenter{
                     loginActivity.showToast("用户名或者密码出错");
                 }
                 else{
-                    //获取登录相关的信息，并更新本地的信息 ,
+                    //获取登录相关的信息，并更新本地的信息 ,主要更新最后登录时间
                     User loginUser= gson.fromJson(info,User.class);
-                    User localUserInfo = localUser.readInfoLocal(StaticVariable.USER_FILE);
-                    loginUser.setFrightRecord(localUserInfo.getFrightRecord());
-                    localUser.saveInfoLocal(loginUser, StaticVariable.USER_FILE);
+                    StaticVariable.LOCAL_USER_INFO.setLastLoginDate(loginUser.getLastLoginDate());
+                    localUser.saveInfoLocal(StaticVariable.LOCAL_USER_INFO, StaticVariable.USER_FILE);
                     //赋值个人信息到全局变量中
-                    LOCAL_USER_INFO = loginUser;
                     loginActivity.showToast("登录成功，跳转到个人信息界面");
                     Intent intent = new Intent(context,WebInfoActivity.class);
                     context.startActivity(intent);

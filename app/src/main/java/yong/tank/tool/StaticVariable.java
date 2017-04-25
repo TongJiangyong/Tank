@@ -22,10 +22,10 @@ public class StaticVariable {
     //设置游戏的类名
     public static String[] VIEW_LIST ={
             "yong.tank.Game_Activity.View.GameView",
-            "yong.tank.Game_Activity.View.PlayerView",
             "yong.tank.Game_Activity.View.BloodView",
             "yong.tank.Game_Activity.View.BonusView",
             "yong.tank.Game_Activity.View.ExplodeView",
+            "yong.tank.Game_Activity.View.PlayerView",
 };
     //设置游戏的模式
     public enum GAME_MODE {
@@ -233,15 +233,16 @@ public class StaticVariable {
     /* 网络连接中，另一个设备的ID*/
     public static String REMOTE_DEVICE_ID = null;
     /* 网络连接中，自己的用户信息*/
-    public static User LOCAL_USER_INFO = new User();
+    public static User LOCAL_USER_INFO = null;
     /* 网络连接中，房间的ID*/
     public static String REMOTE_ROOM_ID = null;
    /* 与存储相关的数据 */
     public final static String TANK_USER_INFO="tank_userinfo.bat";
     public final static String TANK_RECORD_INFO="tank_recordinfo.bat";
-    //好像不能通过这种方法获取root的internal目录
-    public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
-    public final static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
+    //好像不能通过这种方法获取root的internal目录 ,间接用这种方法来获取
+    //public final static File USER_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_USER_INFO);
+    public static File USER_FILE = null;
+    public static File RECORD_FILE = new File(Environment.getExternalStorageDirectory().toString() + File.separator + StaticVariable.TANK_RECORD_INFO);
 
     public final static int VISIBLE_TIME =200;
 

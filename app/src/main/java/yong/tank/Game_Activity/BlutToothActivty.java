@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -88,6 +89,7 @@ public class BlutToothActivty extends Activity {
 				showToast("等待其他设备接入中.......");
 				Intent intent = new Intent();
 				StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.ACTIVITY;
+				Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
 				setResult(Activity.DEFAULT_KEYS_SHORTCUT, intent);
 				finish();
 			}
@@ -111,7 +113,7 @@ public class BlutToothActivty extends Activity {
 			String msg = ((TextView) v).getText().toString();
 			String address = msg.substring(msg.length() - 17);
 			StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.PASSIVE;
-			//Log.i(TAG,"chooseArreas is :"+StaticVariable.CHOSED_RULE);
+			Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
 			//设置游戏模式
 			Uri data = Uri.parse(address);
 			Intent intent = new Intent(null,data);

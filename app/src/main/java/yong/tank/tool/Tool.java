@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -32,7 +33,7 @@ import static yong.tank.tool.StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO;
  */
 
 public class Tool {
-
+    private static final String TAG = "Tool";
     //这里统一使用matrix来处理图像.....但是感觉有点麻烦....没办法啊.....
 
     /**
@@ -400,9 +401,12 @@ public class Tool {
      * @param clientCommunicate
      */
     public static void  sendSelfIdToActive(ClientCommunicate clientCommunicate){
+        Log.i(TAG,"send self to active");
         User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
+        Log.i(TAG,"remoteId is :"+remoteId);
         ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_REQUEST_CONNECT,String.valueOf(user.getId()));
+        Log.i(TAG,"sendInfoTo Active and command is :"+INIT_PASSIVE_REQUEST_CONNECT);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**

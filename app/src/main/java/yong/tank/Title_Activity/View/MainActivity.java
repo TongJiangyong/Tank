@@ -12,9 +12,14 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+
+import yong.tank.LocalRecord.LocalRecord;
 import yong.tank.R;
 import yong.tank.Title_Activity.presenter.ITitlePresenter;
 import yong.tank.Title_Activity.presenter.TitlePresenter;
+import yong.tank.modal.FrightRecord;
+import yong.tank.modal.User;
 import yong.tank.tool.StaticVariable;
 
 public class MainActivity extends Activity implements ITitleView, View.OnClickListener{
@@ -24,6 +29,7 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
     private Button battleNet;
     private Button battleHelp;
     private ITitlePresenter titlePresenter;
+    private LocalRecord<User> localUser = new LocalRecord<User>();
     // Member object for the chat services
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +40,8 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         setContentView(R.layout.activity_main);  //注意，这一句话一定要在initButton之前，否则，会找不到button，即findViewById会找不到....
         DisplayMetrics metric = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(metric);
-
+        //初始化本地的用户信息
+        initLocalUser();
         initButton();
         titlePresenter =new TitlePresenter(this,this);
         //设置本地设备的信息：
@@ -42,6 +49,24 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         StaticVariable.LOCAL_SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
         StaticVariable.LOCAL_DENSITY = this.getResources().getDisplayMetrics().density ;
         Log.i(TAG, "Test in company");
+    }
+
+    private void initLocalUser() {
+        //初始化获取根目录的文件......
+        StaticVariable.USER_FILE= new File(this.getFilesDir() , StaticVariable.TANK_USER_INFO);
+        //则创建一个新的User，并写入
+        if(localUser.readInfoLocal(StaticVariable.USER_FILE)==null){
+            User user =new User();
+            FrightRecord frightRecord = new FrightRecord();
+            user.setFrightRecord(frightRecord);
+            localUser.saveInfoLocal(user,StaticVariable.USER_FILE);
+            StaticVariable.LOCAL_USER_INFO = user;
+        }else{
+            StaticVariable.LOCAL_USER_INFO=localUser.readInfoLocal(StaticVariable.USER_FILE);
+        }
+
+
+
     }
 
     private void initButton() {

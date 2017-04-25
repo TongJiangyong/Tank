@@ -45,6 +45,7 @@ import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
+import static yong.tank.tool.StaticVariable.LOCAL_SCREEN_WIDTH;
 import static yong.tank.tool.StaticVariable.REMOTE_DEVICE_ID;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_HEIGHT;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_WIDTH;
@@ -66,6 +67,9 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     //初始化远程DTO信息完成，即已完成全部初始化工作
     private boolean remoteDtoInitFlag =false;
     //初始化远程交换完成，但是远程DTO等变量还未初始化
+
+
+    private boolean remoteDeviceACKflag = false;
 
     private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     //TODO 测试通讯的代码
@@ -242,7 +246,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 }
                 //***************设置bonus停止***************
                 gameDto.getBonus().setIsBonusFired(true);
-                //gameDto.setBonus(null);
+                gameDto.setBonus(null);
                 //***************产生爆炸***************
                 addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
                         gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
@@ -326,7 +330,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     //敌方坦克的子弹击中效果
     // 包括1、判断是否应该移除子弹 2、增加爆炸的效果.....
     private boolean enermyTankExplode(int bullet) {
-        //TODO 测试explode
+        //TODO 测试explodeewr
         //如果发现子弹已经停止绘制，则移除
         if(!gameDto.getEnemyTank().getBulletsFire().get(bullet).isDrawFlag()){
             gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
@@ -455,12 +459,13 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public class consumeThread extends TimerTask {
         @Override
         public void run() {
+            //Log.d(TAG,"remoteGameDtos num is "+remoteGameDtos.size());
             if(remoteGameDtos.size()!=0){
                 GameDto gameDtoTemp = remoteGameDtos.poll();
                 //在这里初始化Enermy坦克的信息
                 if(!remoteDtoInitFlag&&gameDtoTemp.getMyTank()!=null&&gameDtoTemp.getMyBlood()!=null&& gameDto.getEnemyTank()==null&&gameDto.getEnemyBlood()==null){
                     //初始化敌方的变量......
-                    //Log.i(TAG,"初始化敌方的变量......");
+                    Log.i(TAG,"初始化敌方的变量......");
                     initRemoteDto(gameDtoTemp);
                     //允许敌方坦克发射
                     gameDto.getEnemyTank().setEnableFire(true);
@@ -472,16 +477,22 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 //消费工作分为两类 1、activity的消费工作   2、passive的消费工作 3公共的消费工作
                 if(remoteDtoInitFlag){
                     /**设置EnemyTank相关的属性**/
+                    //这里是不论activity还是passive都要处理的部分：
                     //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
                     //设置WeaponDegree相关的信息
+                    Log.d(TAG,"EnemyTank weapenDegree is "+gameDtoTemp.getMyTank().getWeaponDegree());
                     gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
                     //设置enermy的坦克相关信息
                     //TODO 注意这里，对坐标进行了转换 但是Y坐标为设定为固定值
-                    gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-(int)(gameDtoTemp.getMyTank().getTankPosition_x()*SCALE_SCREEN_WIDTH));
-                    gameDto.getEnemyTank().setTankPosition_y(gameDto.getMyTank().getTankPosition_y());
+                    int tempX = StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-(int)(gameDtoTemp.getMyTank().getTankPosition_x()*SCALE_SCREEN_WIDTH);
+                    int tempY = gameDto.getMyTank().getTankPosition_y();
+                    double tempBlood = gameDtoTemp.getMyBlood().getBloodNum();
+                    Log.d(TAG,"EnemyTank weapenDegree is "+gameDtoTemp.getMyTank().getWeaponDegree() + " eneryTank x： y:");
+                    gameDto.getEnemyTank().setTankPosition_x(tempX);
+                    gameDto.getEnemyTank().setTankPosition_y(tempY);
                     //设置血条相关信息
                     //设置EnemyBlood相关的属性
-                    gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
+                    gameDto.getEnemyBlood().setBloodNum(tempBlood);
                     //TODO 这里的设置，很有问题，很容易出错，想想解决办法 包括子弹和爆炸、bonus以及属于的问题.....
                     //设置bonus相关信息 无论主动被动，都需要知道bonus摧毁没有
                     if(gameDto.getBonus()!=null&&gameDtoTemp.getBonus()!=null){
@@ -512,11 +523,8 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                                 gameDto.getEnemyTank().getBulletsFire().get(i).setDrawFlag(gameDtoTemp.getMyTank().getBulletsFire().get(i).isDrawFlag());
                             }
                         }
-
                     }
                 }
-            }else{
-                //Log.w(TAG,"队列为空");
             }
 
         }
@@ -542,6 +550,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         this.initLocalDto();
         //TODO 确定通信连接后，完成远程连接工作后其他数据的初始化
         Log.i(TAG,"game_mode is :"+StaticVariable.CHOSED_MODE );
+        Log.i(TAG,"game_rule is_1:"+StaticVariable.CHOSED_RULE);
         if(StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL){
             Log.i(TAG,"START GAME local。。。。。。");
             this.initLocalActivity();
@@ -628,13 +637,28 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
      *远程初始化相关的代码
      */
 
-    //发送ID到server，同时，passive端，首先开始进行主动的通讯工作
+    //发送ID到server/activity端 ，同时，passive端，首先开始进行主动的通讯工作
     private void initRemoteActivity() {
-        Tool.sendSelfIdToServer(this.clientCommunicate);
+        //网络模式需要向服务器发送东西.....
+        if(StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.INTERNET){
+            Tool.sendSelfIdToServer(this.clientCommunicate);
+        }
         Log.i(TAG,"mode:"+StaticVariable.CHOSED_RULE);
         if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.PASSIVE){
-            Log.i(TAG,"PASSIVE端发起连接.......");
-            Tool.sendSelfIdToActive(this.clientCommunicate);
+            while(!remoteDeviceACKflag){
+                Log.i(TAG,"PASSIVE端发起连接.......");
+                if(this.clientCommunicate!=null){
+                    Log.i(TAG,"clientCommunicate is ready");
+                }else{
+                    Log.i(TAG,"clientCommunicate is none");
+                }
+                Tool.sendSelfIdToActive(this.clientCommunicate);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     //local暂时直接开始游戏即可
@@ -671,7 +695,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 /**设置EnemyTank相关的属性**/
                 //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
                 this.gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
-                this.gameDto.getEnemyTank().setTankPosition_x(StaticVariable.LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
+                this.gameDto.getEnemyTank().setTankPosition_x(LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
                 this.gameDto.getEnemyTank().setTankPosition_y(gameDtoTemp.getMyTank().getTankPosition_y());
                 /**设置EnemyBlood相关的属性**/
                 //this.gameDto.getEnemyBlood().setBloodNum((gameDtoTemp.getMyBlood().getBloodNum()));
@@ -700,6 +724,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             }
             /** passive接受确认信息，并传输自身的信息数据**/
         }else if(command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT)){
+            this.remoteDeviceACKflag = true;
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
                 Log.w(TAG,"INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:"+comDataF.getComDataS().getCommad());
                 Tool.sendSelfInfoToActive(this.clientCommunicate);
@@ -716,7 +741,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
                 SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
-                StaticVariable.SCALE_SCREEN_WIDTH =StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
+                StaticVariable.SCALE_SCREEN_WIDTH = LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
                 Tool.sendSelfInfoToPassive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");
@@ -730,7 +755,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
                 SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
-                StaticVariable.SCALE_SCREEN_WIDTH =StaticVariable.LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
+                StaticVariable.SCALE_SCREEN_WIDTH = LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");
@@ -779,7 +804,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             }
         }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY)) {
                 Log.w(TAG, "RESPONSE_FINISHED_CONNECT_DIRECTIRY cmmand:" + comDataF.getComDataS().getCommad());
-                 //TODO 中断游戏_direct
+                 //TODO 中断游戏_direct6
                 /*****在这里判断游戏是否主动中断....direction******/
         }else if(command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_UNDIRECTRIY)){
                 Log.w(TAG,"RESPONSE_FINISHED_CONNECT_UNDIRECTRIY cmmand:"+comDataF.getComDataS().getCommad());

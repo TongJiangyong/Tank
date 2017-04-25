@@ -38,12 +38,16 @@ public class ResultActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.againButton:
-                Toast.makeText(this, "againButton", Toast.LENGTH_SHORT).show();
+                this.showToast("againButton" );
                 break;
             case R.id.returnTitleButton:
                 Intent intent = new Intent(this, MainActivity.class);
                 this.startActivity(intent);
                 break;
         }
+    }
+
+    public void showToast(String info){
+        Toast.makeText(this, info, Toast.LENGTH_SHORT).show();
     }
 }

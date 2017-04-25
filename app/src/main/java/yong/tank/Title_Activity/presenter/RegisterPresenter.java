@@ -76,7 +76,12 @@ public class RegisterPresenter {
                 else{
                     //获取登录相关的信息，并更新本地的信息
                     User loginUser= gson.fromJson(info,User.class);
-                    localUser.saveInfoLocal(loginUser, StaticVariable.USER_FILE);
+                    //从注册信息中获取相关的资料
+                    StaticVariable.LOCAL_USER_INFO.setId(loginUser.getId());
+                    StaticVariable.LOCAL_USER_INFO.setUsername(loginUser.getUsername());
+                    StaticVariable.LOCAL_USER_INFO.setPassword(loginUser.getPassword());
+                    StaticVariable.LOCAL_USER_INFO.setLastLoginDate(loginUser.getLastLoginDate());
+                    localUser.saveInfoLocal(StaticVariable.LOCAL_USER_INFO, StaticVariable.USER_FILE);
                     registerActivity.showToast("登录成功，跳转到个人信息界面");
                     Intent intent = new Intent(context,WebInfoActivity.class);
                     context.startActivity(intent);

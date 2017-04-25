@@ -264,6 +264,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
     //开始进行通信初始化的完整流程.......
     public void initCommunicate(){
+        Log.i(TAG,"game_rule is_2:"+StaticVariable.CHOSED_RULE);
         this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
         this.playControler.setClientCommunicate(this.clientCommunicate);
         //初始化全部的数据 ，在这里不同的模式有不同的线路.....

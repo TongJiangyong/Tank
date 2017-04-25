@@ -173,6 +173,11 @@ public class ClientBluetooth implements ClientCommunicate {
         mConnectedThread.start();
         Message msg = new Message();
         //发送允许通讯的通知
+        /***
+         * 注意这里，自身为主动模式，则是等待对方连接接入，自己做所有的计算
+         * 自身为被动模式，则是接入对方的房间，然后等待对方传输数据
+         */
+        Log.i(TAG,"game_rule is_3:"+StaticVariable.CHOSED_RULE);
         if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
             msg.what = StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE;
         }else{

@@ -45,6 +45,7 @@ public class GamePresenter {
     //处理Internet、蓝牙连接的一些反馈信息
     private Handler myHandler = new Handler() {
         public void handleMessage (Message msg) {//此方法在ui线程运行
+            Log.d(TAG,"blue msg is :"+msg.what);
             switch(msg.what){
                 case StaticVariable.BLUE_TOAST:
                     Toast.makeText(context.getApplicationContext(),  msg.getData().getString("message"), Toast.LENGTH_SHORT).show();// 显示时间较
@@ -60,10 +61,10 @@ public class GamePresenter {
                     break;
                 //蓝牙主动连接成功 但是自身为被动模式
                 case StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE:
-                    Log.i(TAG,"蓝牙主动连接成功，自身为passive模式");
+                    //TODO 这里主动连接成功后，为什么为被动模式？？？
+                    Log.i(TAG,"对方蓝牙接入成功,自身为Activity模式");
                     StaticVariable.BLUE_STATE = 1;
-                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.PASSIVE;
-                    gameActivity.showToast("蓝牙主动连接成功,自身为passive模式");
+                    gameActivity.showToast("对方蓝牙接入成功,自身为Activity模式");
                     //testDto testDto_1 = new testDto(12,"test");
                     //ComDataF comDataF_1 = ComDataPackage.packageToF("654321#","1",gson.toJson(testDto_1));
                     //clientCommunicate.sendInfo(gson.toJson(comDataF_1));
@@ -72,10 +73,9 @@ public class GamePresenter {
                     break;
                 //蓝牙被动连接成功，自生为activity模式
                 case StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE:
-                    gameActivity.showToast("蓝牙被动连接成功");
+                    gameActivity.showToast("接入对方蓝牙成功，自身为PASSIVE模式");
                     StaticVariable.BLUE_STATE = 1;
-                    StaticVariable.CHOSED_RULE =StaticVariable.GAME_RULE.ACTIVITY;
-                    Log.i(TAG,"blueTooth passivity connect success");
+                    Log.i(TAG,"接入对方蓝牙成功，自身为PASSIVE模式");
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
                     gameActivity.initCommunicate();
                     break;
