@@ -63,9 +63,9 @@ public class AImaker implements Runnable , Subject {
                 ComDataF comDataF =null;
                 String gameDtoString =null;
                 try{
-                gameDtoString = gson.toJson(this.gameDto);
+                    gameDtoString = gson.toJson(this.gameDto);
                 //TODO 发送gameDto数据 这里随便给个0
-                comDataF = ComDataPackage.packageToF ("0",StaticVariable.COMMAND_INFO,gameDtoString);
+                    comDataF = ComDataPackage.packageToF ("0",StaticVariable.COMMAND_INFO,gameDtoString);
                 }catch (Exception e){
                     Log.i(TAG,"Error:" +e);
                 }

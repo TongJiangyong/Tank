@@ -3,7 +3,6 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,14 +32,12 @@ public class MyTank extends Tank implements Serializable{
 
     public void drawSelf(Canvas canvas){
         //TODO 考虑策略模式优化
+        this.tankPosition_x=tankPrevPosition_x+((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
         if(tankPosition_x<0){
-            this.tankPosition_x=0;
-        }else if((tankPosition_x+this.tankPicture.getWidth())>StaticVariable.LOCAL_SCREEN_WIDTH *3/7){
-            this.tankPosition_x=(StaticVariable.LOCAL_SCREEN_WIDTH *3/7-this.tankPicture.getWidth());
-        }else{
-            //由于这里有余数，所以会让分辨率产生损失.....感觉这样没办法处理.....
-            //Log.i(TAG,"move:"+(Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())));
-            this.tankPosition_x+=((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
+            this.tankPosition_x=this.tankPrevPosition_x;
+        }else if((tankPosition_x+this.tankPicture.getWidth())>(StaticVariable.LOCAL_SCREEN_WIDTH /2)){
+            //TODO 这里先暂时设置为一半
+            this.tankPosition_x=this.tankPrevPosition_x;
         }
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
@@ -53,11 +50,12 @@ public class MyTank extends Tank implements Serializable{
                 weaponPoxitionTemp_y,
                 null);
         //坦克画在arm的后面
-
+        //Log.i(TAG,"tankPosition_x is:"+tankPosition_x);
+        tankPrevPosition_x = tankPosition_x;
         // TODO 这里weapon的点要更精细一点
         this.weaponPoxition_x = weaponPoxitionTemp_x+armPicture_tmp.getWidth();
         this.weaponPoxition_y = weaponPoxitionTemp_y;
-        Log.i(TAG,"current position:"+weaponPoxition_x);
+        //Log.i(TAG,"current position:"+weaponPoxition_x);
         //TODO 绘制预发射的子弹路径 绘制点的方法即可
         if(preFirePath!=null){
             Paint preFirePathPaint = new Paint();

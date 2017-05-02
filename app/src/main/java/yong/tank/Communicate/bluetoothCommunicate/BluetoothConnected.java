@@ -72,7 +72,7 @@ public class BluetoothConnected extends Thread implements Subject {
                     String readline=new String(readBuffer).trim();
                     //需要重新分配，不然会有问题......
                     readBuffer = new byte[StaticVariable.READ_BYTE];
-                    //Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
+                    Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
                     String[] readInfos  =readline.split("&");
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
@@ -160,7 +160,7 @@ public class BluetoothConnected extends Thread implements Subject {
                 // 没有消息写出的时候，线程等待
                 while (isStart) {
                     if (msg != null) {
-                        Log.i(TAG,"send info is :"+msg);
+                        //Log.i(TAG,"sendInfo is_1 :"+msg);
                         outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;

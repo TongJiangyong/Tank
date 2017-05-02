@@ -444,7 +444,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 String gameDtoString =null;
                 try{
                     //不断发送信息数据
-                    //Log.i(TAG,"productor write msg");
                     comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID+"#",StaticVariable.COMMAND_INFO,gson.toJson(gameDto));
                     clientCommunicate.sendInfo(gson.toJson(comDataF));
                 }catch (Exception e){
@@ -459,7 +458,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     public class consumeThread extends TimerTask {
         @Override
         public void run() {
-            //Log.d(TAG,"remoteGameDtos num is "+remoteGameDtos.size());
+            Log.i(TAG,"remoteGameDtos num is "+remoteGameDtos.size());
             if(remoteGameDtos.size()!=0){
                 GameDto gameDtoTemp = remoteGameDtos.poll();
                 //在这里初始化Enermy坦克的信息
@@ -484,10 +483,11 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                     gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
                     //设置enermy的坦克相关信息
                     //TODO 注意这里，对坐标进行了转换 但是Y坐标为设定为固定值
+                    //Log.i(TAG,"recive origin x is "+gameDtoTemp.getMyTank().getTankPosition_x()+",origin y is "+gameDtoTemp.getMyTank().getTankPosition_y() +"SCALE_SCREEN_WIDTH is :"+SCALE_SCREEN_WIDTH);
                     int tempX = StaticVariable.LOCAL_SCREEN_WIDTH-gameDto.getMyTank().getTankPicture().getWidth()-(int)(gameDtoTemp.getMyTank().getTankPosition_x()*SCALE_SCREEN_WIDTH);
                     int tempY = gameDto.getMyTank().getTankPosition_y();
                     double tempBlood = gameDtoTemp.getMyBlood().getBloodNum();
-                    Log.d(TAG,"EnemyTank weapenDegree is "+gameDtoTemp.getMyTank().getWeaponDegree() + " eneryTank x： y:");
+                    //Log.d(TAG,"EnemyTank weapenDegree is "+gameDtoTemp.getMyTank().getWeaponDegree() + " eneryTank x："+tempX+", y:" +tempY);
                     gameDto.getEnemyTank().setTankPosition_x(tempX);
                     gameDto.getEnemyTank().setTankPosition_y(tempY);
                     //设置血条相关信息
@@ -689,10 +689,10 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 gameDto.getEnemyTank().setEnableFire(true);
                 this.remoteDtoInitFlag = true;
             }
-
             //如果初始化完成，即开始进行设置工作
             if(this.remoteDtoInitFlag){
                 /**设置EnemyTank相关的属性**/
+
                 //TODO 注意这里要加上不同分辨率的处理.......注意设置角度为负
                 this.gameDto.getEnemyTank().setWeaponDegree(-gameDtoTemp.getMyTank().getWeaponDegree());
                 this.gameDto.getEnemyTank().setTankPosition_x(LOCAL_SCREEN_WIDTH-gameDtoTemp.getMyTank().getTankPosition_x()-this.gameDto.getMyTank().getTankPicture().getWidth());
@@ -737,11 +737,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Log.w(TAG,"INIT_PASSIVE_RESPONSE_SELFINFO cmmand:"+comDataF.getComDataS().getCommad());
                //activity接受远程的数据信息
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
+                //Log.i(TAG,"activity recived passive info REMOTE_DENSITY: "+remoteDeviceInfo.screanDesntiy +",REMOTE_SCREEN_HEIGHT:"+remoteDeviceInfo.screanHeight+",REMOTE_SCREEN_WIDTH:"+remoteDeviceInfo.screanWidth);
+                //Log.i(TAG,"activity LOCAL_SCREEN_WIDTH:"+LOCAL_SCREEN_WIDTH);
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
-                SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
-                StaticVariable.SCALE_SCREEN_WIDTH = LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
+                StaticVariable.SCALE_SCREEN_HEIGHT =(float)StaticVariable.LOCAL_SCREEN_HEIGHT/(float)StaticVariable.REMOTE_SCREEN_HEIGHT;
+                StaticVariable.SCALE_SCREEN_WIDTH = (float)LOCAL_SCREEN_WIDTH/(float)StaticVariable.REMOTE_SCREEN_WIDTH;
+                Log.i(TAG,"activity SCALE_SCREEN_WIDTH:"+SCALE_SCREEN_WIDTH);
                 Tool.sendSelfInfoToPassive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");
@@ -751,11 +754,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
             if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE){
                 Log.w(TAG,"INIT_ACTIVITE_RESPONSE_SELFINFO cmmand:"+comDataF.getComDataS().getCommad());
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
+                //Log.i(TAG,"passive recived passive info REMOTE_DENSITY: "+remoteDeviceInfo.screanDesntiy +",REMOTE_SCREEN_HEIGHT:"+remoteDeviceInfo.screanHeight+",REMOTE_SCREEN_WIDTH:"+remoteDeviceInfo.screanWidth);
+                //Log.i(TAG,"passive LOCAL_SCREEN_WIDTH:"+LOCAL_SCREEN_WIDTH);
                 StaticVariable.REMOTE_DENSITY=remoteDeviceInfo.screanDesntiy;
                 StaticVariable.REMOTE_SCREEN_HEIGHT=remoteDeviceInfo.screanHeight;
                 StaticVariable.REMOTE_SCREEN_WIDTH=remoteDeviceInfo.screanWidth;
-                SCALE_SCREEN_HEIGHT =StaticVariable.LOCAL_SCREEN_HEIGHT/StaticVariable.REMOTE_SCREEN_HEIGHT;
-                StaticVariable.SCALE_SCREEN_WIDTH = LOCAL_SCREEN_WIDTH/StaticVariable.REMOTE_SCREEN_WIDTH;
+                StaticVariable.SCALE_SCREEN_HEIGHT =(float)StaticVariable.LOCAL_SCREEN_HEIGHT/(float)StaticVariable.REMOTE_SCREEN_HEIGHT;
+                StaticVariable.SCALE_SCREEN_WIDTH = (float)LOCAL_SCREEN_WIDTH/(float)StaticVariable.REMOTE_SCREEN_WIDTH;
+                Log.i(TAG,"passive SCALE_SCREEN_WIDTH:"+SCALE_SCREEN_WIDTH);
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             }else{
                 Log.i(TAG,"*******************身份错误_3************************");

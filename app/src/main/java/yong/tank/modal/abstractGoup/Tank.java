@@ -21,6 +21,7 @@ public abstract class Tank implements Serializable{
     private int tankType;
     public transient TankBascInfo tankBascInfo;
     public int tankPosition_x = 0;
+    public int tankPrevPosition_x = 0;
     public int tankPosition_y =0;
     public int tankDirectrion=0;
     private double firePower = 0; //发射的距离角度
