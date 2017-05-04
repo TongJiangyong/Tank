@@ -1,9 +1,10 @@
 package yong.tank.Game_Activity.View;
 
 import android.content.Context;
+import android.graphics.Canvas;
 
 import yong.tank.Dto.GameDto;
-import yong.tank.Game_Activity.ViewThread.BonusThread;
+import yong.tank.Game_Activity.ViewThread.BonusFrame;
 
 /**
  * Created by jiangyong_tong on 2016/10/31.
@@ -11,30 +12,27 @@ import yong.tank.Game_Activity.ViewThread.BonusThread;
 
 public class BonusView extends ViewBase{
 
-    private BonusThread bonusThread;
+    private BonusFrame bonusFrame;
     private static String TAG = "BonusView";
 
-    public BonusView(Context context) {
-        super(context);
-    }
 
     public BonusView(Context context, GameDto gameDto) {
         super(context, gameDto);
+        this.bonusFrame = new BonusFrame(this.gameDto);
     }
 
 
 
     @Override
-    public void stopThread() {
-        if(this.bonusThread!=null){
-            this.bonusThread.stopThread();
+    public void stopDrawFrame() {
+        if(this.bonusFrame !=null){
+            this.bonusFrame.stopDrawing();
         }
 
     }
     @Override
-    public void startThread() {
-        this.bonusThread = new BonusThread(this.gameDto,this.holder);
-        new Thread(this.bonusThread).start();
+    public void startDrawFrame(float interpolation ,Canvas drawCanvas) {
+        this.bonusFrame.drawFrame(interpolation,drawCanvas);
     }
 
 }

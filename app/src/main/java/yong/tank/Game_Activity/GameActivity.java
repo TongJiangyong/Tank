@@ -30,6 +30,7 @@ import yong.tank.Communicate.bluetoothCommunicate.ClientBluetooth;
 import yong.tank.Dto.GameDto;
 import yong.tank.Game_Activity.View.SelectView;
 import yong.tank.Game_Activity.View.ViewBase;
+import yong.tank.Game_Activity.View.ViewDraw;
 import yong.tank.Game_Activity.control.GameControler;
 import yong.tank.Game_Activity.control.PlayControler;
 import yong.tank.Game_Activity.presenter.GamePresenter;
@@ -106,16 +107,14 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //给gameDto设置msg显示
         gameDto.setMsgText(this.msgText);
         List<ViewBase> views=initViews(gameDto);
-        for(ViewBase v:views){
-            //一定要加上这一句
-            v.setZOrderOnTop(true);
-            activity_game.addView(v);
-        }
+        ViewDraw viewDraw = new ViewDraw(this,gameDto,views);
+        viewDraw.setZOrderOnTop(true);
+        activity_game.addView(viewDraw);
         //activity_game.addView(selectView);  这里不用加，因为已经在里面
         //比较特殊的，加入selectView 即这里对selectView做另一种方法的处理：
         /*********程序控制器**********/
         gameService = new GameService(gameDto,this,gameActivityHandler);
-        gameControler = new GameControler(gameService,this,views);
+        gameControler = new GameControler(gameService,this,viewDraw);
         /*********设置玩家控制器**********/
         //这里的设计也非常不好，为了传输子弹，生硬的插入了clientCommunicate......
         playControler = new PlayControler(this,gameDto,gameControler);
@@ -264,7 +263,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
     //开始进行通信初始化的完整流程.......
     public void initCommunicate(){
-        Log.i(TAG,"game_rule is_2:"+StaticVariable.CHOSED_RULE);
+        //Log.i(TAG,"game_rule is_2:"+StaticVariable.CHOSED_RULE);
         this.gameControler.getGameService().setClientCommunicate(this.clientCommunicate);
         this.playControler.setClientCommunicate(this.clientCommunicate);
         //初始化全部的数据 ，在这里不同的模式有不同的线路.....

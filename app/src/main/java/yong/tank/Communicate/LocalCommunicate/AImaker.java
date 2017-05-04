@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import yong.tank.Communicate.ComData.ComDataF;
@@ -72,13 +71,13 @@ public class AImaker implements Runnable , Subject {
                 if(comDataF!=null){
                     this.notifyWatchers(comDataF);
                     try {
-                        Log.w(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
+                        Log.d(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
                 }
 
-                Log.w(TAG,"发送数据时间为："+formatTime.format(new Date()));
+                //Log.w(TAG,"发送数据时间为："+formatTime.format(new Date()));
                 Thread.sleep(40);
             } catch (InterruptedException e) {
                 e.printStackTrace();

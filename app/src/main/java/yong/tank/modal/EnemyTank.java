@@ -2,7 +2,6 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class EnemyTank extends Tank implements Serializable{
         // TODO 这里weapon的点要更精细一点
         this.weaponPoxition_x = weaponPoxitionTemp_x;
         this.weaponPoxition_y = weaponPoxitionTemp_y;
-        Log.i(TAG,"current position:"+weaponPoxition_x);
+        //Log.i(TAG,"current position:"+weaponPoxition_x);
 
         /**绘制所有的子弹**/
         if(bulletsFire.size()==0){

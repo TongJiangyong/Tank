@@ -330,6 +330,19 @@ public class Tool {
         return bulletPath;
     }
 
+    /***********************************调用相关的工具**********************************/
+    /**
+     * 获取到系统开始为止的系统时间差
+     * @return
+     */
+    public static long getCurrentTimeCount() {
+        //final float scale = context.getResources().getDisplayMetrics().density;
+        return System.currentTimeMillis()-StaticVariable.GAME_START_TIME;
+    }
+
+
+    /************************************手机分辨率工具***************************************/
+
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
      */

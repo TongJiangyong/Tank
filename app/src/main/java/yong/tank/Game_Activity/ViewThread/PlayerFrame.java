@@ -1,9 +1,7 @@
 package yong.tank.Game_Activity.ViewThread;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 
 import yong.tank.Dto.GameDto;
@@ -13,7 +11,7 @@ import yong.tank.tool.StaticVariable;
  * Created by jiangyong_tong on 2016/10/31.
  */
 
-public class PlayerThread implements Runnable {
+public class PlayerFrame {
     private boolean flag =true;
     private GameDto gameDto;
     private SurfaceHolder holder;
@@ -30,26 +28,22 @@ public class PlayerThread implements Runnable {
     private float insideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/20;
     /***************/
 
-    public PlayerThread(GameDto gameDto, SurfaceHolder holder) {
+    public PlayerFrame(GameDto gameDto) {
         this.flag =true;
-        this.holder = holder;
         this.gameDto = gameDto;
         paint = new Paint();
         paint.setAntiAlias(true);
     }
 
-    public void stopThread(){
+    public void stopDrawing(){
         flag = false;
     }
 
-    public void run() {
+    public void drawFrame(float interpolation,Canvas canvas) {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
         //Log.i(TAG,"PlayerThread START_1");
-        while(flag){
             try {
-                //Log.i(TAG,"PlayerThread START");
-                canvas=this.holder.lockCanvas();
-                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
+                //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
                 this.gameDto.getPlayerPain().drawSelf(canvas);
             } catch (Exception e) {
                 // TODO: handle exception
@@ -60,11 +54,5 @@ public class PlayerThread implements Runnable {
                 } catch (Exception e2) {
                 }
             }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

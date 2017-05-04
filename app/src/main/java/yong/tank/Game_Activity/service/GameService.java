@@ -104,13 +104,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     };
 
 
-    public void gameStart(){
-        if(gameThread==null){
-            gameThread= new GameThread();
-            Thread thread = new Thread(gameThread);
-            thread.start();
-            //如果是主动模式则启动bonus的线程 本东端不启动bonux
-            if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+    public void logicalUpdate(){
+        if(gameThread==null) {
+            //可以在gameThrea中多写点内容
+            gameThread = new GameThread();
+            //如果是主动模式则启动bonus的线程 被动端不启动Bonus
+            if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
                 this.startMakeBonus();
             }
             //如果不是本地模式，则启动一个20ms的数据生产者线程
@@ -118,10 +117,12 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 Timer timer = new Timer();
                 timer.schedule(new productorThread(), 100, 30);
             }
-        }else{
-            Log.w(TAG,"gameThread is not null");
         }
+        Log.i(TAG,"************gameThread.runGame()*************");
+        //更新gameThread的逻辑
+        gameThread.runGame();
     }
+
 
 
     public void startMakeBonus(){
@@ -129,7 +130,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
         BonusMaker bonusMaker = new BonusMaker();
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
-        Log.w(TAG,"bonus start to maker");
+        Log.w(TAG,"*********bonus start to maker**************");
         timerBonus.schedule(bonusMaker,5000,10000);
     }
     public void stopMakeBonus(){
@@ -143,8 +144,6 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                 this.stopMakeBonus();
             }
 
-            //关闭游戏线程
-            gameThread.gameThreadStop();
             //TODO 这里设置一个游戏结束标识符，进行判断,然后置为null
             //关闭网络
             clientCommunicate.stopCommunicate();
@@ -154,14 +153,14 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
     }
 
 
-    class GameThread implements Runnable {
-
-        private boolean threadFlag=true;
-
-        @Override
-        public void run() {
+    //GameThread主要用来检测tank爆炸，以及在本地子弹击中bonus的反应
+    //之前是使用独立的线程进行运行和检测，这里考虑其他的处理方法.....：
+    class GameThread {
+        GameThread(){
             gameDto.getMyTank().setEnableFire(true);
-            while(threadFlag){
+        }
+
+        public void runGame() {
                     int num=gameDto.getMyTank().getBulletsFire().size();
                     if(num!=0){
                         for(int i=(num-1);i>=0;i--){
@@ -199,21 +198,7 @@ public class GameService implements ObserverInfo,ObserverMsg,ObserverCommand{
                         }
                     }
                 }
-
-                try {
-                    //逻辑用的时间短一点....
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-
-
-        public void gameThreadStop() {
-            this.threadFlag = true;
-        }
-
     }
     //测试我的坦克击中bonus的反应
     //1、停止bonus 2、设置selectView 4/产生爆炸并移除子弹，5、根据当前的tank子弹状态，更新子弹状态
