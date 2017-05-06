@@ -142,6 +142,11 @@ public class ClientBluetooth implements ClientCommunicate {
         setState(STATE_CONNECTING);
     }
 
+    @Override
+    public void updateRemoteInfo() {
+
+    }
+
     /**
      * Start the ConnectedThread to begin managing a Bluetooth connection
      * @param socket  The BluetoothSocket on which the connection was made

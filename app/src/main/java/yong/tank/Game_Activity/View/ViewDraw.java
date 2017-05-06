@@ -54,7 +54,7 @@ public class ViewDraw extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
     }
 
-    public void drawPicture(float interpolation) {
+    public void drawFrame(float interpolation) {
         try {
             synchronized (holder) {
                 canvas = this.holder.lockCanvas();

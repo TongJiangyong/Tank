@@ -164,11 +164,12 @@ public class PlayControler {
         }
 
     private void countBulletPath(Point tankCenter, int dx, int dy) {
-        double test = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
-        tankDegree=(int)Math.toDegrees(Math.atan (test));
+        double degree = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
+        tankDegree=(int)Math.toDegrees(Math.atan (degree));
+        //distance计算的是与最大圈的比例
         distance=Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()))/
-                (this.gameDto.getMyTank().getTankPicture().getWidth()*1.4);
-        //Log.w(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+                (this.gameDto.getMyTank().getTankPicture().getWidth()*StaticVariable.TANK_SHOT_CIRCLE);
+        Log.i(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
     }
 
 
@@ -218,7 +219,7 @@ public class PlayControler {
             MyBullet myBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
             //在tank中加入子弹
             this.gameDto.getMyTank().addBuleetFire(myBullet);
-            //注意在这里，也要互相发送子弹的创建信息
+            //TODO 注意在这里，也要互相发送子弹的创建信息 这里可能需要重新处理......
             Tool.sendNewBullet(this.clientCommunicate,myBullet);
             //***************重置装填的时间*************
             //如果子弹的类型不是连续弹，则设置装填时间
@@ -244,7 +245,10 @@ public class PlayControler {
     private MyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
-        MyBullet myBullet = new MyBullet(bulletPicture,bulletType);
+        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*distance*Math.cos(Math.toRadians(tankDegree));
+        double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*distance*Math.sin(Math.toRadians(tankDegree));
+        MyBullet myBullet = new MyBullet(bulletPicture,bulletType,bulletV_x,bulletV_y,
+                this.gameDto.getMyTank().getWeaponPoxition_x(),this.gameDto.getMyTank().getWeaponPoxition_y());
         //初始化坦克的性能
         myBullet.setBulletDegree(tankDegree);
         myBullet.setBulletDistance(distance);

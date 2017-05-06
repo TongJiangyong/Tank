@@ -14,7 +14,7 @@ import yong.tank.tool.StaticVariable;
 
 public class Bonus implements Serializable {
     private transient Bitmap bonusPicture;
-    private int bonusDirection= 0;  //0为左 ，1为右边
+    private int bonusDirection= 0;  //1为左 ，-1为右边
     private int bonus_x;
     private int bonus_y;
     private boolean isBonusFired = false; //设置bonus的状态 是否被击中等
@@ -27,10 +27,16 @@ public class Bonus implements Serializable {
     private Point bonusCenter = new Point();
     private int bonusType; //注意，这里的type和子弹的类型有关系，击中bonus后，产生相应的变化
     //activity产生的bonus
-    public Bonus(Bitmap bonusPicture, List<Point> bonusPath,int bonusType) {
+    public Bonus(Bitmap bonusPicture, int bonusDirection,int bonusType) {
         this.bonusPicture = bonusPicture;
-        this.bonusPath = bonusPath;
         this.bonusType = bonusType;
+        if(bonusDirection==0){
+            bonus_x=0;
+            this.bonusDirection = 1;
+        }else{
+            bonus_x= StaticVariable.LOCAL_SCREEN_WIDTH;
+            this.bonusDirection = -1;
+        }
     }
     //client产生的bonux
     public Bonus(Bitmap bonusPicture,int bonusType) {
@@ -38,25 +44,33 @@ public class Bonus implements Serializable {
         this.bonusType = bonusType;
     }
 
+    public void positionUpdate(){
+        //TODO 考虑策略模式优化;
+        if(bonus_x>=-bonusPicture.getWidth()&&bonus_x<=StaticVariable.LOCAL_SCREEN_WIDTH){
+            bonus_x=bonus_x+StaticVariable.BONUS_SPEED*bonusDirection;
+            //注意这里除法是易错点 ,
+            bonus_y=StaticVariable.BONUS_Y_INIT +(int)((Math.sin((double)bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*(double)StaticVariable.BONUS_SCALE));
+            //Log.i(TAG,"bonus_x:"+bonus_x+",bonus_y:"+bonus_y+",StaticVariable.BONUS_SPEED"+StaticVariable.BONUS_SPEED);
+        }else{
+            //TODO 将bonus删掉 并停止绘制
+            this.setDrawFlag(false);
+        }
+    }
+
     public void drawSelf(Canvas canvas) {
         if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
             //TODO 绘制bonus 注意
-            if(bonusPath!=null&&pathPosition<bonusPath.size()&&isDrawFlag&&!isBonusFired){
-                bonus_x=bonusPath.get(pathPosition).getX();
-                bonus_y=bonusPath.get(pathPosition).getY();
-                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
+            if(isDrawFlag&&!isBonusFired){
+                //bonus_x=bonusPath.get(pathPosition).getX();
+                //bonus_y=bonusPath.get(pathPosition).getY();
+                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
                 //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
-                pathPosition++;
             }
         }else{
             if(isDrawFlag&&!isBonusFired){
-                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制子弹
+                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
                 //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
             }
-        }
-        //如果超出界线，则停止绘制
-        if(bonus_x> StaticVariable.LOCAL_SCREEN_WIDTH ||bonus_x<0){
-            this.setDrawFlag(false);
         }
 
     }

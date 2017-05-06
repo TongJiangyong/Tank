@@ -20,7 +20,7 @@ import yong.tank.tool.StaticVariable;
 //TODO clientLocal相关
 //这个类即一个通信的工具代理类 代理类均可以写成接口的形式，就是如此，即通信均通过代理类来实现
 //为了实现通用的通信借口 ，这里采用的逻辑是，将gameDto每隔20ms就主动发送一次数据，然后接收端做同样的处理即可
-public class ClientLocal implements  Runnable,ClientCommunicate {
+public class ClientLocal implements ClientCommunicate {
     private AImaker aImaker;
     private static String TAG ="ClientLocal";
     private GameDto gameDto;
@@ -32,14 +32,6 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
         this.context = context;
     }
 
-    public void run() {
-        //TODO 这里启动AI的线程
-        //线程的主要作用 1、每隔20ms，发送一次gameDto的数据信息
-        //2、自动检测子弹使能的时间，如果有子弹使能，则发射子弹（一律为普通弹）
-        aImaker = new AImaker(context,gameDto,mHandler);
-        new Thread(aImaker).start();
-    }
-
     //封装发送信息的方法 这里不用发信息，所以没用
     @Override
     public void sendInfo (String msg){}
@@ -47,7 +39,7 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
     @Override
     public void startCommunicate() {
         //启动自身....
-        new Thread(this).start();
+        aImaker = new AImaker(context,gameDto,mHandler);
         Message msgInfo = mHandler.obtainMessage();
         msgInfo.what = StaticVariable.LOCAL_INIT_OVER;
         mHandler.sendMessage(msgInfo);
@@ -65,6 +57,11 @@ public class ClientLocal implements  Runnable,ClientCommunicate {
     @Override
     public void connectDevice(BluetoothDevice device, boolean secure) {
 
+    }
+
+    @Override
+    public void updateRemoteInfo() {
+        aImaker.runAImaker();
     }
 
 

@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import yong.tank.tool.Tool;
  * Created by hasee on 2016/12/7.
  */
 
-public class AImaker implements Runnable , Subject {
+public class AImaker implements Subject {
     public static final String TAG = "AImaker";
     private Handler handler;
     private GameDto gameDto;
@@ -48,10 +47,8 @@ public class AImaker implements Runnable , Subject {
 
 
 
-    public void run() {
+    public void runAImaker() {
         //TODO 初始化要完成的工作........，即付给remote相应的变量.....
-        while(this.threadFlag){
-            try {
                if(this.gameDto.getEnemyTank()!=null&&this.gameDto.getEnemyBlood()!=null){
                    if(this.gameDto.getEnemyTank().getEnableFire()&&this.gameDto.getEnemyBlood().getAllowFire()&&this.gameDto.getEnemyTank().getWeaponPoxition_x()!=0){
                        //enermy开火
@@ -70,20 +67,12 @@ public class AImaker implements Runnable , Subject {
                 }
                 if(comDataF!=null){
                     this.notifyWatchers(comDataF);
-                    try {
-                        Log.d(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Log.d(TAG,"发送数据的字节大小为："+gameDtoString.getBytes("UTF-8").length);
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
                 }
-
-                //Log.w(TAG,"发送数据时间为："+formatTime.format(new Date()));
-                Thread.sleep(40);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     //Aimaker发射子弹.....
@@ -118,31 +107,37 @@ public class AImaker implements Runnable , Subject {
     private EnemyBullet initBullet(int bulletType){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
-        EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,bulletType);
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;
         initDegree = this.gameDto.getMyTank().getWeaponDegree();
         initDistance = this.gameDto.getMyTank().getFirePower();
+        //给一点随机误差
+        initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
+        initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
         //TODO 这里将distance做随机处理
-        if(initDistance<=0){
+        if(initDistance<=0||initDistance>=1){
             //小于0则设定一个固定值
             initDistance= 0.5;
         }
-        //Log.i(TAG,"initDegree is *************************:"+initDegree);
-        //Log.i(TAG,"initDistance is *************************:"+initDistance);
+        //默认收到的degree均小于0
+        if(initDegree>0){
+            initDegree = initDegree-10;
+        }
+        Log.i(TAG,"initDegree is *************************:"+initDegree);
+        Log.i(TAG,"initDistance is *************************:"+initDistance);
         //Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
         //Log.i(TAG,"init y is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_y());
         //注意这里，角度为负数
+        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getEnemyTank().getSelectedBullets()].getSpeed()*initDistance*Math.cos(Math.toRadians(initDegree));
+        double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getEnemyTank().getSelectedBullets()].getSpeed()*initDistance*Math.sin(Math.toRadians(initDegree));
+        Log.i(TAG,"initDistance is "+initDistance+" initDegree:"+initDegree+" bulletV_x:" +bulletV_x+" bulletV_y :"+bulletV_y);
+        EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,bulletType,bulletV_x,bulletV_y,
+                this.gameDto.getEnemyTank().getWeaponPoxition_x(),this.gameDto.getEnemyTank().getWeaponPoxition_y());
         enemyBullet.setBulletDegree(initDegree);
         enemyBullet.setBulletDistance(initDistance);
 
-        //计算并初始化子弹的路径
-        enemyBullet.setFirePath(Tool.getEnermyBulletPath(this.gameDto.getEnemyTank().getWeaponPoxition_x(),
-                this.gameDto.getEnemyTank().getWeaponPoxition_y(),
-                initDistance,
-                initDegree,
-                false,this.gameDto.getMyTank().getSelectedBullets()));
+        //计算并初始化子弹的路径,修改后，enemyTank并不需要多余的path
         //允许发射....
         enemyBullet.setDrawFlag(true);
         //初始化坦克的位置

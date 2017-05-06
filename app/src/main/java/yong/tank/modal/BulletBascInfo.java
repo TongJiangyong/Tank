@@ -1,16 +1,18 @@
 package yong.tank.modal;
 
+import yong.tank.tool.StaticVariable;
+
 /**
  * Created by hasee on 2016/11/10.
  */
 
 public class BulletBascInfo {
     private int type;
-    private int speed;
+    private double speed;
     private double power;
     private int picture;
     private String bulletName;
-    public BulletBascInfo(int type, int speed, double power, int picture, String bulletName) {
+    public BulletBascInfo(int type, double speed, double power, int picture, String bulletName) {
         this.type = type;
         this.speed = speed;
         this.power = power;
@@ -26,11 +28,12 @@ public class BulletBascInfo {
         this.type = type;
     }
 
-    public int getSpeed() {
-        return speed;
+    //速度都是按s算
+    public double getSpeed() {
+        return (double)(speed* StaticVariable.LOCAL_SCREEN_WIDTH);
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 

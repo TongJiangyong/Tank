@@ -1,5 +1,7 @@
 package yong.tank.modal;
 
+import yong.tank.tool.StaticVariable;
+
 /**
  * Created by hasee on 2016/10/30.
  */
@@ -8,6 +10,7 @@ public class TankBascInfo {
     private int type;
     private int blood;
     private int speed;
+    private int intervalSpeed;
     private int power;
     private int picture;
     private String tankName; //不联网为坦克名，联网则为自定义名字
@@ -59,6 +62,10 @@ public class TankBascInfo {
 
     public int getSpeed() {
         return speed;
+    }
+    public int getIntervalSpeed() {
+        this.intervalSpeed = (int)((float) StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*this.speed/10));
+        return this.intervalSpeed;
     }
 
     public void setSpeed(int speed) {

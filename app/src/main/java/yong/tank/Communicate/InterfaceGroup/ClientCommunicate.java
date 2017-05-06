@@ -24,4 +24,11 @@ public interface ClientCommunicate {
     void stopCommunicate();
     //停止相应的线程
     void connectDevice(BluetoothDevice device, boolean secure);
+
+    /**
+     * 这一个设计模式出了问题，实际上只能由clientLocal来使用了，因为client和
+     *实际公用一个线程，其他的是分开的.....
+     * * *********************************/
+    void updateRemoteInfo();
+
 }

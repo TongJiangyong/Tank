@@ -98,6 +98,11 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
 
     }
 
+    @Override
+    public void updateRemoteInfo() {
+
+    }
+
     public void addMsgObserver(ObserverMsg observerMsg) {
         this.getClientInputThread().addMsgObserver(observerMsg);
     }

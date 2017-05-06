@@ -24,6 +24,11 @@ public class StaticVariable {
     //设置 游戏的最大跳过帧数为5：
     public static int  MAX_FRAMESKIP = 5;
     public static int SKIP_TICKS = 1000 / LOGICAL_FRAME;
+
+    //设置TANK的射程圈比例
+    public static double TANK_SHOT_CIRCLE = 1.40;
+    //初始化物理场  这里的物理场应该和手机屏幕适应，设置规则为1/2*g*t*t = 屏幕高度 ，其中，t设置为0.5s 即G = 8*屏幕 高度
+    public static double GRAVITY=0;
     //设置游戏的类名
     public static String[] VIEW_LIST ={
             "yong.tank.Game_Activity.View.GameView",
@@ -75,12 +80,15 @@ public class StaticVariable {
     public static int LOCAL_SCREEN_HEIGHT;
 
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
+    //speed 走完半程所需的秒数*10 为了配合绘制斜杠度量衡的方法
     public static TankBascInfo[] TANKBASCINFO = {
             new TankBascInfo(0,30,50,30,StaticVariable.TANKPICTURE_NO_ARM[0],"T-34","简介：很牛B的坦克A"+"\n"+",有多牛呢？"),
             new TankBascInfo(1,30,40,50,StaticVariable.TANKPICTURE_NO_ARM[1],"M4谢尔曼","简介：很牛B的坦克B"+"\n"+",比上面牛"),
             new TankBascInfo(2,30,30,40,StaticVariable.TANKPICTURE_NO_ARM[2],"虎式-1","简介：很牛B的坦克C"+"\n"+"，上五楼不费劲"),
             new TankBascInfo(3,30,50,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D"+"\n"+"，最后的，总是最好的"),
     };
+    //设置坦克的填装时间为2s
+    public static int TANK_LOADING_TIME = 2;
     public static String HELPINFO = "这里加一些帮助信息";
     public static String STATEMENTINFO =
             "   这个程序是自己为了熟悉android studio和apk开发流程所编写的学习程序,\n" +
@@ -103,11 +111,12 @@ public class StaticVariable {
 
 //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
+    //speed的设定为子弹如果平射，1s走过的距离是屏幕宽度的多少倍？
     public static BulletBascInfo[] BUTTLE_BASCINFOS = {
-            new BulletBascInfo(0,150,0.2,R.mipmap.origin,"普通弹"), //0
-            new BulletBascInfo(0,130,0.4,R.mipmap.armor,"穿甲弹"),  //1
-            new BulletBascInfo(0,130,0.3,R.mipmap.ice,"冰弹"),    //2
-            new BulletBascInfo(0,130,0.2,R.mipmap.s_s,"加速弹"),   //3
+            new BulletBascInfo(0,3.0,0.2,R.mipmap.origin,"普通弹"), //0
+            new BulletBascInfo(0,2.5,0.4,R.mipmap.armor,"穿甲弹"),  //1
+            new BulletBascInfo(0,2.3,0.3,R.mipmap.ice,"冰弹"),    //2
+            new BulletBascInfo(0,2.7,0.2,R.mipmap.s_s,"加速弹"),   //3
             new BulletBascInfo(0,130,50, s,"子母弹_母"),
     };
     //初始化子弹的类型
@@ -124,9 +133,8 @@ public class StaticVariable {
             {StaticVariable.ICE,StaticVariable.BUTTON_NUM_ORIGN},
             {StaticVariable.S_S,StaticVariable.BUTTON_NUM_ORIGN},
     };
-    //初始化物理场  这里的物理场应该和手机屏幕适应，但是没有想到好方法
-    public static double GRAVITY=20;
-    public static double INTERVAL_TIME = 0.3;    //初始化与路径相关参数
+
+    public static int INTERVAL_TIME = 1;    //初始化与路径相关参数 ，即每隔5帧画一幅图
     public static  int PREVIEWPATHLENGTH = 50; //priewpath有12个点,测试使用50个
     public static int PATHLENGTH  = 50; //path有40个点
 
@@ -163,9 +171,14 @@ public class StaticVariable {
            R.mipmap.s_1,//F->加速弹
            // R.mipmap.tank_4,  暂时不加这个，以后再加......
    };
-    public static int BONUS_SPEED = 7;
-    public static int BONUS_STEP =90 ;
-    public static final int BONUS_Y = 5;
+    //bonus的速度设置为5s穿过屏幕，这里的speed，是指一帧走过的像素点
+    public static int BONUS_SPEED = 0;
+    public static int BONUS_SCALE = 0;
+    //bonus走完一个屏幕需要的时间
+    public static int BONUS_TIME = 5;
+    //调节bonus震动的频率
+    public static int BONUS_STEP = 6;
+    public static int BONUS_Y_INIT = 0;
     //与message相关
     //gameservice中toast更新
     public final static int MSG_TOAST = 0;

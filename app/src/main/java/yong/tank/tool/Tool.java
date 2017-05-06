@@ -36,6 +36,11 @@ public class Tool {
     private static final String TAG = "Tool";
     //这里统一使用matrix来处理图像.....但是感觉有点麻烦....没办法啊.....
 
+
+    public static double randomDoubleMaker(double n1,double n2){
+        Random ra =new Random();
+        return  ra.nextDouble() * (n2-n1)+n1;
+    }
     /**
      *
      * @param orginBitmap 原始图像
@@ -236,13 +241,14 @@ public class Tool {
         return a ;
     }
 
+    //TODO 重新设计bonus的计算公式 没什么用了
     //计算bonus的路径
     public static List<Point> getBonusPath(Bitmap bonusPicture) {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<>();
         int direction =new Random().nextInt(2); //生成随机方向
         int bonus_x; //这里应该等于bonuspicture的宽度
-        int bonus_y_init = StaticVariable.LOCAL_SCREEN_HEIGHT /StaticVariable.BONUS_Y;  //初始为1/5处的地方
+        int bonus_y_init = StaticVariable.LOCAL_SCREEN_HEIGHT /StaticVariable.BONUS_Y_INIT;  //初始为1/5处的地方
         int bonus_y;
         int speed=StaticVariable.BONUS_SPEED;
         //TODO 振幅为图片的宽度乘以比例
@@ -278,12 +284,20 @@ public class Tool {
         } else {
             pathNum = StaticVariable.PATHLENGTH;
         }
+        /***
+         bulletV_y = bulletV_y + StaticVariable.GRAVITY/StaticVariable.LOGICAL_FRAME;
+         int newPosition_x = (int)(bulletPosition_x + bulletV_x/StaticVariable.LOGICAL_FRAME );
+         //bulletPosition_x+=v_x*t;
+         int newPosition_y = (int)(bulletPosition_y + bulletV_y/StaticVariable.LOGICAL_FRAME + StaticVariable.GRAVITY /(double)(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
+         //bulletPosition_y+=v_y*t-g*t*t/2;
+         bulletDegree = (int) Math.toDegrees(Math.atan(bulletV_y / bulletV_x));
+         */
         for (int i = 0; i < pathNum; i++) {
             //这里计算时，采用向下为正，向右为正的方法
-            bulletV_y = bulletV_y + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME;
-            int newPosition_x = (init_x + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_x * StaticVariable.INTERVAL_TIME)));
+            bulletV_y = bulletV_y + StaticVariable.GRAVITY / (StaticVariable.LOGICAL_FRAME);
+            int newPosition_x = (int)(init_x +  (double)bulletV_x/(double)(StaticVariable.LOGICAL_FRAME));
             //bulletPosition_x+=v_x*t;
-            int newPosition_y = (init_y + Tool.dip2px(StaticVariable.LOCAL_DENSITY,(float)(bulletV_y * StaticVariable.INTERVAL_TIME + StaticVariable.GRAVITY * StaticVariable.INTERVAL_TIME * StaticVariable.INTERVAL_TIME / 2)));
+            int newPosition_y = (int)(init_y +  bulletV_y/(StaticVariable.LOGICAL_FRAME)+ StaticVariable.GRAVITY /(double)(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
             //bulletPosition_y+=v_y*t-g*t*t/2;
             double test = bulletV_y / bulletV_x;
             bulletDegree = (int) Math.toDegrees(Math.atan(test));
@@ -292,7 +306,7 @@ public class Tool {
             bulletPath.add(point);
             init_x=newPosition_x;
             init_y=newPosition_y;
-            //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
             //time = time + StaticVariable.INTERVAL;
         }
         return bulletPath;

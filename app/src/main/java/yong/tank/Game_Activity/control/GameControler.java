@@ -86,12 +86,11 @@ public class GameControler {
                     gameLoop++;
                     Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
                 }
-                //启动程序的界面
                 //TODO 如果有必要，计算一个插值的系数....系数在0~1之间
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );
                 Log.i(TAG,"interpolation is:"+ interpolation);
                 long before_2 = getCurrentTimeCount();
-                viewDraw.drawPicture(interpolation);
+                viewDraw.drawFrame(interpolation);
                 long after_2 = getCurrentTimeCount();
                 Log.i(TAG,"******************渲染帧数："+1000/(after_2-before_2)+"*************************");
             }

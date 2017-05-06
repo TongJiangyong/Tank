@@ -20,6 +20,21 @@ public class MyBlood extends Blood{
         super(blood, power, bloodBlock, bloodNum, powerNum);
     }
 
+
+    public void positionUpdate(){
+        //this.tankPosition_x=tankPrevPosition_x+((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
+        //this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+        //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
+        //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
+        //TODO 这里设置装填的时间需要2s
+        if(powerNum<1){
+            powerNum=powerNum+1/(float)(StaticVariable.LOGICAL_FRAME*StaticVariable.TANK_LOADING_TIME);
+        }else{
+            //设置运行发射
+            this.allowFire = true;
+        }
+    }
+
     //这里配置一个其他的drawEnermy方法进行配置，可能会更好，或者将静态量提取出drawSelf出来
     public void drawSelf(Canvas canvas) {
         //计算血条的比例
@@ -40,13 +55,7 @@ public class MyBlood extends Blood{
         canvas.drawBitmap(bloodBlock,bloodBlock_x,bloodBlock_y, null);
         //绘制血条
         canvas.drawBitmap(blood, src_blood, des_blood, null);
-        //TODO 这里设置装填的时间需要1s 硬编码
-        if(powerNum<1){
-            powerNum=powerNum+0.04;
-        }else{
-            //设置运行发射
-            this.allowFire = true;
-        }
+
     }
 
 }

@@ -33,13 +33,15 @@ public abstract class Bullet implements Serializable{
     public int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
     //测试绘制路径
     private transient Path path = new Path();
-    double bulletV_x=0;
-    double bulletV_y=0;
+    public double bulletV_x=0;
+    public double bulletV_y=0;
     public Bullet(Bitmap bulletPicture, int bulletType) {
         this.bulletPicture = bulletPicture;
         this.bulletType = bulletType;
         this.bulletBascInfo = StaticVariable.BUTTLE_BASCINFOS[bulletType];
     }
+
+    public abstract void  positionUpdate() ;
 
     public abstract  void drawSelf(Canvas canvas);
 

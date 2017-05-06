@@ -30,15 +30,22 @@ public class MyTank extends Tank implements Serializable{
         this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
     }
 
-    public void drawSelf(Canvas canvas){
+    public void positionUpdate(){
         //TODO 考虑策略模式优化
-        this.tankPosition_x=tankPrevPosition_x+((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
+        //this.tankPosition_x=tankPrevPosition_x+((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
+        //this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+        //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
+        //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
+        this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+
         if(tankPosition_x<0){
             this.tankPosition_x=this.tankPrevPosition_x;
         }else if((tankPosition_x+this.tankPicture.getWidth())>(StaticVariable.LOCAL_SCREEN_WIDTH /2)){
             //TODO 这里先暂时设置为一半
             this.tankPosition_x=this.tankPrevPosition_x;
         }
+    }
+    public void drawSelf(Canvas canvas){
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         int weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*2/5;
@@ -73,6 +80,8 @@ public class MyTank extends Tank implements Serializable{
             //注意多线程的处理
             for (int i = bulletsFire.size() -1; i >= 0; i--)
             {
+                //更新该子弹的位置
+                bulletsFire.get(i).positionUpdate();
                 //绘制子弹
                 bulletsFire.get(i).drawSelf(canvas);
             }
