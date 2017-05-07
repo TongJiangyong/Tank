@@ -21,6 +21,10 @@ public class StaticVariable {
     public static long GAME_START_TIME = 0 ;
     //设置游戏的逻辑帧数为25
     public static int LOGICAL_FRAME = 25;
+    //设置游戏的关键帧增长率
+    public static int KEY_FRAME_COUNT = 3;
+    //设置关键帧的帧为： -----0-3-6-9-12-15-18-----
+    public static int KEY_FRAME = 0;
     //设置 游戏的最大跳过帧数为5：
     public static int  MAX_FRAMESKIP = 5;
     public static int SKIP_TICKS = 1000 / LOGICAL_FRAME;

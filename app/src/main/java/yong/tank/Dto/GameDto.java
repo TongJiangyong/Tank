@@ -26,6 +26,7 @@ public class GameDto implements Serializable{
     private int mapType ;
     private MyTank myTank;
     private MyBlood myBlood;
+    private long gameProcessFrameCount = 0;
     private transient EnemyTank enemyTank;
     private transient EnemyBlood enemyBlood;
     //这里最好每一个modal，都会在里面.....
@@ -125,4 +126,14 @@ public class GameDto implements Serializable{
     public void setMsgText(TextView msgText) {
         this.msgText = msgText;
     }
+
+    public long getGameProcessFrameCount() {
+        return gameProcessFrameCount;
+    }
+
+    public void setGameProcessFrameCount(long gameProcessFrameCount) {
+        this.gameProcessFrameCount = gameProcessFrameCount;
+    }
+
+
 }

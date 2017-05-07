@@ -77,7 +77,7 @@ public class PlayControler {
                             this.gameDto.getPlayerPain().setInsideCircle_x(dx);
                             this.gameDto.getPlayerPain().setInsideCircle_y(dy);
                             //TODO 坦克移动 坦克移动即传递方向即可
-                            this.gameDto.getMyTank().move(this.gameDto.getPlayerPain().setTankDirectiron(dx));
+                            this.gameDto.getMyTank().setTankDirection(this.gameDto.getPlayerPain().setTankDirectiron(dx));
                         }
                     }
                     //停止坦克
@@ -100,7 +100,7 @@ public class PlayControler {
                             if(testFlag==pointerCount_3){
                                 this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH *4/5);
                                 this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT *3/4);
-                                this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
+                                this.gameDto.getMyTank().setTankDirection(StaticVariable.TANKESTOP);
                             }
                         }
                     }
@@ -123,7 +123,7 @@ public class PlayControler {
                             //TODO 计算角度和距离，用于设计炮弹曲线
                             countBulletPath(this.gameDto.getMyTank().getTankCenter(),dx,dy);
                             //TODO 没办法，传入负值才行...,所以在setting函数中设为负数了
-                            this.gameDto.getMyTank().weaponMove(tankDegree);
+                            this.gameDto.getMyTank().setWeapenDegree(tankDegree);
                             this.gameDto.getMyTank().setFirePower(distance);
                             this.gameDto.getMyTank().setPreFirePath(Tool.getMyBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
                                                                                         this.gameDto.getMyTank().getWeaponPoxition_y(),
@@ -184,7 +184,7 @@ public class PlayControler {
         if (this.gameDto.getPlayerPain().isInCircle(dx, dy)) {
             this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH * 4 / 5);
             this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT * 3 / 4);
-            this.gameDto.getMyTank().move(StaticVariable.TANKESTOP);
+            this.gameDto.getMyTank().setTankDirection(StaticVariable.TANKESTOP);
         }
         //TODO 这里设置坦克释放炮弹的方法....
         //这里判断是否处于开火区域

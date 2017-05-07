@@ -168,8 +168,11 @@ public abstract class Tank implements Serializable {
         }
     }
 
-    public void move(int tankDirection) {
+    public void setTankDirection(int tankDirection) {
         this.tankDirectrion = tankDirection;
+    }
+    public int getTankDirection() {
+        return this.tankDirectrion;
     }
 
     public boolean isInFireCircle(int x, int y) {
@@ -200,7 +203,7 @@ public abstract class Tank implements Serializable {
         return tankCenter;
     }
 
-    public void weaponMove(int tankDegree) {
+    public void setWeapenDegree(int tankDegree) {
         this.weaponDegree = -tankDegree;
     }
 

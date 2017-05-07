@@ -25,6 +25,7 @@ public class MyTank extends Tank implements Serializable{
         super(tankPicture, armPicture, tankType, tankBascInfo);
         bulletsFire = new ArrayList<MyBullet>(3);//暂时发送子弹数为3？但是这样做好像没用.....
         this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH /4-this.tankPicture.getWidth()/2;
+        this.tankPrevPosition_x = this.tankPosition_x;
         //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
         this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;

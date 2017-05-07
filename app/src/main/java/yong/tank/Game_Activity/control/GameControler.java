@@ -28,6 +28,7 @@ public class GameControler {
     private long gameTimeCount = 0;
     //游戏跳过帧数：
     private long gameLoop = 0;
+
     //游戏渲染插值
     private float interpolation = 0;
     //需要绘制的图像
@@ -72,11 +73,10 @@ public class GameControler {
         public void run() {
             gameStartFlag = true;
             gameTimeCount = getCurrentTimeCount();
-            Log.i(TAG,"into restart Game");
+            Log.i(TAG,"************************into restart Game*************************");
             while (gameStartFlag) {
                 gameLoop = 0;
                 while (getCurrentTimeCount() > gameTimeCount && gameLoop < StaticVariable.MAX_FRAMESKIP){
-                    //TODO 初始化完成后的工作
                     //启动程序的逻辑 ，逻辑设定为25帧，更新游戏数据
                     //一般情况下，执行完这个logicalUpdate，不到1毫秒
                     long before = getCurrentTimeCount();

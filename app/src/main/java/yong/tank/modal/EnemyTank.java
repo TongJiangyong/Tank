@@ -2,7 +2,6 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,9 +26,27 @@ public class EnemyTank extends Tank implements Serializable{
         bulletsFire = new ArrayList<EnemyBullet>(3);//暂时发送子弹数为3？但是这样做好像没用.....
         //重置坦克的位置......
         this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH *3/4-this.tankPicture.getWidth()/2;
+        this.tankPrevPosition_x = this.tankPosition_x;
         //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
         this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
+    }
+
+
+    public void positionUpdate(){
+        //TODO 考虑策略模式优化
+        //this.tankPosition_x=tankPrevPosition_x+((Tool.dip2px(StaticVariable.LOCAL_DENSITY, tankBascInfo.getSpeed())/15)*tankDirectrion);
+        //this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+        //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
+        //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
+        this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+        //Log.i(TAG,"enermy tankPosition_x ："+tankPosition_x+", tankPrevPosition_x:"+tankPrevPosition_x);
+        if(tankPosition_x<StaticVariable.LOCAL_SCREEN_WIDTH /2){
+            this.tankPosition_x=this.tankPrevPosition_x;
+        }else if((tankPosition_x+this.tankPicture.getWidth())>(StaticVariable.LOCAL_SCREEN_WIDTH )){
+            //TODO 这里先暂时设置为一半
+            this.tankPosition_x=this.tankPrevPosition_x;
+        }
     }
 
 
@@ -40,6 +57,7 @@ public class EnemyTank extends Tank implements Serializable{
         }else if((tankPosition_x+this.tankPicture.getWidth())<StaticVariable.LOCAL_SCREEN_WIDTH *4/7){
             this.tankPosition_x=StaticVariable.LOCAL_SCREEN_WIDTH *4/7;
         }*/
+        //Log.i(TAG,"tankPosition_x is:"+tankPosition_x);
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         // 不知道为什么，这里和mytank不一样
@@ -54,12 +72,13 @@ public class EnemyTank extends Tank implements Serializable{
         //坦克画在arm的后面
 
         // TODO 这里weapon的点要更精细一点
+        tankPrevPosition_x = tankPosition_x;
         this.weaponPoxition_x = weaponPoxitionTemp_x;
         this.weaponPoxition_y = weaponPoxitionTemp_y;
         //Log.i(TAG,"current position:"+weaponPoxition_x);
 
         /**绘制所有的子弹**/
-        Log.i(TAG,"enermy draw Bullet*****bulletsFire.size() is："+bulletsFire.size());
+        //Log.i(TAG,"enermy draw Bullet*****bulletsFire.size() is："+bulletsFire.size());
         if(bulletsFire.size()==0){
         }else{
             //这里值得注意的是，模式不同，绘制子弹的方法也不同
@@ -69,7 +88,7 @@ public class EnemyTank extends Tank implements Serializable{
                 //更新该子弹的位置
                 bulletsFire.get(i).positionUpdate();
                 //绘制子弹
-                Log.i(TAG,"enermy draw Bullet*****************");
+                //Log.i(TAG,"enermy draw Bullet*****************");
                 bulletsFire.get(i).drawSelf(canvas);
             }
             this.isBulletDrawOver = true;

@@ -5,15 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
 
 import yong.tank.Dto.GameDto;
-
-import static yong.tank.tool.Tool.getCurrentTimeCount;
 
 /**
  * Created by hasee on 2016/10/31.
@@ -59,12 +56,9 @@ public class ViewDraw extends SurfaceView implements SurfaceHolder.Callback {
             synchronized (holder) {
                 canvas = this.holder.lockCanvas();
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制前先進行清空操作....
-                long before_count = getCurrentTimeCount();
                 for (ViewBase v : views) {
                     v.startDrawFrame(interpolation, canvas);
                 }
-                long after_count = getCurrentTimeCount();
-                Log.i(TAG, "ViewBase  cost time is :" + (after_count - before_count));
             }
         } catch (Exception e) {
                 e.printStackTrace();
