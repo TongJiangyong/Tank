@@ -1,8 +1,6 @@
 package yong.tank.Game_Activity.control;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,7 +9,6 @@ import android.widget.Toast;
 import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Dto.GameDto;
 import yong.tank.R;
-import yong.tank.modal.MyBullet;
 import yong.tank.modal.Point;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
@@ -213,59 +210,20 @@ public class PlayControler {
         }
     }
 
-        //1/发射子弹，2、并重置装填的时间，3、更新bullet的计数
+        //注意这里是发射子弹调用的函数
         public void tankOnFire(){
-            //***************发射子弹*************
-            MyBullet myBullet = initBullet(this.gameDto.getMyTank().getSelectedBullets());
-            //在tank中加入子弹
-            this.gameDto.getMyTank().addBuleetFire(myBullet);
-            //TODO 注意在这里，也要互相发送子弹的创建信息 这里可能需要重新处理......
-            Tool.sendNewBullet(this.clientCommunicate,myBullet);
-            //***************重置装填的时间*************
-            //如果子弹的类型不是连续弹，则设置装填时间
-            if(this.gameDto.getMyTank().getSelectedBullets()==StaticVariable.S_S)
-            {
-                this.gameDto.getMyBlood().setPowerNum(1);
+            //对远程模式来说在这里设置一个flag，用于当客户端发射的时候，可以被发送检测到，并送走......
+            if(StaticVariable.CHOSED_MODE !=StaticVariable.GAME_MODE.LOCAL){
+                this.gameControler.getGameService().setLocalTankOnfire(true);
+                //对非远程模式来说，则需要做如下处理：
+                //1、发射子弹，2、并重置装填的时间，3、更新bullet的计数
             }else{
-                this.gameDto.getMyBlood().setPowerNum(0);
-                //设置禁止发射,直到装填时间回复
-                this.gameDto.getMyBlood().setAllowFire(false);
-            }
-            //***************更新bullet的计数*************
-            //如果当前的子弹类型不为初始类型，则需要更新计数
-            if(gameDto.getMyTank().getSelectedBullets()!=StaticVariable.ORIGIN){
-                //子弹计数
-                gameDto.getSelectButtons().get(R.id.selectButton_2).subtractBulletNum();
-                this.gameDto.getMyTank().setSelectedBulletsNum(gameDto.getSelectButtons().get(R.id.selectButton_2).getBulletNum());
+                this.gameControler.getGameService().myTankOnFire();
             }
         }
 
 
-    //初始化子弹
-    private MyBullet initBullet(int bulletType){
-        Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
-        Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,false);
-        double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*distance*Math.cos(Math.toRadians(tankDegree));
-        double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getMyTank().getSelectedBullets()].getSpeed()*distance*Math.sin(Math.toRadians(tankDegree));
-        MyBullet myBullet = new MyBullet(bulletPicture,bulletType,bulletV_x,bulletV_y,
-                this.gameDto.getMyTank().getWeaponPoxition_x(),this.gameDto.getMyTank().getWeaponPoxition_y());
-        //初始化坦克的性能
-        myBullet.setBulletDegree(tankDegree);
-        myBullet.setBulletDistance(distance);
-        //Log.i(TAG,"distance test is :"+distance+" ******************");
-        //计算并初始化子弹的路径
-        myBullet.setFirePath(Tool.getMyBulletPath(this.gameDto.getMyTank().getWeaponPoxition_x(),
-                                            this.gameDto.getMyTank().getWeaponPoxition_y(),
-                                            distance,
-                                            tankDegree,
-                                            false,this.gameDto.getMyTank().getSelectedBullets()));
-        //允许绘制路径
-        myBullet.setDrawFlag(true);
-        //初始化坦克的位置
-        //bullet.setBulletPosition_x(this.gameDto.getMyTank().getWeaponPoxition_x());
-        //bullet.setBulletPosition_y(this.gameDto.getMyTank().getWeaponPoxition_y());
-        return myBullet;
-    }
+
 
 
 

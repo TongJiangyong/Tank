@@ -19,8 +19,12 @@ public class GameSendingData implements Serializable {
      *
      */
     private int serverFrame;
-    //是否该产生bonus
-    private int enableBonus;
+    //bonus相关参数
+    private boolean enableBonus;
+
+    private int bonusType;
+
+    private int bonusDirction;
 
     /**我的坦克相关参数
      *
@@ -30,7 +34,7 @@ public class GameSendingData implements Serializable {
     //我的坦克角度
     private int MyTankDegree;
     //我的坦克是否要发射
-    private int MyTankEnableFire;
+    private boolean MyTankEnableFire;
     //我的坦克发射力度
     private int MyTankBulletDistance;
 
@@ -71,11 +75,11 @@ public class GameSendingData implements Serializable {
         MyTankDegree = myTankDegree;
     }
 
-    public int getMyTankEnableFire() {
+    public boolean getMyTankEnableFire() {
         return MyTankEnableFire;
     }
 
-    public void setMyTankEnableFire(int myTankEnableFire) {
+    public void setMyTankEnableFire(boolean myTankEnableFire) {
         MyTankEnableFire = myTankEnableFire;
     }
 
@@ -163,11 +167,27 @@ public class GameSendingData implements Serializable {
         EnemyTankBulletType = enemyTankBulletType;
     }
 
-    public int getEnableBonus() {
+    public boolean getEnableBonus() {
         return enableBonus;
     }
 
-    public void setEnableBonus(int enableBonus) {
+    public void setEnableBonus(boolean enableBonus) {
         this.enableBonus = enableBonus;
+    }
+
+    public int getBonusType() {
+        return bonusType;
+    }
+
+    public void setBonusType(int bonusType) {
+        this.bonusType = bonusType;
+    }
+
+    public int getBonusDirction() {
+        return bonusDirction;
+    }
+
+    public void setBonusDirction(int bonusDirction) {
+        this.bonusDirction = bonusDirction;
     }
 }
