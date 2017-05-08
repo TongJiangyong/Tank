@@ -126,7 +126,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     timer.schedule(new productorThread(), 100, 30);
                 }
             }
-            Log.i(TAG, "************gameThread.runGame()*************");
+            //Log.i(TAG, "************gameThread.runGame()*************");
             //更新tankControl的逻辑
             localGameProcess.runTank();
             //更新Bonus的位置
@@ -755,7 +755,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
         initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
         //TODO 这里将distance做随机处理
-        if(initDistance<=0||initDistance>=1){
+        if(initDistance<=0.2||initDistance>=1){
             //小于0则设定一个固定值
             initDistance= 0.5;
         }

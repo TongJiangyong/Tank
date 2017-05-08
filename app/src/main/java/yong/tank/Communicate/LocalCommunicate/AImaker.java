@@ -86,7 +86,7 @@ public class AImaker implements Subject {
                 if(comDataF!=null){
                     this.notifyWatchers(comDataF);
                     try {
-                        Log.i(TAG,"发送数据为："+gameSendingDataString);
+                        //Log.i(TAG,"发送数据为："+gameSendingDataString);
                         Log.d(TAG,"发送数据的字节大小为："+gameSendingDataString.getBytes("UTF-8").length);
                        } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();

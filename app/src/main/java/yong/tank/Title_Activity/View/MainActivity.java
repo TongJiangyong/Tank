@@ -56,8 +56,8 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         StaticVariable.BONUS_Y_INIT = (int)((float)StaticVariable.LOCAL_SCREEN_HEIGHT/5);
         //bonus的振幅为   画面的1/10
         StaticVariable.BONUS_SCALE = (int)((float)StaticVariable.LOCAL_SCREEN_HEIGHT/10);
-        //设置场景的重力
-        StaticVariable.GRAVITY= StaticVariable.LOCAL_SCREEN_HEIGHT * 8 ;
+        //设置场景的重力 ,即1/1.1.41秒，运动到的屏幕高度的距离
+        StaticVariable.GRAVITY= StaticVariable.LOCAL_SCREEN_HEIGHT * 4 ;
         Log.i(TAG, "Test in company");
     }
 

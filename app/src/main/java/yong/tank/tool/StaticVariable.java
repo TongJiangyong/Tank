@@ -115,12 +115,12 @@ public class StaticVariable {
 
 //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
-    //speed的设定为子弹如果平射，1s走过的距离是屏幕宽度的多少倍？
+    //speed的设定为子弹如果平射，1s走过的距离是屏幕宽度的多少倍
     public static BulletBascInfo[] BUTTLE_BASCINFOS = {
-            new BulletBascInfo(0,3.0,0.2,R.mipmap.origin,"普通弹"), //0
-            new BulletBascInfo(0,2.5,0.4,R.mipmap.armor,"穿甲弹"),  //1
-            new BulletBascInfo(0,2.3,0.3,R.mipmap.ice,"冰弹"),    //2
-            new BulletBascInfo(0,2.7,0.2,R.mipmap.s_s,"加速弹"),   //3
+            new BulletBascInfo(0,2,0.2,R.mipmap.origin,"普通弹"), //0
+            new BulletBascInfo(0,2,0.4,R.mipmap.armor,"穿甲弹"),  //1
+            new BulletBascInfo(0,2,0.3,R.mipmap.ice,"冰弹"),    //2
+            new BulletBascInfo(0,2,0.2,R.mipmap.s_s,"加速弹"),   //3
             new BulletBascInfo(0,130,50, s,"子母弹_母"),
     };
     //初始化子弹的类型

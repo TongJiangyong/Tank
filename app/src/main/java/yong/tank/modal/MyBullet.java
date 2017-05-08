@@ -26,7 +26,7 @@ public class MyBullet extends Bullet{
         //this.gameDto.getMyTank().getSelectedBullets()
         //这里计算时，采用向下为正，向右为正的方法
         //这里指示的是每一帧的内容
-        Log.w(TAG, "**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
+        //Log.w(TAG, "**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
         bulletV_y = bulletV_y + StaticVariable.GRAVITY/StaticVariable.LOGICAL_FRAME;
         int newPosition_x = (int)(bulletPosition_x + bulletV_x/StaticVariable.LOGICAL_FRAME );
         //bulletPosition_x+=v_x*t;

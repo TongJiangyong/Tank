@@ -84,7 +84,7 @@ public class GameControler {
                     long after = getCurrentTimeCount();
                     gameTimeCount+=StaticVariable.SKIP_TICKS;
                     gameLoop++;
-                    Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
+                    //Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
                 }
                 //TODO 如果有必要，计算一个插值的系数....系数在0~1之间
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );
