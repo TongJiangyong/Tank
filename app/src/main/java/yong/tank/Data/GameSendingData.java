@@ -18,7 +18,7 @@ public class GameSendingData implements Serializable {
     /**服务器相关参数
      *
      */
-    private int serverFrame;
+    private long serverFrame;
     //bonus相关参数
     private boolean enableBonus;
 
@@ -36,10 +36,12 @@ public class GameSendingData implements Serializable {
     //我的坦克是否要发射
     private boolean MyTankEnableFire;
     //我的坦克发射力度
-    private int MyTankBulletDistance;
+    private double MyTankBulletDistance;
 
     //我的血条比例
     private double MyTankBloodNum;
+
+
     //我的子弹种类：
     private int MyBulletType;
 
@@ -83,11 +85,11 @@ public class GameSendingData implements Serializable {
         MyTankEnableFire = myTankEnableFire;
     }
 
-    public int getMyTankBulletDistance() {
+    public double getMyTankBulletDistance() {
         return MyTankBulletDistance;
     }
 
-    public void setMyTankBulletDistance(int myTankBulletDistance) {
+    public void setMyTankBulletDistance(double myTankBulletDistance) {
         MyTankBulletDistance = myTankBulletDistance;
     }
 
@@ -143,11 +145,11 @@ public class GameSendingData implements Serializable {
         EnemyTankBloodNum = enemyTankBloodNum;
     }
 
-    public int getServerFrame() {
+    public long getServerFrame() {
         return serverFrame;
     }
 
-    public void setServerFrame(int serverFrame) {
+    public void setServerFrame(long serverFrame) {
         this.serverFrame = serverFrame;
     }
 

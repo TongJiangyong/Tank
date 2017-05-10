@@ -15,6 +15,7 @@ import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
+import yong.tank.Communicate.ServerService.ServerService;
 import yong.tank.tool.StaticVariable;
 //TODO 这里出现一个很严重的问题，可能需要AIDL来处理......因为蓝牙的建立是在一个线程，但是使用在其他的线程...
 //TODO 或者只能委屈求全，在game的activity建立蓝牙的选择等处理流程.......没有办法......
@@ -53,6 +54,7 @@ public class ClientBluetooth implements ClientCommunicate {
     private BluetoothConnected mConnectedThread;
     private int mState;
 
+    private ServerService serverService;
     // Constants that indicate the current connection state
     //将其定义为其他的变量......
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -182,7 +184,7 @@ public class ClientBluetooth implements ClientCommunicate {
          * 注意这里，自身为主动模式，则是等待对方连接接入，自己做所有的计算
          * 自身为被动模式，则是接入对方的房间，然后等待对方传输数据
          */
-        Log.i(TAG,"game_rule is_3:"+StaticVariable.CHOSED_RULE);
+        //Log.i(TAG,"game_rule is_3:"+StaticVariable.CHOSED_RULE);
         if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
             msg.what = StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE;
         }else{
@@ -229,15 +231,6 @@ public class ClientBluetooth implements ClientCommunicate {
      * @see BluetoothConnected(String)
      */
     public void write(String msg) {
-        // Create temporary object
-        //Log.i(TAG,"write info_1:"+msg);
-        //BluetoothConnected r;
-        // Synchronize a copy of the ConnectedThread
-/*        synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
-            r = mConnectedThread;
-        }*/
-        // Perform the write unsynchronized
         mConnectedThread.write(msg);
         //Log.i(TAG,"write info :"+msg);
        // r.write(msg);

@@ -157,7 +157,7 @@ public class GamePresenter {
     //1、判断能否通信，2、打开界面
     public void msgSend() {
         //TODO 如果全部初始化完全，可以打开这个 ,即，加一个判断
-        if(StaticVariable.remotePrepareInitFlag){
+        if(StaticVariable.REMOTE_PREPARED_INIT_FLAG){
             String sendInfo =gameActivity.msg_input.getText().toString();
             if(sendInfo.length()==0){
                 gameActivity.showToast("发送的信息不能为空....");

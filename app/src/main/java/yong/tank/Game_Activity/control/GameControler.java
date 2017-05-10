@@ -60,7 +60,7 @@ public class GameControler {
         //停止程序的逻辑
         this.gameService.gameStop();
         //恢复初始化变量
-        StaticVariable.remotePrepareInitFlag=false;
+        StaticVariable.REMOTE_PREPARED_INIT_FLAG =false;
     }
 
     public GameService getGameService() {
@@ -76,7 +76,7 @@ public class GameControler {
             Log.i(TAG,"************************into restart Game*************************");
             while (gameStartFlag) {
                 gameLoop = 0;
-                while (getCurrentTimeCount() > gameTimeCount && gameLoop < StaticVariable.MAX_FRAMESKIP){
+                while (getCurrentTimeCount() >= gameTimeCount && gameLoop < StaticVariable.MAX_FRAMESKIP){
                     //启动程序的逻辑 ，逻辑设定为25帧，更新游戏数据
                     //一般情况下，执行完这个logicalUpdate，不到1毫秒
                     long before = getCurrentTimeCount();
@@ -84,7 +84,7 @@ public class GameControler {
                     long after = getCurrentTimeCount();
                     gameTimeCount+=StaticVariable.SKIP_TICKS;
                     gameLoop++;
-                    //Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
+                    Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
                 }
                 //TODO 如果有必要，计算一个插值的系数....系数在0~1之间
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );

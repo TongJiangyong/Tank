@@ -22,6 +22,7 @@ import yong.tank.Communicate.InterfaceGroup.ObserverCommand;
 import yong.tank.Communicate.InterfaceGroup.ObserverInfo;
 import yong.tank.Communicate.InterfaceGroup.ObserverMsg;
 import yong.tank.Communicate.InterfaceGroup.Subject;
+import yong.tank.Communicate.ServerService.ServerService;
 import yong.tank.tool.StaticVariable;
 
 /**
@@ -42,6 +43,7 @@ public class BluetoothConnected extends Thread implements Subject {
     private List<ObserverCommand> observerCommands = new ArrayList<ObserverCommand>();
     private List<ObserverInfo> observerInfos = new ArrayList<ObserverInfo>();
     private boolean readFlag = true;
+    private ServerService serverService;
     public BluetoothConnected(BluetoothSocket socket, String socketType, ClientBluetooth clientBluetooth) {
         Log.i(TAG, "create ConnectedThread: " + socketType);
         mmSocket = socket;
@@ -57,9 +59,19 @@ public class BluetoothConnected extends Thread implements Subject {
         } catch (IOException e) {
             Log.e(TAG, "temp sockets not created", e);
         }
+        //如果成功连上蓝牙，并是activity模式，则创建一个服务器线程，并开始处理
+        if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+            ServerService serverService = new ServerService();
+            this.serverService= serverService;
+        }
     }
 
     public void run() {
+        //主线程开始前，先给serverService配置蓝牙适配器
+        if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+            this.serverService.setBlutoothAdapter(this);
+        }
+
         Log.i(TAG, "BEGIN mConnectedThread ---->允许蓝牙开始读写....");
          //byte[] buffer = new byte[1024];
         // Keep listening to the InputStream while connected
@@ -74,13 +86,35 @@ public class BluetoothConnected extends Thread implements Subject {
                     readBuffer = new byte[StaticVariable.READ_BYTE];
                     Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
                     String[] readInfos  =readline.split("&");
+                    Log.w(TAG,"数据长度："+readInfos.length);
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
                         //Log.w(TAG, "input Thread 收到的id: "+readInfos[i]);
+                        /**
+                         * 注意这里，对 activity和passive端的处理方式。两者各有不同，这里仅仅对标签为StaticVariable.COMMAND_INFO
+                         * activity的处理方式为，直接将收到passvie的数据发送给serverService线程，并由serverService线程处理后序
+                         * 后序处理分为两步：
+                         * 1、activity数据,因为activity实际为server，所以需要把数据转给server
+                         * 2、passive数据 ，通过蓝牙线程的write函数，sending出去....
+                         * passive端的处理方式为传送给notifyWatchers
+                         */
                         ComDataF comDataF=null;
                         try {
                             comDataF = ComDataPackage.unpackToF(readInfos[i]);
-                            this.notifyWatchers(comDataF);
+                            if(comDataF.getComDataS().getCommad()==StaticVariable.COMMAND_INFO){
+                                if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+                                    //即，这里是passive发送过来的数据
+                                    this.serverService.reciveDataFromPassive(comDataF);
+                                }else{
+                                    //即，这里是server转发过来的数据，直接转走即可
+                                    this.notifyWatchers(comDataF);
+                                }
+                            }else{
+                                //如果不是commandinfo，则直接转发该数据
+                                this.notifyWatchers(comDataF);
+                            }
+
+
                         }
                         catch (Exception e)
                         {
@@ -113,7 +147,17 @@ public class BluetoothConnected extends Thread implements Subject {
      */
     //public void write(byte[] buffer) {
     public void write(String msg) {
-        this.blueOutputThread.setMsg(msg);
+        /**
+         * 注意这里，对 activity和passive端的处理方式。两者各有不同
+         * activity的处理方式为，直接将预备发送的activity的数据发送给serverService线程，并由serverService线程处理后序
+         * passive端的处理方式为，将数据 发送给output的另一端
+         */
+        if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+            this.serverService.reciveDataFromActivity(msg);
+        }else{
+            this.blueOutputThread.setMsg(msg);
+        }
+
     }
 
     public void cancel() {
@@ -159,6 +203,11 @@ public class BluetoothConnected extends Thread implements Subject {
             try {
                 // 没有消息写出的时候，线程等待
                 while (isStart) {
+                    /**
+                     * 注意这里，对 activity和passive端的处理方式。两者各有不同
+                     * activity的处理方式为，直接将预备发送的activity的数据发送给serverService线程，并由serverService线程处理后序
+                     * passive端的处理方式为，将数据 发送给output的另一端
+                     */
                     if (msg != null) {
                         //Log.i(TAG,"sendInfo is_1 :"+msg);
                         outupt.write(msg+"&");

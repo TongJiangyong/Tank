@@ -17,7 +17,6 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.ToDoubleBiFunction;
 
 import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
@@ -45,7 +44,6 @@ import yong.tank.modal.abstractGoup.Tank;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
-import static android.R.attr.x;
 import static yong.tank.tool.StaticVariable.LOCAL_SCREEN_WIDTH;
 import static yong.tank.tool.StaticVariable.REMOTE_DEVICE_ID;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_HEIGHT;
@@ -84,6 +82,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     //这是一个专门用于启动程序的handler......，因为架构设计出错，导致service和actiactivity层之间要建立联系，非常不对.....
     private Handler gameActivityHandler;
 
+    //gameDto中设置的remote端的信息暂存处
+    private int remoteTankType;
 
     public GameService(GameDto gameDto, Context context, Handler gameActivityHandler) {
         this.gameDto = gameDto;
@@ -114,11 +114,13 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
      * this.gameDto.getGameProcessFrameCount() 为当前游戏进程的帧，本地每一次执行logicalUpdate则需要+1
      * StaticVariable.KEY_FRAME 此轮游戏的关键帧，按顺序增长
      * gameCurrentFrame 在当前函数中获取的getGameProcessFrameCount()
+     * 初始时，各个frame均为0
      */
     public void logicalUpdate() {
         /**
          ***********************如如果是本地模式，则采用本地模式的处理*****************************************
          */
+        //Log.i(TAG,"******************logicalUpdate getCurrentTimeCount() is +"+getCurrentTimeCount());
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
             //对初始化的处理
             if (localGameProcess == null) {
@@ -159,7 +161,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     }
                     //出列一个数据
                     gameData = remoteGameData.poll();
-                    //如果给的数据的帧等于当前的关键帧
+                    //如果给的数据的帧等于当前的关键帧，则程序向下执行
                     if (gameData.getServerFrame()==gameCurrentFrame)
                     {
                         break;
@@ -174,13 +176,14 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 //TODO 初始化要完成的工作........，即付给remote相应的变量.....将当前采集的数据，作为输入包发送 ，发送自己的数据
                 //不断发送信息数据
                 GameSendingData gameSendingData = new GameSendingData(1);
-                gameSendingData.setEnemyTankDirection(this.gameDto.getMyTank().getTankDirection());
-                gameSendingData.setEnemyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
-                gameSendingData.setEnemyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
-                gameSendingData.setEnemyTankEnableFire(false);
+                gameSendingData.setMyTankDirection(this.gameDto.getMyTank().getTankDirection());
+                gameSendingData.setMyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
+                gameSendingData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
+                gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                gameSendingData.setMyTankEnableFire(false);
                 //使用tank发送进行判断即可.......
                 if(this.isLocalTankOnfire()){
-                    gameSendingData.setEnemyTankEnableFire(true);
+                    gameSendingData.setMyTankEnableFire(true);
                     this.setLocalTankOnfire(false);
                 }
                 //不断发送信息数据
@@ -195,10 +198,13 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 this.remoteSetEnmyTank(gameData.getEnemyTankDegree(),gameData.getEnemyTankDirection(),gameData.getEnemyTankEnableFire());
                 //处理bonus的过程,即如果广播有bonus产生，则产生bonus
                 if(gameData.getEnableBonus()){
-                    bonusControl();
+                    this.bonusControl();
                     BonusMaker bonusMaker = new BonusMaker();
                     bonusMaker.bonusProductor(gameData.getBonusDirction(),gameData.getBonusType());
                 }
+                //填充tank的血条信息
+                this.gameDto.getMyBlood().setBloodNum(gameData.getMyTankBloodNum());
+                this.gameDto.getEnemyBlood().setBloodNum(gameData.getEnemyTankBloodNum());
                 //TODO 这里对关键帧的数据填充后，需要进一步计算，如何处理计算方面的内容？？？？
                 StaticVariable.KEY_FRAME = nextKeyFrame;
                 gameCurrentFrame++;
@@ -217,7 +223,6 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             localGameProcess.runBonus();
             //更新血条：
             localGameProcess.runBlood();
-
 
             //TODO: 2017/5/8**********************************************************************************
             /*1、写服务器程序
@@ -288,29 +293,32 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
 
         public void runTank() {
-            int num = gameDto.getMyTank().getBulletsFire().size();
+
             //更新本地的坦克位置
             gameDto.getMyTank().positionUpdate();
             //更新地方tank的位置信息
             gameDto.getEnemyTank().positionUpdate();
-            if (num != 0) {
-                for (int i = (num - 1); i >= 0; i--) {
-                    //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
-                    //这里设置continue语句来解决这个问题.....
-                    //测试击中bonus后用的方法
-                    if (myFireBonus(i)) {
-                        continue;
-                    }
-                    //测试爆炸用的方法
-                    if (myTankExplode(i)) {
-                        continue;
-                    }
-
-                }
-            }
-
             //下面是本地模式的相关代码 即 本地模式下，Enemy的数据是直接在这里获取的
+            //这里也用于判断爆炸和判断bonus击中，即本地用于判断击中 的部分
             if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
+                int num = gameDto.getMyTank().getBulletsFire().size();
+                if (num != 0) {
+                    for (int i = (num - 1); i >= 0; i--) {
+                        //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+                        //这里设置continue语句来解决这个问题.....
+                        //测试击中bonus后用的方法
+                        if (myFireBonus(i)) {
+                            continue;
+                        }
+                        //测试爆炸用的方法
+                        if (myTankExplode(i)) {
+                            continue;
+                        }
+
+                    }
+                }
+
+
                 if (remoteDataInitFlag) {
                     //TODO 检查一下，这个enermyNum为啥为0
                     int enermyNum = gameDto.getEnemyTank().getBulletsFire().size();
@@ -561,7 +569,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         @Override
         public void run() {
             //如果初始化prepare完成,就开始传输数据
-            if (StaticVariable.remotePrepareInitFlag) {
+            if (StaticVariable.REMOTE_PREPARED_INIT_FLAG) {
                 ComDataF comDataF = null;
                 String gameDtoString = null;
                 try {
@@ -705,7 +713,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     /**
      * 本地初始化远程dto相关的代码
      */
-    private void initRemoteDto(int tankType) {
+    private void initLocalEnemy(int tankType) {
         //初始化enemyTank
         EnemyTank enemyTank = (EnemyTank) initTank(tankType, false);
         //初始化blood
@@ -876,12 +884,14 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
      * 远程初始化相关的代码
      */
 
-    //发送ID到server/activity端 ，同时，passive端，首先开始进行主动的通讯工作
+    //发送ID到server/activity端 ，初始化本地的地方tank信息，同时，passive端，首先开始进行主动的通讯工作
     private void initRemoteActivity() {
         //网络模式需要向服务器发送东西.....
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.INTERNET) {
             Tool.sendSelfIdToServer(this.clientCommunicate);
         }
+        //初始化地方的tank信息.....
+        initLocalEnemyInfo(this.remoteTankType);
         Log.i(TAG, "mode:" + StaticVariable.CHOSED_RULE);
         if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
             while (!remoteDeviceACKflag) {
@@ -904,15 +914,15 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     //local暂时直接开始游戏即可
     private void initLocalActivity() {
         //TODO ，在这里初始化敌方坦克等信息，不再数据接收中处理
-        this.initLocalActivityInfo();
+        this.initLocalEnemyInfo(this.gameDto.getMyTank().getTankType());
         this.startGame();
     }
 
     //初始化和本地程序相关的信息，以前是在recive信息重初始化，这里要改变
-    private void initLocalActivityInfo() {
+    private void initLocalEnemyInfo(int tankType) {
         //初始化敌方的变量......
         //Log.i(TAG,"初始化敌方的变量......");
-        initRemoteDto(this.gameDto.getMyTank().getTankType());
+        initLocalEnemy(tankType);
         //允许敌方坦克发射
         gameDto.getEnemyTank().setEnableFire(true);
         this.remoteDataInitFlag = true;
@@ -999,6 +1009,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.REMOTE_DEVICE_ID = comDataF.getComDataS().getObject();
                 //INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT
                 Tool.sendACKToPassive(this.clientCommunicate);
+                //发送完成后，activity端启动一个server的线程，用于处理和server相关的动作
             } else {
                 Log.i(TAG, "*******************身份错误_1************************");
             }
@@ -1007,7 +1018,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             this.remoteDeviceACKflag = true;
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
                 Log.w(TAG, "INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:" + comDataF.getComDataS().getCommad());
-                Tool.sendSelfInfoToActive(this.clientCommunicate);
+                Tool.sendSelfInfoToActive(this.clientCommunicate,this.gameDto.getMyTank().getTankType());
             } else {
                 Log.i(TAG, "*******************身份错误_2************************");
             }
@@ -1024,8 +1035,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.REMOTE_SCREEN_WIDTH = remoteDeviceInfo.screanWidth;
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
+                this.remoteTankType = remoteDeviceInfo.tankType;
                 Log.i(TAG, "activity SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH);
-                Tool.sendSelfInfoToPassive(this.clientCommunicate);
+                Tool.sendSelfInfoToPassive(this.clientCommunicate,this.gameDto.getMyTank().getTankType());
             } else {
                 Log.i(TAG, "*******************身份错误_3************************");
             }
@@ -1041,6 +1053,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.REMOTE_SCREEN_WIDTH = remoteDeviceInfo.screanWidth;
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
+                this.remoteTankType = remoteDeviceInfo.tankType;
                 Log.i(TAG, "passive SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH);
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             } else {
@@ -1054,9 +1067,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
-                StaticVariable.remotePrepareInitFlag = true;
+                StaticVariable.REMOTE_PREPARED_INIT_FLAG = true;
                 this.startGame();
-
             } else {
 
             }
@@ -1065,7 +1077,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 Log.w(TAG, "INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
-                StaticVariable.remotePrepareInitFlag = true;
+                StaticVariable.REMOTE_PREPARED_INIT_FLAG = true;
                 this.startGame();
             } else {
 

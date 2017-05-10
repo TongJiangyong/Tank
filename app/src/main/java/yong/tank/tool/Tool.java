@@ -449,10 +449,10 @@ public class Tool {
      * passive接受确认信息，并传输自身的信息数据
      * @param clientCommunicate
      */
-    public static void  sendSelfInfoToActive(ClientCommunicate clientCommunicate){
+    public static void  sendSelfInfoToActive(ClientCommunicate clientCommunicate,int tankType){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
         //传输的数据包括： 高，宽，密度
-        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT);
+        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT,tankType);
         ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
@@ -460,15 +460,15 @@ public class Tool {
      * activity接受信息数据，并传输自身的信息数据
      * @param clientCommunicate
      */
-    public static void  sendSelfInfoToPassive(ClientCommunicate clientCommunicate){
+    public static void  sendSelfInfoToPassive(ClientCommunicate clientCommunicate,int tankType){
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        //传输的数据包括： 高，宽，密度
-        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT);
+        //传输的数据包括： 高，宽，密度 ，初始化tank的型号
+        DeviceInfo deviceInfo = new DeviceInfo(StaticVariable.LOCAL_DENSITY,StaticVariable.LOCAL_SCREEN_WIDTH,StaticVariable.LOCAL_SCREEN_HEIGHT,tankType);
         ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO,gson.toJson(deviceInfo));
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**
-     * activity初始化完成命令，开始进入游戏，并传输初始化完成命令
+     * activity初始化完成命令，发送自身的tank型号信息，并传输初始化完成命令
      * @param clientCommunicate
      */
     public static void  sendInitFinishedToPassive(ClientCommunicate clientCommunicate){
@@ -485,6 +485,8 @@ public class Tool {
         ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED,null);
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
+
+
     /**
      * PASSIVE发送一轮游戏结束后的命令
      * @param clientCommunicate

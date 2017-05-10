@@ -117,10 +117,10 @@ public class StaticVariable {
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     //speed的设定为子弹如果平射，1s走过的距离是屏幕宽度的多少倍
     public static BulletBascInfo[] BUTTLE_BASCINFOS = {
-            new BulletBascInfo(0,2,0.2,R.mipmap.origin,"普通弹"), //0
-            new BulletBascInfo(0,2,0.4,R.mipmap.armor,"穿甲弹"),  //1
-            new BulletBascInfo(0,2,0.3,R.mipmap.ice,"冰弹"),    //2
-            new BulletBascInfo(0,2,0.2,R.mipmap.s_s,"加速弹"),   //3
+            new BulletBascInfo(0,1.7,0.2,R.mipmap.origin,"普通弹"), //0
+            new BulletBascInfo(0,1.8,0.4,R.mipmap.armor,"穿甲弹"),  //1
+            new BulletBascInfo(0,1.7,0.3,R.mipmap.ice,"冰弹"),    //2
+            new BulletBascInfo(0,1.9,0.2,R.mipmap.s_s,"加速弹"),   //3
             new BulletBascInfo(0,130,50, s,"子母弹_母"),
     };
     //初始化子弹的类型
@@ -239,17 +239,20 @@ public class StaticVariable {
     public final static String INIT_ACTIVITE_RESPONSE_GAMEOVER ="9";        //activity发送一轮游戏结束后的命令
     public final static String RESPONSE_FINISHED_CONNECT_DIRECTIRY ="10";        //发送断开命令------互相直接发送
     public final static String RESPONSE_FINISHED_CONNECT_UNDIRECTRIY ="11";        //发送断开命令------服务器发送
-
-    public final static String ACTIVITY_MAKE_BONUS ="14";
-    public final static String ACTIVITY_MAKE_EXPLODE ="15";
-    public final static String MAKE_BULLET ="16";
     //定义的command：
     public  final static String COMMAND_MSG =  "12";
     public  final static String COMMAND_INFO =  "13";
 
+    public final static String ACTIVITY_MAKE_BONUS ="14";
+    public final static String ACTIVITY_MAKE_EXPLODE ="15";
+    public final static String MAKE_BULLET ="16";
+    //server已经准备好的标志
+    public final static String SERVER_READY = "17";
+
+
 //定义网络中双方是否初始化完全，DTO未初始化
     //TODO 注意在断开时，要结束这个变量
-    public static boolean remotePrepareInitFlag =false;
+    public static boolean REMOTE_PREPARED_INIT_FLAG =false;
 
 
     /* 网络连接中，另一个设备的ID*/
