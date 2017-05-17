@@ -41,7 +41,7 @@ public class EnemyBullet extends Bullet{
     public void drawSelf(Canvas canvas){
         //如果是本地模式，则，按照路径数据进行绘制
         Log.w(TAG, "drawSelf*******************");
-        if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.LOCAL){
+        //if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.LOCAL){
             if(drawFlag){
                 matrix.setTranslate(bulletPosition_x, bulletPosition_y);//子弹坐标
                 //注意这里，给的角度为负数
@@ -50,14 +50,14 @@ public class EnemyBullet extends Bullet{
                 //Log.i(TAG, "X:" + bulletPosition_x+" Y:" + bulletPosition_y  + " Degree:" + bulletDegree);
             }
             //如果不是本地模式，则按照位置进行绘制
-        }else{
+/*        }else{
             //如果不是本地模式，则，按坐标
             if(drawFlag) {
                 matrix.setTranslate(bulletPosition_x, bulletPosition_y);//子弹坐标
-                matrix.postRotate(bulletDegree, bulletPosition_x, bulletPosition_y);
+                matrix.postRotate(-bulletDegree, bulletPosition_x, bulletPosition_y);
                 canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
             }
-        }
+        }*/
         if(bulletPosition_x> StaticVariable.LOCAL_SCREEN_WIDTH ||
                 bulletPosition_y>StaticVariable.LOCAL_SCREEN_HEIGHT ||
                 bulletPosition_x<0){

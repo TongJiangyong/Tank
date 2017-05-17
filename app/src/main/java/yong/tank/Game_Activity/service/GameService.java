@@ -860,9 +860,10 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;
+        //对本地模式的处理
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL){
-            initDegree = degree;//this.gameDto.getMyTank().getWeaponDegree();
-            initDistance = distance;//this.gameDto.getMyTank().getFirePower();
+            initDegree = degree;
+            initDistance = distance;
             //给一点随机误差
             initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
             initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
@@ -877,9 +878,10 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             }
             Log.i(TAG,"initDegree is *************************:"+initDegree);
             Log.i(TAG,"initDistance is *************************:"+initDistance);
+            //对remote模式的处理.....
         }else{
-            initDegree = this.gameDto.getMyTank().getWeaponDegree();
-            initDistance = this.gameDto.getMyTank().getFirePower();
+            initDegree = degree;
+            initDistance = distance;
         }
 
         //Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
