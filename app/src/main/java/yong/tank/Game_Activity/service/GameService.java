@@ -46,6 +46,7 @@ import yong.tank.tool.Tool;
 
 import static yong.tank.tool.StaticVariable.LOCAL_SCREEN_WIDTH;
 import static yong.tank.tool.StaticVariable.REMOTE_DEVICE_ID;
+import static yong.tank.tool.StaticVariable.REMOTE_PREPARED_INIT_FLAG;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_HEIGHT;
 import static yong.tank.tool.StaticVariable.SCALE_SCREEN_WIDTH;
 
@@ -79,11 +80,14 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     private ClientCommunicate clientCommunicate;
     private Gson gson = new Gson();
 
+    //发送第一个包
+    private boolean isFirstPacket = true;
+
     //这是一个专门用于启动程序的handler......，因为架构设计出错，导致service和actiactivity层之间要建立联系，非常不对.....
     private Handler gameActivityHandler;
 
     //gameDto中设置的remote端的信息暂存处
-    private int remoteTankType;
+    private int remoteTankType = 0;
 
     public GameService(GameDto gameDto, Context context, Handler gameActivityHandler) {
         this.gameDto = gameDto;
@@ -132,10 +136,10 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     this.bonusControl();
                 //}
                 //如果不是本地模式，则启动一个20ms的数据生产者线程
-                if (StaticVariable.CHOSED_MODE != StaticVariable.GAME_MODE.LOCAL) {
+/*                if (StaticVariable.CHOSED_MODE != StaticVariable.GAME_MODE.LOCAL) {
                     Timer timer = new Timer();
                     timer.schedule(new productorThread(), 100, 30);
-                }
+                }*/
             }
             //Log.i(TAG, "************gameThread.runGame()*************");
             //更新tankControl的逻辑
@@ -150,72 +154,134 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             /**
              ***********************如果不是本地模式，则采用帧同步的算法*****************************************
              */
+            if (localGameProcess == null) {
+                localGameProcess = new LocalGameProcess();
+            }
             gameCurrentFrame = this.gameDto.getGameProcessFrameCount();
             //如果当前帧是关键帧，则需要获取服务器的更新数据：
-            if(gameCurrentFrame == StaticVariable.KEY_FRAME){
-                //查看是否有服务器的更新包,
-                GameSendingData gameData = null;
-                while(remoteGameData.size()>0) {
-                    if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
-                        Log.i(TAG,"***************8wait to long********************");
-                    }
-                    //出列一个数据
-                    gameData = remoteGameData.poll();
-                    //如果给的数据的帧等于当前的关键帧，则程序向下执行
-                    if (gameData.getServerFrame()==gameCurrentFrame)
-                    {
-                        break;
-                    }
-                    remoteWaitTime++;
-                }
-                //更新本地的关键帧序列
-                long nextKeyFrame = gameCurrentFrame + StaticVariable.KEY_FRAME_COUNT;
-                //*******************收集准备发送的信息,包括：坦克的移动方向，开火的判断 血条的基本信息***************************
-                //服务器主要负责有：bonus的生成，胜利的判断（血条）   （数据的转发）   击中的判断先将帧同步做好再说，再看怎么处理
-                 //*
-                //TODO 初始化要完成的工作........，即付给remote相应的变量.....将当前采集的数据，作为输入包发送 ，发送自己的数据
+            Log.i(TAG,"check is key_frame gameCurrentFrame "+gameCurrentFrame);
+            //如果是第0帧，则需要发送一个空包过去
+            if(gameCurrentFrame == 0){
+                GameSendingData gameFirstData = new GameSendingData(1);
+                gameFirstData.setMyTankDirection(this.gameDto.getMyTank().getTankDirection());
+                gameFirstData.setMyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
+                gameFirstData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
+                gameFirstData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                gameFirstData.setMyTankEnableFire(false);
+                gameFirstData.setServerFrame(0);
                 //不断发送信息数据
-                GameSendingData gameSendingData = new GameSendingData(1);
-                gameSendingData.setMyTankDirection(this.gameDto.getMyTank().getTankDirection());
-                gameSendingData.setMyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
-                gameSendingData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
-                gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
-                gameSendingData.setMyTankEnableFire(false);
-                //使用tank发送进行判断即可.......
-                if(this.isLocalTankOnfire()){
-                    gameSendingData.setMyTankEnableFire(true);
-                    this.setLocalTankOnfire(false);
+                ComDataF comFirstDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(gameFirstData));
+                //专门用来发送信息的方法
+                if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+                    //即，如果本机是ACTIVITY，直接转发给server
+                    clientCommunicate.writeToService(gson.toJson(comFirstDataF));
+                }else{
+                    //即，如果本机是Passvie，发送给activity端
+                    clientCommunicate.sendInfo(gson.toJson(comFirstDataF));
                 }
-                //不断发送信息数据
-                ComDataF comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(gameSendingData));
-                clientCommunicate.sendInfo(gson.toJson(comDataF));
-                //发送完成后，获取服务器得到的数据进行更新：
-                //服务器发过来的数据，包括自己和对方两个部分
-                //更新包括敌方的和自身的数据信息
 
-                //主要是填充自己和对方的坦克两种：
-                this.remoteSetMyTank(gameData.getMyTankDegree(),gameData.getMyTankDirection(),gameData.getMyTankEnableFire());
-                this.remoteSetEnmyTank(gameData.getEnemyTankDegree(),gameData.getEnemyTankDirection(),gameData.getEnemyTankEnableFire());
-                //处理bonus的过程,即如果广播有bonus产生，则产生bonus
-                if(gameData.getEnableBonus()){
-                    this.bonusControl();
-                    BonusMaker bonusMaker = new BonusMaker();
-                    bonusMaker.bonusProductor(gameData.getBonusDirction(),gameData.getBonusType());
-                }
-                //填充tank的血条信息
-                this.gameDto.getMyBlood().setBloodNum(gameData.getMyTankBloodNum());
-                this.gameDto.getEnemyBlood().setBloodNum(gameData.getEnemyTankBloodNum());
-                //TODO 这里对关键帧的数据填充后，需要进一步计算，如何处理计算方面的内容？？？？
-                StaticVariable.KEY_FRAME = nextKeyFrame;
+                Log.i(TAG,"**************sending first packet****************");
                 gameCurrentFrame++;
+                Log.i(TAG,"set 0 frame over : "+gameCurrentFrame);
                 this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
-                remoteWaitTime = 0;
             }else{
-                //TODO 这里非关键帧的处理方式，可能需要进一步的处理？？？
-                //非关键帧的处理方式：
-                gameCurrentFrame++;
-                this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
+                Log.i(TAG,"**************into recive packet gameCurrentFrame is "+gameCurrentFrame);
+                if(gameCurrentFrame == StaticVariable.KEY_FRAME){
+                    //查看是否有服务器的更新包,
+                    GameSendingData gameData = null;
+                    Log.i(TAG,"remoteGameData size is :"+remoteGameData.size());
+                    //while(remoteGameData.size()<=0){
+                        //等待
+                     //   Log.i(TAG,"....wait for data......");
+                    //}
+                    while(remoteGameData.size()>0) {
+                        Log.i(TAG,"into remoteGameData polling and gameCurrentFrame is :"+gameCurrentFrame);
+                        if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
+                            Log.i(TAG,"***************wait to long********************");
+                            remoteWaitTime = 0;
+                        }
+                        //出列一个数据
+                        gameData = remoteGameData.poll();
+                        //如果给的数据的帧等于当前的关键帧，则程序向下执行
+                        Log.i(TAG,"if break to deal with key frame gameData.getServerFrame():"+gameData.getServerFrame()+" gameCurrentFrame:"+gameCurrentFrame);
+                        if (gameData.getServerFrame()==gameCurrentFrame)
+                        {
+                            Log.i(TAG,"into break");
+                            break;
+                        }
+                        remoteWaitTime++;
+                    }
+                    //TODO  暂时先做不为空处理
+                        Log.i(TAG,"check gameData! = null "+gameData);
+                        //更新本地的关键帧序列
+                        if (gameData !=null&& (gameData.getServerFrame()==gameCurrentFrame)) {
+                            Log.i(TAG,"reciveData Frame is :" +gameData.getServerFrame() +" gameCurrentFrame is: "+gameCurrentFrame);
+                            long nextKeyFrame = gameCurrentFrame + StaticVariable.KEY_FRAME_COUNT;
+                            //*******************收集准备发送的信息,包括：坦克的移动方向，开火的判断 血条的基本信息***************************
+                            //服务器主要负责有：bonus的生成，胜利的判断（血条）   （数据的转发）   击中的判断先将帧同步做好再说，再看怎么处理
+                            //*
+                            //TODO 初始化要完成的工作........，即付给remote相应的变量.....将当前采集的数据，作为输入包发送 ，发送自己的数据
+                            //不断发送信息数据
+                            GameSendingData gameSendingData = new GameSendingData(1);
+                            gameSendingData.setMyTankDirection(this.gameDto.getPlayerPain().getTankDirection());
+                            gameSendingData.setMyTankDegree(this.gameDto.getPlayerPain().getTankDegree());
+                            gameSendingData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
+                            gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                            gameSendingData.setServerFrame(nextKeyFrame);
+                            gameSendingData.setMyTankEnableFire(false);
+                            //使用tank发送进行判断即可.......
+                            if (this.isLocalTankOnfire()) {
+                                gameSendingData.setMyTankEnableFire(true);
+                                this.setLocalTankOnfire(false);
+                            }
+                            //不断发送信息数据
+                            ComDataF comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(gameSendingData));
+                            if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
+                                Log.i(TAG,"ACTIVITY sendingData to server");
+                                clientCommunicate.writeToService(gson.toJson(comDataF));
+                            }else{
+                                Log.i(TAG,"Passive sendingData to server");
+                                clientCommunicate.sendInfo(gson.toJson(comDataF));
+                            }
+                            //发送完成后，获取服务器得到的数据进行更新：
+                            //服务器发过来的数据，包括自己和对方两个部分
+                            //更新包括敌方的和自身的数据信息
+
+                            //主要是填充自己和对方的坦克两种：
+                            Log.i(TAG, "gameData.getMyTankDegree is:" + gameData.getMyTankDegree());
+                            this.remoteSetMyTank(gameData.getMyTankDegree(), gameData.getMyTankDirection(), gameData.getMyTankEnableFire());
+                            this.remoteSetEnmyTank(gameData.getEnemyTankDegree(), gameData.getEnemyTankDirection(), gameData.getEnemyTankEnableFire(),gameData.getEnemyTankBulletDistance());
+                            //处理bonus的过程,即如果广播有bonus产生，则产生bonus
+                            if (gameData.getEnableBonus()) {
+                                this.bonusControl();
+                                BonusMaker bonusMaker = new BonusMaker();
+                                bonusMaker.bonusProductor(gameData.getBonusDirction(), gameData.getBonusType());
+                            }
+                            //填充tank的血条信息
+                            this.gameDto.getMyBlood().setBloodNum(gameData.getMyTankBloodNum());
+                            this.gameDto.getEnemyBlood().setBloodNum(gameData.getEnemyTankBloodNum());
+                            //TODO 这里对关键帧的数据填充后，需要进一步计算，如何处理计算方面的内容？？？？
+                            StaticVariable.KEY_FRAME = nextKeyFrame;
+                            gameCurrentFrame++;
+                            this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
+                            remoteWaitTime = 0;
+                        }else{
+                            remoteWaitTime++;
+                            if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
+                                Log.i(TAG,"***************wait to long********************");
+                                remoteWaitTime = 0;
+                            }
+                        }
+                }else{
+                    //TODO 这里非关键帧的处理方式，,非关键帧，不随大流的变化而变化，可能需要进一步的处理？？？
+                    //非关键帧的处理方式：
+                    gameCurrentFrame++;
+                    Log.i(TAG,"deal with no key frame "+gameCurrentFrame);
+                    this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
+                }
             }
+
+
             //TODO 这里确认一下，需不需要进行处理
             //更新tankControl的逻辑
             localGameProcess.runTank();
@@ -569,7 +635,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         @Override
         public void run() {
             //如果初始化prepare完成,就开始传输数据
-            if (StaticVariable.REMOTE_PREPARED_INIT_FLAG) {
+            if (REMOTE_PREPARED_INIT_FLAG) {
                 ComDataF comDataF = null;
                 String gameDtoString = null;
                 try {
@@ -760,9 +826,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     }
 
     //敌方数据发射子弹.....
-    public void enemyTankOnFire(){
+    public void enemyTankOnFire(int degree,double distance){
         //***************发射子弹*************
-        EnemyBullet enemyBullet = initEnemyBullet(this.gameDto.getMyTank().getSelectedBullets());
+        EnemyBullet enemyBullet = initEnemyBullet(this.gameDto.getMyTank().getSelectedBullets(),degree,distance);
         //在tank中加入子弹
         //Log.i(TAG,"getFirePath is *************************:"+enemyBullet.getFirePath().size());
 /*        for(int i=0;i<enemyBullet.getFirePath().size();i++){
@@ -788,28 +854,34 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     // 这里做将初速度随机增减处理后，计算坐标即可.....
     //对AI模式，子弹的处理....同AI模式即可，即，通过传递真实的子弹路径即可
     //对非AI模式，子弹的处理为每次赋值，都创建新的bullet的list对象即可......
-    private EnemyBullet initEnemyBullet(int bulletType){
+    private EnemyBullet initEnemyBullet(int bulletType,int degree,double distance){
         Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bulletType].getPicture());
         Bitmap bulletPicture = Tool.reBuildImg(bullet_temp,0,1,1,false,true);
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;
-        initDegree = this.gameDto.getMyTank().getWeaponDegree();
-        initDistance = this.gameDto.getMyTank().getFirePower();
-        //给一点随机误差
-        initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
-        initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
-        //TODO 这里将distance做随机处理
-        if(initDistance<=0.2||initDistance>=1){
-            //小于0则设定一个固定值
-            initDistance= 0.5;
+        if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL){
+            initDegree = degree;//this.gameDto.getMyTank().getWeaponDegree();
+            initDistance = distance;//this.gameDto.getMyTank().getFirePower();
+            //给一点随机误差
+            initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
+            initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
+            //TODO 这里将distance做随机处理
+            if(initDistance<=0.2||initDistance>=1){
+                //小于0则设定一个固定值
+                initDistance= 0.5;
+            }
+            //默认收到的degree均小于0
+            if(initDegree>0){
+                initDegree = initDegree-10;
+            }
+            Log.i(TAG,"initDegree is *************************:"+initDegree);
+            Log.i(TAG,"initDistance is *************************:"+initDistance);
+        }else{
+            initDegree = this.gameDto.getMyTank().getWeaponDegree();
+            initDistance = this.gameDto.getMyTank().getFirePower();
         }
-        //默认收到的degree均小于0
-        if(initDegree>0){
-            initDegree = initDegree-10;
-        }
-        Log.i(TAG,"initDegree is *************************:"+initDegree);
-        Log.i(TAG,"initDistance is *************************:"+initDistance);
+
         //Log.i(TAG,"init x is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_x());
         //Log.i(TAG,"init y is *************************:"+this.gameDto.getEnemyTank().getWeaponPoxition_y());
         //注意这里，角度为负数
@@ -890,8 +962,6 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.INTERNET) {
             Tool.sendSelfIdToServer(this.clientCommunicate);
         }
-        //初始化地方的tank信息.....
-        initLocalEnemyInfo(this.remoteTankType);
         Log.i(TAG, "mode:" + StaticVariable.CHOSED_RULE);
         if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
             while (!remoteDeviceACKflag) {
@@ -909,6 +979,10 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 }
             }
         }
+        //在这里等待初始化信息传输完全 ,如果REMOTE_PREPARED_INIT_FLAG不变，则一直在这里等待.....
+        while(!REMOTE_PREPARED_INIT_FLAG){};
+        Log.i(TAG, "remoteTankType is :" + this.remoteTankType);
+        initLocalEnemyInfo(this.remoteTankType);
     }
 
     //local暂时直接开始游戏即可
@@ -941,6 +1015,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     //主要用来向buffer中填充数据
     @Override
     public void infoRecived(GameSendingData gameData) {
+        Log.i(TAG,"infoRecived"+gameData.getEnemyTankDirection());
         remoteGameData.offer(gameData);   //入列
         //下面是与本地模式相关的代码 联网和蓝牙模式，采用在update函数中处理该数据......
         //TODO 一定要在这里强制修改这种模式........
@@ -968,29 +1043,37 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 if(gameData.getEnemyTankEnableFire()){
                     this.enemyTankOnFire();
                 }*/
-                this.remoteSetEnmyTank(gameData.getEnemyTankDegree(),gameData.getEnemyTankDirection(),gameData.getEnemyTankEnableFire());
+                //注意这里，由于方法和蓝牙的有冲突，默认 给0
+                this.remoteSetEnmyTank(gameData.getEnemyTankDegree(),gameData.getEnemyTankDirection(),gameData.getEnemyTankEnableFire(),0);
 
             }
 
         }
     }
 
-    public void remoteSetEnmyTank(int tankDegree,int tankDirection,boolean tankFireFlag){
+    public void remoteSetEnmyTank(int tankDegree,int tankDirection,boolean tankFireFlag,double distance){
         this.gameDto.getEnemyTank().setWeaponDegree(-tankDegree);
         this.gameDto.getEnemyTank().setTankDirection(-tankDirection);
         //Log.i(TAG,"gameData.getEnemyTankDirection():"+gameData.getEnemyTankDirection());
         //设置enemy坦克的开火属性
         if(tankFireFlag){
-            this.enemyTankOnFire();
+            if (StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
+                this.enemyTankOnFire(this.gameDto.getMyTank().getWeaponDegree(),this.gameDto.getMyTank().getFirePower());
+            }else{
+                this.enemyTankOnFire(tankDegree,distance);
+            }
+
         }
     }
     public void remoteSetMyTank(int tankDegree,int tankDirection,boolean tankFireFlag){
+        Log.i(TAG,"is mytank is null ? "+this.gameDto.getMyTank());
+        Log.i(TAG,"is Enertank is null ? "+this.gameDto.getEnemyTank());
         this.gameDto.getMyTank().setWeaponDegree(tankDegree);
         this.gameDto.getMyTank().setTankDirection(tankDirection);
         //Log.i(TAG,"gameData.getEnemyTankDirection():"+gameData.getEnemyTankDirection());
         //设置enemy坦克的开火属性
         if(tankFireFlag){
-            this.enemyTankOnFire();
+            this.myTankOnFire();
         }
     }
 
@@ -1036,7 +1119,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
                 this.remoteTankType = remoteDeviceInfo.tankType;
-                Log.i(TAG, "activity SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH);
+                Log.i(TAG, "activity SCALE_SCREEN_WIDTH:"+ SCALE_SCREEN_WIDTH+" and remoteTankType is: "+this.remoteTankType );
                 Tool.sendSelfInfoToPassive(this.clientCommunicate,this.gameDto.getMyTank().getTankType());
             } else {
                 Log.i(TAG, "*******************身份错误_3************************");
@@ -1054,7 +1137,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
                 this.remoteTankType = remoteDeviceInfo.tankType;
-                Log.i(TAG, "passive SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH);
+                Log.i(TAG, "activity SCALE_SCREEN_WIDTH:"+ SCALE_SCREEN_WIDTH+" and remoteTankType is: "+this.remoteTankType );
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             } else {
                 Log.i(TAG, "*******************身份错误_3************************");
@@ -1067,7 +1150,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
-                StaticVariable.REMOTE_PREPARED_INIT_FLAG = true;
+                REMOTE_PREPARED_INIT_FLAG = true;
                 this.startGame();
             } else {
 
@@ -1077,7 +1160,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 Log.w(TAG, "INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
-                StaticVariable.REMOTE_PREPARED_INIT_FLAG = true;
+                REMOTE_PREPARED_INIT_FLAG = true;
                 this.startGame();
             } else {
 

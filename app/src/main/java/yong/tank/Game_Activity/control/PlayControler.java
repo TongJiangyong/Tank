@@ -98,6 +98,7 @@ public class PlayControler {
                                 this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH *4/5);
                                 this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT *3/4);
                                 this.gameDto.getMyTank().setTankDirection(StaticVariable.TANKESTOP);
+                                this.gameDto.getPlayerPain().setTankDirection(StaticVariable.TANKESTOP);
                             }
                         }
                     }
@@ -163,6 +164,7 @@ public class PlayControler {
     private void countBulletPath(Point tankCenter, int dx, int dy) {
         double degree = (double)Math.abs(dy-tankCenter.getY())/(double)Math.abs(dx-tankCenter.getX());
         tankDegree=(int)Math.toDegrees(Math.atan (degree));
+        this.gameDto.getPlayerPain().setTankDegree(tankDegree);
         //distance计算的是与最大圈的比例
         distance=Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()))/
                 (this.gameDto.getMyTank().getTankPicture().getWidth()*StaticVariable.TANK_SHOT_CIRCLE);
@@ -182,6 +184,7 @@ public class PlayControler {
             this.gameDto.getPlayerPain().setInsideCircle_x(StaticVariable.LOCAL_SCREEN_WIDTH * 4 / 5);
             this.gameDto.getPlayerPain().setInsideCircle_y(StaticVariable.LOCAL_SCREEN_HEIGHT * 3 / 4);
             this.gameDto.getMyTank().setTankDirection(StaticVariable.TANKESTOP);
+            this.gameDto.getPlayerPain().setTankDirection(StaticVariable.TANKESTOP);
         }
         //TODO 这里设置坦克释放炮弹的方法....
         //这里判断是否处于开火区域

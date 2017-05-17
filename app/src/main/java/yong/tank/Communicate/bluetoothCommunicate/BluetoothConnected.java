@@ -62,6 +62,8 @@ public class BluetoothConnected extends Thread implements Subject {
         //如果成功连上蓝牙，并是activity模式，则创建一个服务器线程，并开始处理
         if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
             ServerService serverService = new ServerService();
+            //启动sevice线程
+            new Thread(serverService).start();
             this.serverService= serverService;
         }
     }
@@ -89,7 +91,7 @@ public class BluetoothConnected extends Thread implements Subject {
                     Log.w(TAG,"数据长度："+readInfos.length);
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
-                        //Log.w(TAG, "input Thread 收到的id: "+readInfos[i]);
+                        Log.i(TAG, "input Thread 收到的信息_1: "+readInfos[i]);
                         /**
                          * 注意这里，对 activity和passive端的处理方式。两者各有不同，这里仅仅对标签为StaticVariable.COMMAND_INFO
                          * activity的处理方式为，直接将收到passvie的数据发送给serverService线程，并由serverService线程处理后序
@@ -101,14 +103,20 @@ public class BluetoothConnected extends Thread implements Subject {
                         ComDataF comDataF=null;
                         try {
                             comDataF = ComDataPackage.unpackToF(readInfos[i]);
-                            if(comDataF.getComDataS().getCommad()==StaticVariable.COMMAND_INFO){
+                            //这里表示是数据的信息
+                            if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_INFO)){
+                                //如果数据是从passive端传入，则直接转发给server
                                 if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-                                    //即，这里是passive发送过来的数据
+                                    //即，如果本机是ACTIVITY，收到COMMAND_INFO的数据，判定数据是从passive端传过来，直接转发给server
+                                    Log.i(TAG, "这里是activy端收到数据，转发给server: "+readInfos[i]);
                                     this.serverService.reciveDataFromPassive(comDataF);
+                                    //如果本机是passive，收到COMMAND_INFO的数据，判定数据是从activity端传过来，直接转发给自己
                                 }else{
                                     //即，这里是server转发过来的数据，直接转走即可
+                                    Log.i(TAG, "这里是passive端收到数据，直接转发给游戏: "+readInfos[i]);
                                     this.notifyWatchers(comDataF);
                                 }
+                                //如果不是数据的信息，则直接转发
                             }else{
                                 //如果不是commandinfo，则直接转发该数据
                                 this.notifyWatchers(comDataF);
@@ -149,14 +157,29 @@ public class BluetoothConnected extends Thread implements Subject {
     public void write(String msg) {
         /**
          * 注意这里，对 activity和passive端的处理方式。两者各有不同
-         * activity的处理方式为，直接将预备发送的activity的数据发送给serverService线程，并由serverService线程处理后序
+         * activity的处理方式为，直接将预备发送的activity的数据发送给serverService线程（不包括还没有准备完全的情况.....），并由serverService线程处理后序
          * passive端的处理方式为，将数据 发送给output的另一端
+         *
          */
-        if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
-            this.serverService.reciveDataFromActivity(msg);
-        }else{
+        //if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+        //    this.serverService.reciveDataFromActivity(msg);
+        //}else{
             this.blueOutputThread.setMsg(msg);
-        }
+        //}
+    }
+
+    public void writeToService(String msg) {
+        /**
+         * 注意这里，对 activity和passive端的处理方式。两者各有不同
+         * activity的处理方式为，直接将预备发送的activity的数据发送给serverService线程（不包括还没有准备完全的情况.....），并由serverService线程处理后序
+         * passive端的处理方式为，将数据 发送给output的另一端
+         *
+         */
+        //if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+            this.serverService.reciveDataFromActivity(msg);
+        //}else{
+            //this.blueOutputThread.setMsg(msg);
+        //}
 
     }
 
@@ -209,7 +232,7 @@ public class BluetoothConnected extends Thread implements Subject {
                      * passive端的处理方式为，将数据 发送给output的另一端
                      */
                     if (msg != null) {
-                        //Log.i(TAG,"sendInfo is_1 :"+msg);
+                        Log.i(TAG,"sendInfo is_1 :"+msg);
                         outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;

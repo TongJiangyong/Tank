@@ -35,7 +35,9 @@ public class ClientLocal implements ClientCommunicate {
     //封装发送信息的方法 这里不用发信息，所以没用
     @Override
     public void sendInfo (String msg){}
-
+    @Override
+    public void writeToService(String info) {
+    }
     @Override
     public void startCommunicate() {
         //启动自身....

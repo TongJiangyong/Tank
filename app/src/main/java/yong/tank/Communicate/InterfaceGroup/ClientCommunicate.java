@@ -18,6 +18,8 @@ public interface ClientCommunicate {
     void setMyHandle(Handler myHandle);
     //发送数据方法
     void sendInfo(String info);
+    //Activity专门发送程序运行数据给service的方法 ，这个是很不好的处理方式，没办法
+    void writeToService(String info);
     //启动相应的线程
     void startCommunicate();
     //停止相应的线程

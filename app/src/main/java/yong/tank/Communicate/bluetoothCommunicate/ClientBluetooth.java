@@ -232,9 +232,15 @@ public class ClientBluetooth implements ClientCommunicate {
      */
     public void write(String msg) {
         mConnectedThread.write(msg);
-        //Log.i(TAG,"write info :"+msg);
+        Log.i(TAG,"write info :"+msg);
        // r.write(msg);
+    }
 
+
+    public void writeToService(String msg) {
+        mConnectedThread.writeToService(msg);
+        Log.i(TAG,"writeToService"+msg);
+        // r.write(msg);
     }
 
     /**
@@ -293,6 +299,7 @@ public class ClientBluetooth implements ClientCommunicate {
     public void  sendInfo(String info) {
         this.write(info);
     }
+
 
     @Override
     public void startCommunicate() {

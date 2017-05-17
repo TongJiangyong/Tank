@@ -82,6 +82,11 @@ public class ClentInternet implements  Runnable,ClientCommunicate {
     }
 
     @Override
+    public void writeToService(String info) {
+            this.clientThread.getOut().setMsg(info);
+    }
+
+    @Override
     public void startCommunicate() {
         //启动自身....
         new Thread(this).start();

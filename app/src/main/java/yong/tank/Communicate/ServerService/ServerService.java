@@ -60,9 +60,9 @@ public class ServerService implements Runnable,ServerCommunicate{
                     Log.w(TAG,"error 1");
                 }
             }
-            Log.i(TAG,"..........server into framenum is："+serverFrame);
+            Log.i(TAG,"..........server into serverFrame is："+serverFrame+" activityData.getServerFrame():"+activityData.getServerFrame() +" passiveData.getServerFrame():"+passiveData.getServerFrame() );
             //如果帧的序列相同
-            if(passiveData.getServerFrame()==serverFrame&&serverFrame==activityData.getServerFrame()){
+            if(passiveData!=null&&activityData!=null&&passiveData.getServerFrame()==activityData.getServerFrame()){
                 serverFrame =serverFrame+StaticVariable.KEY_FRAME_COUNT;
                 //TODO 处理每一次线程所需要处理的内容......
                 //填充passiveData数据，
@@ -79,10 +79,14 @@ public class ServerService implements Runnable,ServerCommunicate{
                 activityData.setEnemyTankBloodNum(passiveData.getMyTankBloodNum());
                 activityData.setEnemyTankEnableFire(passiveData.getMyTankEnableFire());
                 activityData.setServerFrame(serverFrame);
+                //发送给activivity
                 this.sendDataToActivity(ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(activityData)));
-                this.sendDataToPassive(gson.toJson(passiveData));
+                //发送给passive
+                this.sendDataToPassive(gson.toJson(ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(passiveData))));
                 isPassiveFrameArrive =false;
                 isActivityFrameArrive =false;
+                activityData = null;
+                passiveData = null;
             }
         }
 
@@ -91,6 +95,7 @@ public class ServerService implements Runnable,ServerCommunicate{
 
     // 这里处理跟服务器是一样的
     public void checkIsDataPrepared() {
+        Log.i(TAG,"checkIsDataPrepared.....");
         if((isPassiveFrameArrive&&isActivityFrameArrive)||this.serverFlag==false){
             isPassiveFrameArrive = false;
             isActivityFrameArrive = false;
@@ -107,6 +112,7 @@ public class ServerService implements Runnable,ServerCommunicate{
      */
     @Override
     public void sendDataToActivity(ComDataF comDataF) {
+        Log.i(TAG,"sendDataToActivity.....");
         this.bluetoothConnected.notifyWatchers(comDataF);
     }
 
@@ -116,14 +122,18 @@ public class ServerService implements Runnable,ServerCommunicate{
      */
     @Override
     public void sendDataToPassive(String msg) {
+        Log.i(TAG,"sendDataToPassive.....");
         this.bluetoothConnected.write(msg);
     }
 
     @Override
     public void reciveDataFromActivity(String msg) {
         //TODO 收到数据，置位flag，检查是否可发送
-        ComDataF comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, msg);
+        Log.i(TAG,"reciveDataFromActivity :"+msg);
+        ComDataF comDataF = ComDataPackage.unpackToF(msg);
         activityData = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
+        Log.i(TAG,"reciveDataFromActivity :"+activityData);
+        Log.i(TAG,"reciveDataFromActivity and dataFrame is:"+activityData.getServerFrame());
         isActivityFrameArrive = true;
         checkIsDataPrepared();
     }
@@ -131,7 +141,9 @@ public class ServerService implements Runnable,ServerCommunicate{
     @Override
     public void reciveDataFromPassive(ComDataF comDataF) {
         //TODO 收到数据，置位flag，检查是否可发送
+        Log.i(TAG,"reciveDataFromPassive :"+comDataF.getComDataS().getCommad());
         passiveData = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
+        Log.i(TAG,"reciveDataFromPassive and dataFrame is:"+passiveData.getServerFrame());
         isPassiveFrameArrive = true;
         checkIsDataPrepared();
     }

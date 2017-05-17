@@ -11,7 +11,7 @@ public class GameSendingData implements Serializable {
         this.dataFlag = dataFlag;
     }
 
-    /**判断是本地的信息，还是服务器的信息
+    /**
      * 0为本地，1为服务器
      */
     public int dataFlag = 0;
@@ -191,5 +191,28 @@ public class GameSendingData implements Serializable {
 
     public void setBonusDirction(int bonusDirction) {
         this.bonusDirction = bonusDirction;
+    }
+
+    @Override
+    public String toString() {
+        return "GameSendingData{" +
+                "dataFlag=" + dataFlag +
+                ", serverFrame=" + serverFrame +
+                ", enableBonus=" + enableBonus +
+                ", bonusType=" + bonusType +
+                ", bonusDirction=" + bonusDirction +
+                ", MyTankDirection=" + MyTankDirection +
+                ", MyTankDegree=" + MyTankDegree +
+                ", MyTankEnableFire=" + MyTankEnableFire +
+                ", MyTankBulletDistance=" + MyTankBulletDistance +
+                ", MyTankBloodNum=" + MyTankBloodNum +
+                ", MyBulletType=" + MyBulletType +
+                ", EnemyTankDirection=" + EnemyTankDirection +
+                ", EnemyTankDegree=" + EnemyTankDegree +
+                ", EnemyTankEnableFire=" + EnemyTankEnableFire +
+                ", EnemyTankBulletDistance=" + EnemyTankBulletDistance +
+                ", EnemyTankBloodNum=" + EnemyTankBloodNum +
+                ", EnemyTankBulletType=" + EnemyTankBulletType +
+                '}';
     }
 }

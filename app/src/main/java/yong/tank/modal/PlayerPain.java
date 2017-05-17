@@ -11,6 +11,8 @@ import yong.tank.tool.StaticVariable;
 
 public class PlayerPain {
     private Paint paint = new Paint();
+    private int tankDirection;
+    private int tankDegree;
     private int outsideCircle_x = StaticVariable.LOCAL_SCREEN_WIDTH *4/5;
     private int outsideCircle_y = StaticVariable.LOCAL_SCREEN_HEIGHT *3/4;
     private int outsideCircle_r = StaticVariable.LOCAL_SCREEN_WIDTH *1/8;
@@ -52,12 +54,31 @@ public class PlayerPain {
         this.insideCircle_y = insideCircle_y;
     }
 
+    public int getTankDirection() {
+        return tankDirection;
+    }
+
+    public void setTankDirection(int tankDirection) {
+        this.tankDirection = tankDirection;
+    }
+
+    public int getTankDegree() {
+        return -tankDegree;
+    }
+
+    public void setTankDegree(int tankDegree) {
+        this.tankDegree = tankDegree;
+    }
+
     public int setTankDirectiron(float insideCircle_x) {
         if(insideCircle_x>this.outsideCircle_x){
+            this.setTankDirection(StaticVariable.MYTANKEFORWARD);
             return StaticVariable.MYTANKEFORWARD;
         }else if(insideCircle_x==this.outsideCircle_x){
+            this.setTankDirection(StaticVariable.TANKESTOP);
             return StaticVariable.TANKESTOP;
         }else{
+            this.setTankDirection(StaticVariable.MYTANKEBACK);
             return StaticVariable.MYTANKEBACK;
         }
 
