@@ -73,34 +73,41 @@ public class GameControler {
         public void run() {
             gameStartFlag = true;
             gameTimeCount = getCurrentTimeCount();
-            long previousGameTimeCount = gameTimeCount;
-            long currentGameTimeCount = gameTimeCount;
-            long  dValue = 0;
+            long previousLogicalTimeCount = 0;
+            long currentLogicalTimeCount = gameTimeCount;
+            long previousFrameTimeCount = gameTimeCount;
+            long currentFrameTimeCount = gameTimeCount;
             Log.i(TAG,"************************into restart Game*************************");
             while (gameStartFlag) {
                 gameLoop = 0;
                 while (getCurrentTimeCount() >= gameTimeCount && gameLoop < StaticVariable.MAX_FRAMESKIP){
                     //启动程序的逻辑 ，逻辑设定为25帧，更新游戏数据
                     //一般情况下，执行完这个logicalUpdate，不到1毫秒
-                    currentGameTimeCount = getCurrentTimeCount();
+                    currentLogicalTimeCount = getCurrentTimeCount();
                     //dValue = StaticVariable.SKIP_TICKS - (currentGameTimeCount - previousGameTimeCount-StaticVariable.SKIP_TICKS);
 
-                    previousGameTimeCount = currentGameTimeCount;
+
                     long before = getCurrentTimeCount();
                     gameService.logicalUpdate();
                     long after = getCurrentTimeCount();
                     //gameTimeCount+=(dValue);
                     gameTimeCount+=StaticVariable.SKIP_TICKS;
                     gameLoop++;
-                    Log.i(TAG,"******************getCurrentTimeCount() is +"+getCurrentTimeCount()+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop+" and  cost time is :"+(after-before)+"*************************");
+                    long count = currentLogicalTimeCount-previousLogicalTimeCount;
+                    if(count ==0){
+                        count =1;
+                    }
+                    Log.i(TAG,"********Logical Frame is: "+1000/count+"**********Time cost  is "+(currentLogicalTimeCount-previousLogicalTimeCount)+" and  current duration is :"+(after-before)+"*************************"+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop);
+                    previousLogicalTimeCount = currentLogicalTimeCount;
                 }
                 //TODO 如果有必要，计算一个插值的系数....系数在0~1之间
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );
                 //Log.i(TAG,"interpolation is:"+ interpolation);
-                long before_2 = getCurrentTimeCount();
+                currentFrameTimeCount = getCurrentTimeCount();
                 viewDraw.drawFrame(interpolation);
-                long after_2 = getCurrentTimeCount();
-                //Log.i(TAG,"******************渲染帧数："+1000/(after_2-before_2)+"*************************");
+                long after = getCurrentTimeCount();
+                Log.i(TAG,"******************draw Frame："+1000/(after-currentFrameTimeCount)+"******current duration  is "+(currentLogicalTimeCount-previousFrameTimeCount)+"*******************");
+                previousFrameTimeCount = currentFrameTimeCount;
             }
 
         }

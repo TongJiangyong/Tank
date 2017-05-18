@@ -41,9 +41,25 @@ public abstract class Bullet implements Serializable{
         this.bulletBascInfo = StaticVariable.BUTTLE_BASCINFOS[bulletType];
     }
 
-    public abstract void  positionUpdate() ;
+    public void  positionUpdate() {
+        //这里关联speed和distance，暂时不处理
+        //this.gameDto.getMyTank().getSelectedBullets()
+        //这里计算时，采用向下为正，向右为正的方法
+        //这里指示的是每一帧的内容
+        //Log.w(TAG, "**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
+        bulletV_y = bulletV_y + StaticVariable.GRAVITY/StaticVariable.LOGICAL_FRAME;
+        int newPosition_x = (int)(bulletPosition_x + bulletV_x/StaticVariable.LOGICAL_FRAME );
+        //bulletPosition_x+=v_x*t;
+        int newPosition_y = (int)(bulletPosition_y + bulletV_y/StaticVariable.LOGICAL_FRAME + StaticVariable.GRAVITY /(double)(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
+        //bulletPosition_y+=v_y*t-g*t*t/2;
+        bulletDegree = (int) Math.toDegrees(Math.atan(bulletV_y / bulletV_x));
+        //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
+        bulletPosition_x=newPosition_x;
+        bulletPosition_y=newPosition_y;
+        //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+        //time = time + StaticVariable.INTERVAL;
+    }
 
-    public abstract  void drawSelf(Canvas canvas);
 
     public Bitmap getBulletPicture() {
         return bulletPicture;
@@ -90,7 +106,34 @@ public abstract class Bullet implements Serializable{
         bulletV_y=-(bulletBascInfo.getSpeed()*bulletDistance*Math.sin(Math.toRadians(bulletDegree)));
     }
 
+    public void drawSelf(Canvas canvas){
+        //如果是本地模式，则，按照路径数据进行绘制
+        //Log.w(TAG, "drawSelf*******************");
+        //if(StaticVariable.CHOSED_MODE== StaticVariable.GAME_MODE.LOCAL){
+        //这样的处理是为了让物理上的视觉效果更好
+        if(drawFlag&&bulletPosition_y<StaticVariable.GAMME_GROUND_POSITION){
+            matrix.setTranslate(bulletPosition_x, bulletPosition_y);//子弹坐标
+            //注意这里，给的角度为负数
+            matrix.postRotate(bulletDegree,bulletPosition_x,bulletPosition_y);//子弹的旋转
+            canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
+            //Log.i(TAG, "X:" + bulletPosition_x+" Y:" + bulletPosition_y  + " Degree:" + bulletDegree);
+        }
+        //如果不是本地模式，则按照位置进行绘制
+/*        }else{
+            //如果不是本地模式，则，按坐标
+            if(drawFlag) {
+                matrix.setTranslate(bulletPosition_x, bulletPosition_y);//子弹坐标
+                matrix.postRotate(-bulletDegree, bulletPosition_x, bulletPosition_y);
+                canvas.drawBitmap(this.bulletPicture, matrix, null);//绘制子弹
+            }
+        }*/
+        if(bulletPosition_x> StaticVariable.LOCAL_SCREEN_WIDTH ||
+                bulletPosition_y>StaticVariable.LOCAL_SCREEN_HEIGHT ||
+                bulletPosition_x<0){
+            this.setDrawFlag(false);
+        }
 
+    }
 
     public int getBulletDegree() {
         return bulletDegree;

@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
@@ -32,6 +33,10 @@ public class AImaker implements Subject {
     private GameDto gameDto;
     private boolean threadFlag = true;
     private Context context;
+    private int countTime = 0;
+    private int AITankDirection = 0;
+    //这里的随机为2s内的整数即可.....
+    private int randomTime = 30-new Random().nextInt(25);
     private Gson gson = new Gson();
     private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     // 存放观察者
@@ -64,8 +69,19 @@ public class AImaker implements Subject {
                     private int EnemyTankEnableBonus;
                     //敌方的血条比例
                     private double EnemyTankBloodNum;*/
+                    //TODO 以随机数设计AI的行走
+                    countTime++;
+                    if(countTime>=randomTime){
+                        countTime = 0;
+                        randomTime = 30-new Random().nextInt(26);
+                        AITankDirection = 1-new Random().nextInt(3);
+                        //Log.i(TAG,"AITankDirection:"+AITankDirection);
+                    }
+                    //TODO 以输入值设计计算AI的角度；
+                      //这里需要设计服装的抛物线设计公式......
                     GameSendingData gameSendingData = new GameSendingData(0);
-                    gameSendingData.setEnemyTankDirection(this.gameDto.getMyTank().getTankDirection());
+                    //gameSendingData.setEnemyTankDirection(this.gameDto.getMyTank().getTankDirection());
+                    gameSendingData.setEnemyTankDirection(AITankDirection);
                     gameSendingData.setEnemyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
                     gameSendingData.setEnemyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
                     gameSendingData.setEnemyTankEnableFire(false);

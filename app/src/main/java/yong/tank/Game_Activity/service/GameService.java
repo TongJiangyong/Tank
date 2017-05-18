@@ -500,16 +500,19 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 bundleMsg.putString("message", "敌方坦克血条已空，我方胜利");  //设置子弹数量
                 msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
                 myHandler.sendMessage(msgInfo);
-                //测试，用于重启游戏
+                //TODO 测试，用于重启游戏
+                //在这里进行结束即可.....
                 gameDto.getEnemyBlood().setBloodNum(1);
             }
             return true;
         }
 
         //如果打中地面 1、产生爆炸 2、移除子弹
-        if (gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y() > StaticVariable.LOCAL_SCREEN_HEIGHT / 7 * 5) {
+        if (gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y() > StaticVariable.GAMME_GROUND_POSITION) {
+            gameDto.getMyTank().getBulletsFire().get(bullet).setDrawFlag(false); //停止绘制
             addExplode(gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
-                    gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    //gameDto.getMyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.GAMME_GROUND_POSITION,
                     StaticVariable.EXPLODE_TYPE_GROUND);
             gameDto.getMyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;
@@ -555,9 +558,11 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             return true;
         }
         //如果打中地面
-        if (gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y() > StaticVariable.LOCAL_SCREEN_HEIGHT / 7 * 5) {
+        if (gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y() > StaticVariable.GAMME_GROUND_POSITION) {
+            gameDto.getEnemyTank().getBulletsFire().get(bullet).setDrawFlag(false); //停止绘制
             addExplode(gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_x(),
-                    gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    //gameDto.getEnemyTank().getBulletsFire().get(bullet).getBulletPosition_y(),
+                    StaticVariable.GAMME_GROUND_POSITION,
                     StaticVariable.EXPLODE_TYPE_GROUND);
             gameDto.getEnemyTank().getBulletsFire().remove(bullet);//移除子弹
             return true;

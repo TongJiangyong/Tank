@@ -50,6 +50,8 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         StaticVariable.LOCAL_SCREEN_HEIGHT = metric.heightPixels;  // 屏幕高度（像素）
         StaticVariable.LOCAL_DENSITY = this.getResources().getDisplayMetrics().density ;
         //TODO 重新计算一些参数
+        //设置游戏地面的位置
+        StaticVariable.GAMME_GROUND_POSITION = StaticVariable.LOCAL_SCREEN_HEIGHT*5/7;
         //bonus的速度  5s走完
         StaticVariable.BONUS_SPEED = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH/(float)(StaticVariable.BONUS_TIME*StaticVariable.LOGICAL_FRAME));
         //bonus的初始Y位置   画面1/5处

@@ -83,6 +83,8 @@ public class StaticVariable {
     public static int LOCAL_SCREEN_WIDTH;
     public static int LOCAL_SCREEN_HEIGHT;
 
+    public static int GAMME_GROUND_POSITION;
+
     //tank的基本信息 TankBascInfo(int type, int blood, int speed, int power, int picture, String tankName, String describeInfo) {
     //speed 走完半程所需的秒数*10 为了配合绘制斜杠度量衡的方法
     public static TankBascInfo[] TANKBASCINFO = {
