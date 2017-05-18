@@ -52,7 +52,7 @@ public class BlutToothActivty extends Activity {
 		ListNew.setAdapter(NewAdapterdevice);
 		ListNew.setOnItemClickListener(mDeviceClickListener);
 
-		Set<BluetoothDevice> OldBluetoothDevice = bluetoothadapter.getBondedDevices();//获取以配对的蓝牙设备对象
+		Set<BluetoothDevice> OldBluetoothDevice = bluetoothadapter.getBondedDevices();//获取已配对的蓝牙设备对象
 		for (BluetoothDevice device : OldBluetoothDevice) {
 			arraybluetoothdevice.add(device.getName() + "\n"
 					+ device.getAddress());
@@ -67,6 +67,7 @@ public class BlutToothActivty extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+				Log.i(TAG,"尝试接入其他设备....正在查找周围设备");
 				bluetoothadapter.startDiscovery();
 				bu_scan.setClickable(false);
 				bu_can_check.setClickable(false);
@@ -75,7 +76,7 @@ public class BlutToothActivty extends Activity {
 		});
 		//*********************************************************************************************************************
 
-		//本地设备可被扫描，等待设备接入
+		//本地设备可被扫描，等待设备接入，设置本设备可以被扫描即可
 		bu_can_check.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -96,11 +97,14 @@ public class BlutToothActivty extends Activity {
 
 		});
 
-		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BluetoothDevice.ACTION_FOUND);
+		filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+		filter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+		filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		this.registerReceiver(mReceiver, filter);
-
-		filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-		this.registerReceiver(mReceiver, filter);
+		bluetoothadapter.startDiscovery();
 	}
 
 	//*********************************************************************************************************************

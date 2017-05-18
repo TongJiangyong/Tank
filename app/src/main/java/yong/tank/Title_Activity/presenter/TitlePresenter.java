@@ -75,9 +75,9 @@ public class TitlePresenter implements ITitlePresenter {
                         .setAction(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 
                 // 设置 Bluetooth 设备可见时间
-               requestBluetoothOn.putExtra(
+/*               requestBluetoothOn.putExtra(
                         BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
-                        StaticVariable.VISIBLE_TIME);
+                        StaticVariable.VISIBLE_TIME);*/
                 // 请求开启 Bluetooth
                 this.context.startActivityForResult(requestBluetoothOn,
                         StaticVariable.REQUEST_CODE_BLUETOOTH_ON);
@@ -89,6 +89,8 @@ public class TitlePresenter implements ITitlePresenter {
     }
 
 
+    //打开蓝牙后，进入选择的activity
+    //TODO 这里最好将蓝牙写成service的模式....尝试着改一下
     public void enableBluetooth() {
         bluetoothadpter.isEnabled();
         Intent intent = new Intent(context,SelectActivity.class);

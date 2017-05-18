@@ -145,9 +145,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
             //进入本地模式的确认连接步骤 可以不做
             this.gamePresenter.prepareLocal(this.clientCommunicate);
         }
+
+
     }
-
-
 
 
    // public boolean onTouchEvent(MotionEvent event) {
