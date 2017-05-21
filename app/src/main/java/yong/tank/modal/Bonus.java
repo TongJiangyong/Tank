@@ -2,6 +2,7 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,8 +16,8 @@ import yong.tank.tool.StaticVariable;
 public class Bonus implements Serializable {
     private transient Bitmap bonusPicture;
     private int bonusDirection= 0;  //1为左 ，-1为右边
-    private int bonus_x;
-    private int bonus_y;
+    private float bonus_x;
+    private float bonus_y;
     private boolean isBonusFired = false; //设置bonus的状态 是否被击中等
     private static String TAG = "Bonus";
     private int pathPosition = 0;  //当前子弹位于的position 绘制敌方子弹主要的变量
@@ -31,10 +32,10 @@ public class Bonus implements Serializable {
         this.bonusPicture = bonusPicture;
         this.bonusType = bonusType;
         if(bonusDirection==0){
-            bonus_x=0;
+            bonus_x=-bonusPicture.getWidth();
             this.bonusDirection = 1;
         }else{
-            bonus_x= StaticVariable.LOCAL_SCREEN_WIDTH;
+            bonus_x=-bonusPicture.getWidth();
             this.bonusDirection = -1;
         }
     }
@@ -47,10 +48,22 @@ public class Bonus implements Serializable {
     public void positionUpdate(){
         //TODO 考虑策略模式优化;
         if(bonus_x>=-bonusPicture.getWidth()&&bonus_x<=StaticVariable.LOCAL_SCREEN_WIDTH){
-            bonus_x=bonus_x+StaticVariable.BONUS_SPEED*bonusDirection;
-            //注意这里除法是易错点 ,
-            bonus_y=StaticVariable.BONUS_Y_INIT +(int)((Math.sin((double)bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*(double)StaticVariable.BONUS_SCALE));
-            //Log.i(TAG,"bonus_x:"+bonus_x+",bonus_y:"+bonus_y+",StaticVariable.BONUS_SPEED"+StaticVariable.BONUS_SPEED);
+   //         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
+            bonus_x=bonus_x+StaticVariable.BONUS_SPEED;
+                //注意这里除法是易错点
+            bonus_y=StaticVariable.BONUS_Y_INIT +(float)((Math.sin(bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*StaticVariable.BONUS_SCALE));
+ /*           }else{
+            if(this.bonusDirection>0){
+                bonus_x=bonus_x+StaticVariable.BONUS_SPEED*bonusDirection;
+                //注意这里除法是易错点
+                bonus_y=StaticVariable.BONUS_Y_INIT +(float)((Math.sin(bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*StaticVariable.BONUS_SCALE));
+            }else{
+                bonus_x=bonus_x+StaticVariable.BONUS_SPEED*(-bonusDirection);
+                //注意这里除法是易错点
+                bonus_y=StaticVariable.BONUS_Y_INIT +(float)((Math.sin(bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*StaticVariable.BONUS_SCALE));
+            }*/
+/*            }*/
+            Log.i(TAG,"bonus_x:"+bonus_x+",bonus_y:"+bonus_y+",StaticVariable.BONUS_SPEED"+StaticVariable.BONUS_SPEED);
         }else{
             //TODO 将bonus删掉 并停止绘制
             this.setDrawFlag(false);
@@ -58,24 +71,32 @@ public class Bonus implements Serializable {
     }
 
     public void drawSelf(Canvas canvas) {
-        if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
+//        if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
             //TODO 绘制bonus 注意
             if(isDrawFlag&&!isBonusFired){
                 //bonus_x=bonusPath.get(pathPosition).getX();
                 //bonus_y=bonusPath.get(pathPosition).getY();
-                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
+                if(bonusDirection>0){
+                    canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
+                }else{
+                    canvas.drawBitmap(this.bonusPicture, (float)(StaticVariable.LOCAL_SCREEN_WIDTH-bonusPicture.getWidth())-bonus_x,bonus_y, null);//绘制bonus
+                }
                 //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
             }
-        }else{
+/*        }else{
             if(isDrawFlag&&!isBonusFired){
-                canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
+                if(bonusDirection>0){
+                    canvas.drawBitmap(this.bonusPicture, bonus_x,bonus_y, null);//绘制bonus
+                }else{
+                    canvas.drawBitmap(this.bonusPicture, (float)(StaticVariable.LOCAL_SCREEN_WIDTH-bonusPicture.getWidth())-bonus_x,bonus_y, null);//绘制bonus
+                }
                 //Log.w(TAG, "X:" + bonusPath.get(pathPosition).getX() +" Y:" + bonusPath.get(pathPosition).getY());
             }
-        }
+        }*/
 
     }
 
-    public int getBonus_x() {
+    public float getBonus_x() {
         return bonus_x;
     }
 
@@ -83,7 +104,7 @@ public class Bonus implements Serializable {
         this.bonus_x = bonus_x;
     }
 
-    public int getBonus_y() {
+    public float getBonus_y() {
         return bonus_y;
     }
 
@@ -129,7 +150,7 @@ public class Bonus implements Serializable {
         return bonusCenter;
     }
 
-    public boolean isInBonusScope(int dx,int dy){
+    public boolean isInBonusScope(float dx,float dy){
         if(Math.abs(dx-this.getBonusCenter().getX())<this.bonusPicture.getWidth()/2&&
            Math.abs(dy-this.getBonusCenter().getY())<this.bonusPicture.getHeight()/2){
             return true;

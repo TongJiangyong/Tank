@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.Random;
+
 import yong.tank.Communicate.ComData.ComDataF;
 import yong.tank.Communicate.ComData.ComDataPackage;
 import yong.tank.Communicate.InterfaceGroup.ServerCommunicate;
@@ -63,6 +65,22 @@ public class ServerService implements Runnable,ServerCommunicate{
             Log.i(TAG,"..........server into serverFrame is："+serverFrame+" activityData.getServerFrame():"+activityData.getServerFrame() +" passiveData.getServerFrame():"+passiveData.getServerFrame() );
             //如果帧的序列相同
             if(passiveData!=null&&activityData!=null&&passiveData.getServerFrame()==activityData.getServerFrame()){
+                //这里判断每隔9s则刷出一个bonus ，并填充bonus
+                if(serverFrame%(StaticVariable.LOGICAL_FRAME*9)==0){
+                    Log.i(TAG,"..........server into serverFrame is："+serverFrame+" ,and try to makebonus");
+                    int bonusDirectionTemp = new Random().nextInt(2);
+                    int bonusTypeTemp = new Random().nextInt(StaticVariable.BONUSPICTURE.length);
+                    passiveData.setEnableBonus(true);
+                    //将其设置为相反的方向.....
+                    passiveData.setBonusDirction(1-bonusDirectionTemp);
+                    passiveData.setBonusType(bonusTypeTemp);
+                    activityData.setEnableBonus(true);
+                    activityData.setBonusDirction(bonusDirectionTemp);
+                    activityData.setBonusType(bonusTypeTemp);
+                }else{
+                    passiveData.setEnableBonus(false);
+                    activityData.setEnableBonus(false);
+                }
                 serverFrame =serverFrame+StaticVariable.KEY_FRAME_COUNT;
                 //TODO 处理每一次线程所需要处理的内容......
                 //填充passiveData数据，

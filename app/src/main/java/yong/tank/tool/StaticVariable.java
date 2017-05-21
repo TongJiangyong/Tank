@@ -178,13 +178,13 @@ public class StaticVariable {
            // R.mipmap.tank_4,  暂时不加这个，以后再加......
    };
     //bonus的速度设置为5s穿过屏幕，这里的speed，是指一帧走过的像素点
-    public static int BONUS_SPEED = 0;
-    public static int BONUS_SCALE = 0;
+    public static float BONUS_SPEED = 0;
+    public static float BONUS_SCALE = 0;
     //bonus走完一个屏幕需要的时间
     public static int BONUS_TIME = 5;
     //调节bonus震动的频率
     public static int BONUS_STEP = 6;
-    public static int BONUS_Y_INIT = 0;
+    public static float BONUS_Y_INIT = 0;
     //与message相关
     //gameservice中toast更新
     public final static int MSG_TOAST = 0;

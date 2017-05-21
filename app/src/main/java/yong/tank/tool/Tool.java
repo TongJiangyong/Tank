@@ -248,9 +248,9 @@ public class Tool {
         List<Point> bulletPath = new ArrayList<>();
         int direction =new Random().nextInt(2); //生成随机方向
         int bonus_x; //这里应该等于bonuspicture的宽度
-        int bonus_y_init = StaticVariable.LOCAL_SCREEN_HEIGHT /StaticVariable.BONUS_Y_INIT;  //初始为1/5处的地方
-        int bonus_y;
-        int speed=StaticVariable.BONUS_SPEED;
+        float bonus_y_init = StaticVariable.LOCAL_SCREEN_HEIGHT /StaticVariable.BONUS_Y_INIT;  //初始为1/5处的地方
+        float bonus_y;
+        float speed=StaticVariable.BONUS_SPEED;
         //TODO 振幅为图片的宽度乘以比例
         int scale = StaticVariable.LOCAL_SCREEN_HEIGHT/10;
         if(direction==0){
@@ -262,7 +262,7 @@ public class Tool {
         while(bonus_x>=0&&bonus_x<=StaticVariable.LOCAL_SCREEN_WIDTH){
             bonus_x=bonus_x+Tool.dip2px(StaticVariable.LOCAL_DENSITY, speed);
             //注意这里除法是易错点
-            bonus_y=bonus_y_init +(int)(Math.sin((double)bonus_x/StaticVariable.BONUS_STEP)*scale);
+            bonus_y=bonus_y_init +(float)(Math.sin(bonus_x/StaticVariable.BONUS_STEP)*scale);
             Point point = new Point(bonus_x,bonus_y,0,false);
             bulletPath.add(point);
         }
@@ -272,7 +272,7 @@ public class Tool {
     //路径计算好以后，怎么给子弹
     //写成一个函数，然后计算返回一系列的点和角度即可.....List<Point>
     //这里感觉不对，以后做处理看看....先处理互相传输数据的模式......
-    public static List<Point> getMyBulletPath(int init_x, int init_y, double bulletDistance, int bulletDegree, boolean isPreView, int selectedBullets) {
+    public static List<Point> getMyBulletPath(float init_x, float init_y, double bulletDistance, int bulletDegree, boolean isPreView, int selectedBullets) {
         //这里关联speed和distance，暂时不处理
         List<Point> bulletPath = new ArrayList<Point>();
         //this.gameDto.getMyTank().getSelectedBullets()
@@ -295,9 +295,9 @@ public class Tool {
         for (int i = 0; i < pathNum; i++) {
             //这里计算时，采用向下为正，向右为正的方法
             bulletV_y = bulletV_y + StaticVariable.GRAVITY / (StaticVariable.LOGICAL_FRAME);
-            int newPosition_x = (int)(init_x +  (double)bulletV_x/(double)(StaticVariable.LOGICAL_FRAME));
+            float newPosition_x = (init_x +  (float)bulletV_x/(StaticVariable.LOGICAL_FRAME));
             //bulletPosition_x+=v_x*t;
-            int newPosition_y = (int)(init_y +  bulletV_y/(StaticVariable.LOGICAL_FRAME)+ StaticVariable.GRAVITY /(double)(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
+            float newPosition_y = (init_y +  (float)bulletV_y/(StaticVariable.LOGICAL_FRAME)+ (float)StaticVariable.GRAVITY /(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
             //bulletPosition_y+=v_y*t-g*t*t/2;
             double test = bulletV_y / bulletV_x;
             bulletDegree = (int) Math.toDegrees(Math.atan(test));

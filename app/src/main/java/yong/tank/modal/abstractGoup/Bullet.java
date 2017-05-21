@@ -22,8 +22,8 @@ public abstract class Bullet implements Serializable{
     private int bulletType;
     //发射路径点
     public transient List<Point> firePath;
-    public int bulletPosition_x;
-    public int bulletPosition_y;
+    public float bulletPosition_x;
+    public float bulletPosition_y;
     //用来决定距离的....
     public double bulletDistance;
     public int bulletDegree; //armpicture为内置的.....
@@ -48,9 +48,9 @@ public abstract class Bullet implements Serializable{
         //这里指示的是每一帧的内容
         //Log.w(TAG, "**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
         bulletV_y = bulletV_y + StaticVariable.GRAVITY/StaticVariable.LOGICAL_FRAME;
-        int newPosition_x = (int)(bulletPosition_x + bulletV_x/StaticVariable.LOGICAL_FRAME );
+        float newPosition_x = (bulletPosition_x + (float)bulletV_x/StaticVariable.LOGICAL_FRAME );
         //bulletPosition_x+=v_x*t;
-        int newPosition_y = (int)(bulletPosition_y + bulletV_y/StaticVariable.LOGICAL_FRAME + StaticVariable.GRAVITY /(double)(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME));
+        float newPosition_y = (bulletPosition_y + (float)(bulletV_y/StaticVariable.LOGICAL_FRAME )+ (float)(StaticVariable.GRAVITY /(2*StaticVariable.LOGICAL_FRAME*StaticVariable.LOGICAL_FRAME)));
         //bulletPosition_y+=v_y*t-g*t*t/2;
         bulletDegree = (int) Math.toDegrees(Math.atan(bulletV_y / bulletV_x));
         //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
@@ -70,7 +70,7 @@ public abstract class Bullet implements Serializable{
     }
 
 
-    public int getBulletPosition_x() {
+    public float getBulletPosition_x() {
         return bulletPosition_x;
     }
 
@@ -94,7 +94,7 @@ public abstract class Bullet implements Serializable{
         this.drawFlag = drawFlag;
     }
 
-    public int getBulletPosition_y() {
+    public float getBulletPosition_y() {
         return bulletPosition_y;
     }
 

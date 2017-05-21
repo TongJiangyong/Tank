@@ -20,16 +20,16 @@ public abstract class Tank implements Serializable {
     private transient Bitmap armPicture;
     private int tankType;
     public transient TankBascInfo tankBascInfo;
-    public int tankPosition_x = 0;
-    public int tankPrevPosition_x = 0;
+    public float tankPosition_x = 0;
+    public float tankPrevPosition_x = 0;
     public int tankPosition_y = 0;
     public int tankDirectrion = 0;
     private double firePower = 0; //发射的距离角度
     private Point tankCenter = new Point();
     private transient static String TAG = "Tank";
     public int weaponDegree = -10; //armpicture为内置的.....
-    public int weaponPoxition_x = 0;
-    public int weaponPoxition_y = 0;
+    public float weaponPoxition_x = 0;
+    public float weaponPoxition_y = 0;
     private transient Boolean enableFire = false;     //允许发射使能（总开关）
     private transient Boolean fireAction = false;      //tank发射动作使能 （动作开关）
     //预发射路径点
@@ -98,11 +98,11 @@ public abstract class Tank implements Serializable {
         this.tankBascInfo = tankBascInfo;
     }
 
-    public int getTankPosition_x() {
+    public float getTankPosition_x() {
         return tankPosition_x;
     }
 
-    public void setTankPosition_x(int tankPosition_x) {
+    public void setTankPosition_x(float tankPosition_x) {
         this.tankPosition_x = tankPosition_x;
     }
 
@@ -147,17 +147,17 @@ public abstract class Tank implements Serializable {
         this.fireAction = fireAction;
     }
 
-    public int getWeaponPoxition_x() {
+    public float getWeaponPoxition_x() {
         return weaponPoxition_x;
     }
 
 
-    public int getWeaponPoxition_y() {
+    public float getWeaponPoxition_y() {
         return weaponPoxition_y;
     }
 
 
-    public boolean isInCircle(int x, int y) {
+    public boolean isInCircle(float x, float y) {
         if (this.tankPosition_x < x &&
                 x < (this.tankPosition_x + this.tankPicture.getWidth()) &&
                 this.tankPosition_y < y &&
@@ -176,7 +176,7 @@ public abstract class Tank implements Serializable {
     }
 
     public boolean isInFireCircle(int x, int y) {
-        int distance = (x - this.getTankCenter().getX()) * (x - this.getTankCenter().getX()) + (y - this.getTankCenter().getY()) * (y - this.getTankCenter().getY());
+        int distance = (x - (int)this.getTankCenter().getX()) * (x - (int)this.getTankCenter().getX()) + (y - (int)this.getTankCenter().getY()) * (y - (int)this.getTankCenter().getY());
         int distance_scope = this.getTankPicture().getWidth() * this.getTankPicture().getWidth();
         //TODO 这里需要将tank的distance设为一个定值
         if (distance > 0 && distance < distance_scope * 2) {
@@ -188,7 +188,7 @@ public abstract class Tank implements Serializable {
 
     //这是一个释放的范围...
     public boolean isOutFireCircle(int x, int y) {
-        int distance = (x - this.getTankCenter().getX()) * (x - this.getTankCenter().getX()) + (y - this.getTankCenter().getY()) * (y - this.getTankCenter().getY());
+        int distance = (x - (int)this.getTankCenter().getX()) * (x - (int)this.getTankCenter().getX()) + (y - (int)this.getTankCenter().getY()) * (y - (int)this.getTankCenter().getY());
         int distance_scope = this.getTankPicture().getWidth() * this.getTankPicture().getWidth();
         if (distance > distance_scope * 2 && distance < distance_scope * 2.5) {
             return true;
@@ -198,7 +198,7 @@ public abstract class Tank implements Serializable {
     }
 
     public Point getTankCenter() {
-        this.tankCenter.setX(this.getTankPosition_x() + this.tankPicture.getWidth() / 2);
+        this.tankCenter.setX((int)(this.getTankPosition_x() + this.tankPicture.getWidth() / 2));
         this.tankCenter.setY(this.getTankPosition_y() + this.tankPicture.getHeight() / 2);
         return tankCenter;
     }

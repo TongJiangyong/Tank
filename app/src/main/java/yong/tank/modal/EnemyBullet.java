@@ -10,7 +10,7 @@ import yong.tank.modal.abstractGoup.Bullet;
 
 public class EnemyBullet extends Bullet{
     private transient static String TAG = "EnemyBullet";
-    public  EnemyBullet(Bitmap bulletPicture, int bulletType,double initVx,double initVy,int initPx,int initPy) {
+    public  EnemyBullet(Bitmap bulletPicture, int bulletType,double initVx,double initVy,float initPx,float initPy) {
         super(bulletPicture, bulletType);
         this.bulletV_x = -initVx;
         this.bulletV_y = -initVy;

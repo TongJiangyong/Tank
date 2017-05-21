@@ -14,11 +14,11 @@ public class Explode implements Serializable {
     private transient Bitmap explodeFrame[];
     private transient int currentFrame= 0;
     private int explodeType= 0;  //0为ground ，1为tank
-    private int explode_x;
-    private int explode_y;
+    private float explode_x;
+    private float explode_y;
     private transient static String TAG = "Explode";
     //TODO 以后加上角度
-    public Explode(Bitmap[] explodeFrame, int explode_x, int explode_y,int explodeType) {
+    public Explode(Bitmap[] explodeFrame, float explode_x, float explode_y,int explodeType) {
         this.explodeFrame = explodeFrame;
         this.explode_x = explode_x;
         this.explode_y = explode_y;
@@ -48,11 +48,11 @@ public class Explode implements Serializable {
         this.explodeType = explodeType;
     }
 
-    public int getDrawCenter_x() {
+    public float getDrawCenter_x() {
         return explode_x-this.explodeFrame[currentFrame].getWidth()/2;
     }
 
-    public int getDrawCenter_y() {
+    public float getDrawCenter_y() {
         return explode_y-this.explodeFrame[currentFrame].getHeight()/2;
     }
 }

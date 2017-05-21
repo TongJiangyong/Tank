@@ -11,32 +11,32 @@ public class Point {
         this.flag=true;
     }
 
-    public Point(int x, int y, int degree, boolean flag) {
+    public Point(float x, float y, int degree, boolean flag) {
         this.x = x;
         this.y = y;
         this.degree = degree;
         this.flag = flag;
     }
 
-    private int x;
-    private int y;
+    private float x;
+    private float y;
     //点此时的斜率 有的可以没有
     private int degree;
     private boolean flag;
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 

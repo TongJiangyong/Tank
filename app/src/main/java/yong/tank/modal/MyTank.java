@@ -3,6 +3,7 @@ package yong.tank.modal;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class MyTank extends Tank implements Serializable{
         this.tankPrevPosition_x = this.tankPosition_x;
         //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
-        this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
+        this.tankPosition_y=StaticVariable.GAMME_GROUND_POSITION-this.tankPicture.getHeight()/3;
     }
 
     public void positionUpdate(){
@@ -38,7 +39,7 @@ public class MyTank extends Tank implements Serializable{
         //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
         //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
         this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
-
+        Log.i(TAG,"MyTank position :"+(float)(this.tankPosition_x-this.tankPicture.getWidth()/2) / (float)StaticVariable.LOCAL_SCREEN_WIDTH+" tankBascInfo.getIntervalSpeed() is:"+tankBascInfo.getIntervalSpeed()+" this.tankPosition_x:"+this.tankPosition_x);
         if(tankPosition_x<0){
             this.tankPosition_x=this.tankPrevPosition_x;
         }else if((tankPosition_x+this.tankPicture.getWidth())>(StaticVariable.LOCAL_SCREEN_WIDTH /2)){
@@ -49,8 +50,8 @@ public class MyTank extends Tank implements Serializable{
     public void drawSelf(Canvas canvas){
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
-        int weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*2/5;
-        int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22);
+        float weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*2/5;
+        float weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22);
         canvas.drawBitmap(armPicture_tmp,
                 weaponPoxitionTemp_x,
                 //0,0,

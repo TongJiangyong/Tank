@@ -47,6 +47,8 @@ public class TitlePresenter implements ITitlePresenter {
         Intent intent = new Intent(context,SelectActivity.class);
         //TODO intenet借用
         StaticVariable.CHOSED_MODE = StaticVariable.GAME_MODE.LOCAL;
+        //主要确保bonus那里不会出错，虽然没什么影响
+        StaticVariable.CHOSED_RULE = StaticVariable.GAME_RULE.ACTIVITY;
         intent.putExtra("type", StaticVariable.GAMEMODE[0]);
         context.startActivity(intent);
     }

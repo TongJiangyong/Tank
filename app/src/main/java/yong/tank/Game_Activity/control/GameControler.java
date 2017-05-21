@@ -89,6 +89,7 @@ public class GameControler {
 
                     long before = getCurrentTimeCount();
                     gameService.logicalUpdate();
+                    viewDraw.drawFrame(interpolation);
                     long after = getCurrentTimeCount();
                     //gameTimeCount+=(dValue);
                     gameTimeCount+=StaticVariable.SKIP_TICKS;
@@ -97,8 +98,8 @@ public class GameControler {
                     if(count ==0){
                         count =1;
                     }
-                    Log.i(TAG,"********Logical Frame is: "+1000/count+"**********Time cost  is "+(currentLogicalTimeCount-previousLogicalTimeCount)+" and  current duration is :"+(after-before)+"*************************"+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop);
-                    previousLogicalTimeCount = currentLogicalTimeCount;
+                    //Log.i(TAG,"********Logical Frame is: "+1000/count+"**********Time cost  is "+(currentLogicalTimeCount-previousLogicalTimeCount)+" and  current duration is :"+(after-before)+"*************************"+",gameTimeCount ："+gameTimeCount+",gameLoop:"+gameLoop);
+                    //previousLogicalTimeCount = currentLogicalTimeCount;
                 }
                 //TODO 如果有必要，计算一个插值的系数....系数在0~1之间
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );

@@ -86,9 +86,9 @@ public class BluetoothConnected extends Thread implements Subject {
                     String readline=new String(readBuffer).trim();
                     //需要重新分配，不然会有问题......
                     readBuffer = new byte[StaticVariable.READ_BYTE];
-                    Log.w(TAG, "*******************************input Thread 收到的数据 *****************************************");
+                    Log.i(TAG, "*******************************input Thread 收到的数据 大小："+readline.getBytes().length+"*****************************************");
                     String[] readInfos  =readline.split("&");
-                    Log.w(TAG,"数据长度："+readInfos.length);
+                    //Log.w(TAG,"数据长度："+readInfos.length);
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
                         Log.i(TAG, "input Thread 收到的信息_1: "+readInfos[i]);
@@ -108,12 +108,12 @@ public class BluetoothConnected extends Thread implements Subject {
                                 //如果数据是从passive端传入，则直接转发给server
                                 if(StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY){
                                     //即，如果本机是ACTIVITY，收到COMMAND_INFO的数据，判定数据是从passive端传过来，直接转发给server
-                                    Log.i(TAG, "这里是activy端收到数据，转发给server: "+readInfos[i]);
+                                    //Log.i(TAG, "这里是activy端收到数据，转发给server: "+readInfos[i]);
                                     this.serverService.reciveDataFromPassive(comDataF);
                                     //如果本机是passive，收到COMMAND_INFO的数据，判定数据是从activity端传过来，直接转发给自己
                                 }else{
                                     //即，这里是server转发过来的数据，直接转走即可
-                                    Log.i(TAG, "这里是passive端收到数据，直接转发给游戏: "+readInfos[i]);
+                                    //Log.i(TAG, "这里是passive端收到数据，直接转发给游戏: "+readInfos[i]);
                                     this.notifyWatchers(comDataF);
                                 }
                                 //如果不是数据的信息，则直接转发
@@ -232,7 +232,7 @@ public class BluetoothConnected extends Thread implements Subject {
                      * passive端的处理方式为，将数据 发送给output的另一端
                      */
                     if (msg != null) {
-                        Log.i(TAG,"sendInfo is_1 :"+msg);
+                        //Log.i(TAG,"sendInfo is_1 :"+msg);
                         outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;
@@ -303,6 +303,7 @@ public class BluetoothConnected extends Thread implements Subject {
         if(comDataF.getComDataS().getCommad().equals(StaticVariable.COMMAND_MSG)){
             for(ObserverMsg o:observerMsgs){
                 //传入string
+                Log.i(TAG,"recive send info is :"+comDataF.getComDataS().getObject());
                 o.msgRecived(comDataF.getComDataS().getObject());
             }
             //处理info信息

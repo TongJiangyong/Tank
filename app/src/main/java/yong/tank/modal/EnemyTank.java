@@ -2,6 +2,7 @@ package yong.tank.modal;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class EnemyTank extends Tank implements Serializable{
         this.tankPrevPosition_x = this.tankPosition_x;
         //this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT*3/4;
         //这是测试用的tank位置
-        this.tankPosition_y=StaticVariable.LOCAL_SCREEN_HEIGHT *2/3;
+        this.tankPosition_y=StaticVariable.GAMME_GROUND_POSITION-this.tankPicture.getHeight()/3;
     }
 
 
@@ -40,6 +41,7 @@ public class EnemyTank extends Tank implements Serializable{
         //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
         //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
         this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
+        Log.i(TAG,"EnemyTank position :"+(float)(this.tankPosition_x+this.tankPicture.getWidth()/2) / (float)StaticVariable.LOCAL_SCREEN_WIDTH+" tankBascInfo.getIntervalSpeed() is:"+tankBascInfo.getIntervalSpeed()+" this.tankPosition_x:"+this.tankPosition_x);
         //Log.i(TAG,"enermy tankPosition_x ："+tankPosition_x+", tankPrevPosition_x:"+tankPrevPosition_x);
         if(tankPosition_x<StaticVariable.LOCAL_SCREEN_WIDTH /2){
             this.tankPosition_x=this.tankPrevPosition_x;
@@ -61,7 +63,7 @@ public class EnemyTank extends Tank implements Serializable{
         canvas.drawBitmap(this.tankPicture,this.tankPosition_x,this.tankPosition_y,null);
         Bitmap armPicture_tmp = Tool.reBuildImg(this.getArmPicture(),this.weaponDegree,1,1,false,false);
         // 不知道为什么，这里和mytank不一样
-        int weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*3/5 -armPicture_tmp.getWidth();
+        float weaponPoxitionTemp_x = this.tankPosition_x+tankPicture.getWidth()*3/5 -armPicture_tmp.getWidth();
         int weaponPoxitionTemp_y = this.tankPosition_y-armPicture_tmp.getHeight()+Tool.dip2px(StaticVariable.LOCAL_DENSITY, 22);
         canvas.drawBitmap(armPicture_tmp,
                 weaponPoxitionTemp_x,

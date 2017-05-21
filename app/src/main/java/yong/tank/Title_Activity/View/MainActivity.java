@@ -53,11 +53,11 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         //设置游戏地面的位置
         StaticVariable.GAMME_GROUND_POSITION = StaticVariable.LOCAL_SCREEN_HEIGHT*5/7;
         //bonus的速度  5s走完
-        StaticVariable.BONUS_SPEED = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH/(float)(StaticVariable.BONUS_TIME*StaticVariable.LOGICAL_FRAME));
+        StaticVariable.BONUS_SPEED = ((float)StaticVariable.LOCAL_SCREEN_WIDTH/(StaticVariable.BONUS_TIME*StaticVariable.LOGICAL_FRAME));
         //bonus的初始Y位置   画面1/5处
         StaticVariable.BONUS_Y_INIT = (int)((float)StaticVariable.LOCAL_SCREEN_HEIGHT/5);
         //bonus的振幅为   画面的1/10
-        StaticVariable.BONUS_SCALE = (int)((float)StaticVariable.LOCAL_SCREEN_HEIGHT/10);
+        StaticVariable.BONUS_SCALE = ((float)StaticVariable.LOCAL_SCREEN_HEIGHT/10);
         //设置场景的重力 ,即1/1.1.41秒，运动到的屏幕高度的距离
         StaticVariable.GRAVITY= StaticVariable.LOCAL_SCREEN_HEIGHT * 4 ;
         Log.i(TAG, "Test in company");

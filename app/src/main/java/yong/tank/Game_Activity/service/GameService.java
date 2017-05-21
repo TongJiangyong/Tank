@@ -73,6 +73,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     //初始化远程交换完成，但是远程DTO等变量还未初始化
     private boolean remoteDeviceACKflag = false;
 
+    //用于制造bonus
+    private BonusMaker bonusMaker=null;
     //用于判断自己的tanke是否fire的标志位，主要方便发送数据的时候进行检测
     private boolean isLocalTankOnfire = false;
     private SimpleDateFormat formatTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -154,13 +156,16 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             /**
              ***********************如果不是本地模式，则采用帧同步的算法*****************************************
              */
-            if (localGameProcess == null) {
-                localGameProcess = new LocalGameProcess();
-            }
             gameCurrentFrame = this.gameDto.getGameProcessFrameCount();
+            //对初始化的处理
+            if (localGameProcess == null) {
+                //可以在gameThrea中多写点内容
+                localGameProcess = new LocalGameProcess();
+                this.bonusControl();
+            }
             //如果当前帧是关键帧，则需要获取服务器的更新数据：
             Log.i(TAG,"check is key_frame gameCurrentFrame "+gameCurrentFrame);
-            //如果是第0帧，则需要发送一个空包过去
+            //如果是第0帧，则需要发送一个空包过去,并运行一些只执行一次的方法
             if(gameCurrentFrame == 0){
                 GameSendingData gameFirstData = new GameSendingData(1);
                 gameFirstData.setMyTankDirection(this.gameDto.getMyTank().getTankDirection());
@@ -226,7 +231,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                             gameSendingData.setMyTankDirection(this.gameDto.getPlayerPain().getTankDirection());
                             gameSendingData.setMyTankDegree(this.gameDto.getPlayerPain().getTankDegree());
                             gameSendingData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
-                            gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                            //gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
                             gameSendingData.setServerFrame(nextKeyFrame);
                             gameSendingData.setMyTankEnableFire(false);
                             //使用tank发送进行判断即可.......
@@ -248,18 +253,16 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                             //更新包括敌方的和自身的数据信息
 
                             //主要是填充自己和对方的坦克两种：
-                            Log.i(TAG, "gameData.getMyTankDegree is:" + gameData.getMyTankDegree());
+                            //Log.i(TAG, "gameData.getMyTankDegree is:" + gameData.getMyTankDegree());
                             this.remoteSetMyTank(gameData.getMyTankDegree(), gameData.getMyTankDirection(), gameData.getMyTankEnableFire());
                             this.remoteSetEnmyTank(gameData.getEnemyTankDegree(), gameData.getEnemyTankDirection(), gameData.getEnemyTankEnableFire(),gameData.getEnemyTankBulletDistance());
                             //处理bonus的过程,即如果广播有bonus产生，则产生bonus
                             if (gameData.getEnableBonus()) {
-                                this.bonusControl();
-                                BonusMaker bonusMaker = new BonusMaker();
                                 bonusMaker.bonusProductor(gameData.getBonusDirction(), gameData.getBonusType());
                             }
-                            //填充tank的血条信息
-                            this.gameDto.getMyBlood().setBloodNum(gameData.getMyTankBloodNum());
-                            this.gameDto.getEnemyBlood().setBloodNum(gameData.getEnemyTankBloodNum());
+                            //填充tank的血条信息-----不必填充，因为血条也是计算得到......
+                            //this.gameDto.getMyBlood().setBloodNum(gameData.getMyTankBloodNum());
+                            //this.gameDto.getEnemyBlood().setBloodNum(gameData.getEnemyTankBloodNum());
                             //TODO 这里对关键帧的数据填充后，需要进一步计算，如何处理计算方面的内容？？？？
                             StaticVariable.KEY_FRAME = nextKeyFrame;
                             gameCurrentFrame++;
@@ -304,11 +307,13 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
 //这里本地模式调用的bonus产生方法........
     public void bonusControl() {
         timerBonus = new Timer();
-        BonusMaker bonusMaker = new BonusMaker();
+        bonusMaker = new BonusMaker();
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
-        Log.w(TAG, "*********bonus start to maker**************");
-        timerBonus.schedule(bonusMaker, 5000, 10000);
+        if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
+            Log.w(TAG, "*********bonus start to maker**************");
+            timerBonus.schedule(bonusMaker, 5000, 9000);
+        }
     }
 
     public void stopMakeBonus() {
@@ -366,7 +371,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             gameDto.getEnemyTank().positionUpdate();
             //下面是本地模式的相关代码 即 本地模式下，Enemy的数据是直接在这里获取的
             //这里也用于判断爆炸和判断bonus击中，即本地用于判断击中 的部分
-            if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
+            //if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
                 int num = gameDto.getMyTank().getBulletsFire().size();
                 if (num != 0) {
                     for (int i = (num - 1); i >= 0; i--) {
@@ -401,7 +406,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                             }
                         }
                     }
-                }
+                //}
             }
         }
     }
@@ -572,7 +577,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
 
 
     //产生爆炸的方法
-    public void addExplode(int dx, int dy, int type) {
+    public void addExplode(float dx, float dy, int type) {
         Explode explode = null;
         if (type == StaticVariable.EXPLODE_TYPE_GROUND) {
             explode = new Explode(StaticVariable.EXPLODESONGROND,
@@ -1073,8 +1078,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
     }
     public void remoteSetMyTank(int tankDegree,int tankDirection,boolean tankFireFlag){
-        Log.i(TAG,"is mytank is null ? "+this.gameDto.getMyTank());
-        Log.i(TAG,"is Enertank is null ? "+this.gameDto.getEnemyTank());
+        //Log.i(TAG,"is mytank is null ? "+this.gameDto.getMyTank());
+        //Log.i(TAG,"is Enertank is null ? "+this.gameDto.getEnemyTank());
         this.gameDto.getMyTank().setWeaponDegree(tankDegree);
         this.gameDto.getMyTank().setTankDirection(tankDirection);
         //Log.i(TAG,"gameData.getEnemyTankDirection():"+gameData.getEnemyTankDirection());

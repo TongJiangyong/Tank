@@ -74,7 +74,7 @@ public class AImaker implements Subject {
                     if(countTime>=randomTime){
                         countTime = 0;
                         randomTime = 30-new Random().nextInt(26);
-                        AITankDirection = 1-new Random().nextInt(3);
+                        //AITankDirection = 1-new Random().nextInt(3);
                         //Log.i(TAG,"AITankDirection:"+AITankDirection);
                     }
                     //TODO 以输入值设计计算AI的角度；
