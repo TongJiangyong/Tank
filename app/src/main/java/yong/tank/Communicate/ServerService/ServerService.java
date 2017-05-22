@@ -30,6 +30,7 @@ public class ServerService implements Runnable,ServerCommunicate{
      */
     private long serverFrame = 0;
     private boolean serverFlag =false;
+    private boolean serverSendingLock = false;
     private boolean isPassiveFrameArrive = false;
     private boolean isActivityFrameArrive = false;
     private GameSendingData activityData;
@@ -65,6 +66,7 @@ public class ServerService implements Runnable,ServerCommunicate{
             Log.i(TAG,"..........server into serverFrame is："+serverFrame+" activityData.getServerFrame():"+activityData.getServerFrame() +" passiveData.getServerFrame():"+passiveData.getServerFrame() );
             //如果帧的序列相同
             if(passiveData!=null&&activityData!=null&&passiveData.getServerFrame()==activityData.getServerFrame()){
+                serverSendingLock = true;
                 //这里判断每隔9s则刷出一个bonus ，并填充bonus
                 if(serverFrame%(StaticVariable.LOGICAL_FRAME*9)==0){
                     Log.i(TAG,"..........server into serverFrame is："+serverFrame+" ,and try to makebonus");
@@ -105,6 +107,7 @@ public class ServerService implements Runnable,ServerCommunicate{
                 isActivityFrameArrive =false;
                 activityData = null;
                 passiveData = null;
+                serverSendingLock = false;
             }
         }
 
@@ -149,8 +152,11 @@ public class ServerService implements Runnable,ServerCommunicate{
         //TODO 收到数据，置位flag，检查是否可发送
         Log.i(TAG,"reciveDataFromActivity :"+msg);
         ComDataF comDataF = ComDataPackage.unpackToF(msg);
-        activityData = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
-        Log.i(TAG,"reciveDataFromActivity :"+activityData);
+        GameSendingData activityDataTemp = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
+        //如果处于sending状态，则暂时不向下运行
+        while(serverSendingLock);
+        activityData = activityDataTemp;
+        //Log.i(TAG,"reciveDataFromActivity :"+activityData);
         Log.i(TAG,"reciveDataFromActivity and dataFrame is:"+activityData.getServerFrame());
         isActivityFrameArrive = true;
         checkIsDataPrepared();
@@ -160,7 +166,9 @@ public class ServerService implements Runnable,ServerCommunicate{
     public void reciveDataFromPassive(ComDataF comDataF) {
         //TODO 收到数据，置位flag，检查是否可发送
         Log.i(TAG,"reciveDataFromPassive :"+comDataF.getComDataS().getCommad());
-        passiveData = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
+        GameSendingData passiveDataTemp = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
+        while(serverSendingLock);
+        passiveData = passiveDataTemp;
         Log.i(TAG,"reciveDataFromPassive and dataFrame is:"+passiveData.getServerFrame());
         isPassiveFrameArrive = true;
         checkIsDataPrepared();

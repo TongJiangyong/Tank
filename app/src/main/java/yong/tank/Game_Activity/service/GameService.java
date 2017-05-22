@@ -190,7 +190,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 Log.i(TAG,"set 0 frame over : "+gameCurrentFrame);
                 this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
             }else{
-                Log.i(TAG,"**************into recive packet gameCurrentFrame is "+gameCurrentFrame);
+                Log.i(TAG,"**************into recive packet gameCurrentFrame is "+gameCurrentFrame +" StaticVariable.KEY_FRAME is:"+StaticVariable.KEY_FRAME);
                 if(gameCurrentFrame == StaticVariable.KEY_FRAME){
                     //查看是否有服务器的更新包,
                     GameSendingData gameData = null;
@@ -592,9 +592,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
         gameDto.getExplodes().add(explode);//发生爆炸
         //每次增加爆炸，则向client发送一个bonus
-        if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
+/*        if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
             Tool.sendNewExplode(clientCommunicate, explode);
-        }
+        }*/
     }
 
 
