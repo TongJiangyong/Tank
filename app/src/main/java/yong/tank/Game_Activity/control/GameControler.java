@@ -89,7 +89,7 @@ public class GameControler {
 
                     long before = getCurrentTimeCount();
                     gameService.logicalUpdate();
-                    viewDraw.drawFrame(interpolation);
+                    //viewDraw.drawFrame(interpolation);
                     long after = getCurrentTimeCount();
                     //gameTimeCount+=(dValue);
                     gameTimeCount+=StaticVariable.SKIP_TICKS;
@@ -105,6 +105,10 @@ public class GameControler {
                 interpolation = (float)( getCurrentTimeCount() + StaticVariable.SKIP_TICKS - gameTimeCount ) / (float)( StaticVariable.SKIP_TICKS );
                 //Log.i(TAG,"interpolation is:"+ interpolation);
                 currentFrameTimeCount = getCurrentTimeCount();
+                //这里处理有一点例外，因为设置的子弹速度很快，所以是按frame频率走的，所以这么做虽然不好，但是也只能这样了....
+                if(gameService.getLocalGameProcess()!=null){
+                    gameService.getLocalGameProcess().tankBulletShot();
+                }
                 viewDraw.drawFrame(interpolation);
                 long after = getCurrentTimeCount();
                 Log.i(TAG,"******************draw Frame："+1000/(after-currentFrameTimeCount)+"******current duration  is "+(currentLogicalTimeCount-previousFrameTimeCount)+"*******************");

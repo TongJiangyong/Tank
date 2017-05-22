@@ -338,7 +338,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
 
     //GameThread主要用来检测tank爆炸，以及在本地子弹击中bonus的反应
     //之前是使用独立的线程进行运行和检测，这里考虑其他的处理方法.....：
-    class LocalGameProcess {
+    public class LocalGameProcess {
         public LocalGameProcess() {
             gameDto.getMyTank().setEnableFire(true);
         }
@@ -369,43 +369,45 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             gameDto.getMyTank().positionUpdate();
             //更新地方tank的位置信息
             gameDto.getEnemyTank().positionUpdate();
+        }
+
+        //这里是判断tank击中相关的代码
+        public void tankBulletShot(){
             //下面是本地模式的相关代码 即 本地模式下，Enemy的数据是直接在这里获取的
             //这里也用于判断爆炸和判断bonus击中，即本地用于判断击中 的部分
             //if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
-                int num = gameDto.getMyTank().getBulletsFire().size();
-                if (num != 0) {
-                    for (int i = (num - 1); i >= 0; i--) {
-                        //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
-                        //这里设置continue语句来解决这个问题.....
-                        //测试击中bonus后用的方法
-                        if (myFireBonus(i)) {
-                            continue;
-                        }
-                        //测试爆炸用的方法
-                        if (myTankExplode(i)) {
-                            continue;
-                        }
+            int num = gameDto.getMyTank().getBulletsFire().size();
+            if (num != 0) {
+                for (int i = (num - 1); i >= 0; i--) {
+                    //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+                    //这里设置continue语句来解决这个问题.....
+                    //测试击中bonus后用的方法
+                    if (myFireBonus(i)) {
+                        continue;
+                    }
+                    //测试爆炸用的方法
+                    if (myTankExplode(i)) {
+                        continue;
+                    }
 
+                }
+            }
+            if (remoteDataInitFlag) {
+                //TODO 检查一下，这个enermyNum为啥为0
+                int enermyNum = gameDto.getEnemyTank().getBulletsFire().size();
+                //Log.i(TAG,"enermyNum is :"+enermyNum);
+                //TODO 这里加上并测试本地模式的程序流程
+                if (enermyNum != 0) {
+                    for (int i = (enermyNum - 1); i >= 0; i--) {
+                        //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
+                        if (enermyFireBonus(i)) {
+                            continue;
+                        }
+                        if (enermyTankExplode(i)) {
+                            continue;
+                        }
                     }
                 }
-
-
-                if (remoteDataInitFlag) {
-                    //TODO 检查一下，这个enermyNum为啥为0
-                    int enermyNum = gameDto.getEnemyTank().getBulletsFire().size();
-                    //Log.i(TAG,"enermyNum is :"+enermyNum);
-                    //TODO 这里加上并测试本地模式的程序流程
-                    if (enermyNum != 0) {
-                        for (int i = (enermyNum - 1); i >= 0; i--) {
-                            //TODO 这里注意，统一在爆炸中删除所有子弹，并只能放在最后，不然会有问题
-                            if (enermyFireBonus(i)) {
-                                continue;
-                            }
-                            if (enermyTankExplode(i)) {
-                                continue;
-                            }
-                        }
-                    }
                 //}
             }
         }
@@ -641,7 +643,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
     }
 
-    public class productorThread extends TimerTask {
+/*    public class productorThread extends TimerTask {
         @Override
         public void run() {
             //如果初始化prepare完成,就开始传输数据
@@ -657,7 +659,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 }
             }
         }
-    }
+    }*/
 
 
 /*    //互相communicate的线程
@@ -875,8 +877,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             initDegree = degree;
             initDistance = distance;
             //给一点随机误差
-            initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
-            initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
+            //initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
+            //initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
             //TODO 这里将distance做随机处理
             if(initDistance<=0.2||initDistance>=1){
                 //小于0则设定一个固定值
@@ -1262,4 +1264,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     public void setLocalTankOnfire(boolean localTankOnfire) {
         isLocalTankOnfire = localTankOnfire;
     }
+
+    public LocalGameProcess getLocalGameProcess() {
+        return localGameProcess;
+    }
+
 }

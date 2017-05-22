@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Path;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class Bullet implements Serializable{
         //this.gameDto.getMyTank().getSelectedBullets()
         //这里计算时，采用向下为正，向右为正的方法
         //这里指示的是每一帧的内容
-        //Log.w(TAG, "**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
+
         bulletV_y = bulletV_y + StaticVariable.GRAVITY/StaticVariable.LOGICAL_FRAME;
         float newPosition_x = (bulletPosition_x + (float)bulletV_x/StaticVariable.LOGICAL_FRAME );
         //bulletPosition_x+=v_x*t;
@@ -56,7 +57,8 @@ public abstract class Bullet implements Serializable{
         //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
         bulletPosition_x=newPosition_x;
         bulletPosition_y=newPosition_y;
-        //Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+        Log.w(TAG, "isInCircle**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
+        Log.w(TAG, "isInCircle bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + bulletPosition_x + " bulletPosition_y:" + bulletPosition_y);
         //time = time + StaticVariable.INTERVAL;
     }
 

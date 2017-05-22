@@ -3,6 +3,7 @@ package yong.tank.modal.abstractGoup;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.List;
@@ -158,10 +159,14 @@ public abstract class Tank implements Serializable {
 
 
     public boolean isInCircle(float x, float y) {
-        if (this.tankPosition_x < x &&
-                x < (this.tankPosition_x + this.tankPicture.getWidth()) &&
-                this.tankPosition_y < y &&
-                y < (this.tankPosition_y + this.tankPicture.getHeight())) {
+        Log.i(TAG,"isInCircle x:"+x+" y:"+y+" this.tankPosition_x:"+this.tankPosition_x+" this.tankPosition_y"+this.tankPosition_y
+                +" (this.tankPosition_x + this.tankPicture.getWidth()):"+(this.tankPosition_x + this.tankPicture.getWidth()) +
+                " (this.tankPosition_y + this.tankPicture.getHeight())" +(this.tankPosition_y + this.tankPicture.getHeight()));
+        if (this.tankPosition_x <= x &&
+                x <= (this.tankPosition_x + this.tankPicture.getWidth()) &&
+                this.tankPosition_y <= y &&
+                y <= (this.tankPosition_y + this.tankPicture.getHeight())) {
+            Log.i(TAG,"*****************isInCircle******************");
             return true;
         } else {
             return false;

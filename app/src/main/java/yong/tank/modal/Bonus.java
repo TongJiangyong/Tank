@@ -97,7 +97,11 @@ public class Bonus implements Serializable {
     }
 
     public float getBonus_x() {
-        return bonus_x;
+        if(bonusDirection>0) {
+            return bonus_x;
+        }else{
+            return (StaticVariable.LOCAL_SCREEN_WIDTH-bonusPicture.getWidth()-bonus_x);
+        }
     }
 
     public void setBonus_x(int bonus_x) {

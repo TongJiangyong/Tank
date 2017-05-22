@@ -94,7 +94,7 @@ public class StaticVariable {
             new TankBascInfo(3,30,50,70,StaticVariable.TANKPICTURE_NO_ARM[3],"豹式-2","简介：很牛B的坦克D"+"\n"+"，最后的，总是最好的"),
     };
     //设置坦克的填装时间为2s
-    public static int TANK_LOADING_TIME = 2;
+    public static int TANK_LOADING_TIME = 1;
     public static String HELPINFO = "这里加一些帮助信息";
     public static String STATEMENTINFO =
             "   这个程序是自己为了熟悉android studio和apk开发流程所编写的学习程序,\n" +
