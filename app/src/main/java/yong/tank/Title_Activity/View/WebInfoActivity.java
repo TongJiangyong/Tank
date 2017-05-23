@@ -13,6 +13,7 @@ import android.widget.Toast;
 import yong.tank.R;
 import yong.tank.Title_Activity.presenter.WebInfoPresenter;
 import yong.tank.modal.WebInfo;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/12/10.
@@ -46,7 +47,9 @@ public class WebInfoActivity extends Activity implements View.OnClickListener{
         webInfoPresenter.roomInfoInit();
         //User userinfo =localUser.readInfoLocal(StaticVariable.USER_FILE);
         //Log.i(TAG, "print personnal info："+userinfo.toString() );
-        Log.i(TAG, "Test  WebInfoActivity");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "Test  WebInfoActivity");
+        }
     }
 
     @Override

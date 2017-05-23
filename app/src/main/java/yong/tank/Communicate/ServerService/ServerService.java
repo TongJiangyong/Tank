@@ -63,13 +63,17 @@ public class ServerService implements Runnable,ServerCommunicate{
                     Log.w(TAG,"error 1");
                 }
             }
-            Log.i(TAG,"..........server into serverFrame is："+serverFrame+" activityData.getServerFrame():"+activityData.getServerFrame() +" passiveData.getServerFrame():"+passiveData.getServerFrame() );
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "..........server into serverFrame is：" + serverFrame + " activityData.getServerFrame():" + activityData.getServerFrame() + " passiveData.getServerFrame():" + passiveData.getServerFrame());
+            }
             //如果帧的序列相同
             if(passiveData!=null&&activityData!=null&&passiveData.getServerFrame()==activityData.getServerFrame()){
                 serverSendingLock = true;
                 //这里判断每隔9s则刷出一个bonus ，并填充bonus
                 if(serverFrame%(StaticVariable.LOGICAL_FRAME*9)==0){
-                    Log.i(TAG,"..........server into serverFrame is："+serverFrame+" ,and try to makebonus");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "..........server into serverFrame is：" + serverFrame + " ,and try to makebonus");
+                    }
                     int bonusDirectionTemp = new Random().nextInt(2);
                     int bonusTypeTemp = new Random().nextInt(StaticVariable.BONUSPICTURE.length);
                     passiveData.setEnableBonus(true);
@@ -118,7 +122,9 @@ public class ServerService implements Runnable,ServerCommunicate{
 
     // 这里处理跟服务器是一样的
     public void checkIsDataPrepared() {
-        Log.i(TAG,"checkIsDataPrepared.....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "checkIsDataPrepared.....");
+        }
         if((isPassiveFrameArrive&&isActivityFrameArrive)||this.serverFlag==false){
             isPassiveFrameArrive = false;
             isActivityFrameArrive = false;
@@ -135,7 +141,9 @@ public class ServerService implements Runnable,ServerCommunicate{
      */
     @Override
     public void sendDataToActivity(ComDataF comDataF) {
-        Log.i(TAG,"sendDataToActivity.....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "sendDataToActivity.....");
+        }
         this.bluetoothConnected.notifyWatchers(comDataF);
     }
 
@@ -145,21 +153,27 @@ public class ServerService implements Runnable,ServerCommunicate{
      */
     @Override
     public void sendDataToPassive(String msg) {
-        Log.i(TAG,"sendDataToPassive.....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "sendDataToPassive.....");
+        }
         this.bluetoothConnected.write(msg);
     }
 
     @Override
     public void reciveDataFromActivity(String msg) {
         //TODO 收到数据，置位flag，检查是否可发送
-        Log.i(TAG,"reciveDataFromActivity :"+msg);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "reciveDataFromActivity :" + msg);
+        }
         ComDataF comDataF = ComDataPackage.unpackToF(msg);
         GameSendingData activityDataTemp = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
         //如果处于sending状态，则暂时不向下运行
         while(serverSendingLock);
         activityData = activityDataTemp;
         //Log.i(TAG,"reciveDataFromActivity :"+activityData);
-        Log.i(TAG,"reciveDataFromActivity and dataFrame is:"+activityData.getServerFrame());
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "reciveDataFromActivity and dataFrame is:" + activityData.getServerFrame());
+        }
         isActivityFrameArrive = true;
         checkIsDataPrepared();
     }
@@ -167,11 +181,15 @@ public class ServerService implements Runnable,ServerCommunicate{
     @Override
     public void reciveDataFromPassive(ComDataF comDataF) {
         //TODO 收到数据，置位flag，检查是否可发送
-        Log.i(TAG,"reciveDataFromPassive :"+comDataF.getComDataS().getCommad());
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "reciveDataFromPassive :" + comDataF.getComDataS().getCommad());
+        }
         GameSendingData passiveDataTemp = ComDataPackage.packageToObject(comDataF.getComDataS().getObject());
         while(serverSendingLock);
         passiveData = passiveDataTemp;
-        Log.i(TAG,"reciveDataFromPassive and dataFrame is:"+passiveData.getServerFrame());
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "reciveDataFromPassive and dataFrame is:" + passiveData.getServerFrame());
+        }
         isPassiveFrameArrive = true;
         checkIsDataPrepared();
     }

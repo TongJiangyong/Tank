@@ -63,7 +63,9 @@ public class Bonus implements Serializable {
                 bonus_y=StaticVariable.BONUS_Y_INIT +(float)((Math.sin(bonus_x/(StaticVariable.BONUS_SPEED*StaticVariable.BONUS_STEP))*StaticVariable.BONUS_SCALE));
             }*/
 /*            }*/
-            Log.i(TAG,"bonus_x:"+bonus_x+",bonus_y:"+bonus_y+",StaticVariable.BONUS_SPEED"+StaticVariable.BONUS_SPEED);
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "bonus_x:" + bonus_x + ",bonus_y:" + bonus_y + ",StaticVariable.BONUS_SPEED" + StaticVariable.BONUS_SPEED);
+            }
         }else{
             //TODO 将bonus删掉 并停止绘制
             this.setDrawFlag(false);

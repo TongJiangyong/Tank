@@ -77,8 +77,10 @@ public class ClientInputThread implements Runnable,Subject{
                         }
                         catch (Exception e)
                         {
-                            System.out.println("input Thread error parse file "+e);
-                            System.out.println("error info is "+readInfos[i]);
+                            if(StaticVariable.DEBUG) {
+                                System.out.println("input Thread error parse file " + e);
+                                System.out.println("error info is " + readInfos[i]);
+                            }
                             continue;
                         }
                     }

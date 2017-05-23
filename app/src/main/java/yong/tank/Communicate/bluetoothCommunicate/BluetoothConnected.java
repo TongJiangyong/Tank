@@ -55,7 +55,9 @@ public class BluetoothConnected extends Thread implements Subject {
             //启动另外读的线程即可
             blueOutputThread = new BlueOutputThread(socket);
             new Thread(blueOutputThread).start();
-            Log.i(TAG,"AcceptThread in STATE_CONNECTING");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "AcceptThread in STATE_CONNECTING");
+            }
         } catch (IOException e) {
             Log.e(TAG, "temp sockets not created", e);
         }
@@ -83,8 +85,9 @@ public class BluetoothConnected extends Thread implements Subject {
         if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
             this.serverService.setBlutoothAdapter(this);
         }
-
-        Log.i(TAG, "BEGIN mConnectedThread ---->允许蓝牙开始读写....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "BEGIN mConnectedThread ---->允许蓝牙开始读写....");
+        }
          //byte[] buffer = new byte[1024];
         // Keep listening to the InputStream while connected
         while (readFlag) {
@@ -96,12 +99,16 @@ public class BluetoothConnected extends Thread implements Subject {
                     String readline=new String(readBuffer).trim();
                     //需要重新分配，不然会有问题......
                     readBuffer = new byte[StaticVariable.READ_BYTE];
-                    Log.i(TAG, "*******************************input Thread 收到的数据 大小："+readline.getBytes().length+"*****************************************");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "*******************************input Thread 收到的数据 大小：" + readline.getBytes().length + "*****************************************");
+                    }
                     String[] readInfos  =readline.split("&");
                     //Log.w(TAG,"数据长度："+readInfos.length);
                     //解析每一个消息
                     for(int i=0;i<readInfos.length;i++){
-                        Log.i(TAG, "input Thread 收到的信息_1: "+readInfos[i]);
+                        if(StaticVariable.DEBUG) {
+                            Log.i(TAG, "input Thread 收到的信息_1: " + readInfos[i]);
+                        }
                         /**
                          * 注意这里，对 activity和passive端的处理方式。两者各有不同，这里仅仅对标签为StaticVariable.COMMAND_INFO
                          * activity的处理方式为，直接将收到passvie的数据发送给serverService线程，并由serverService线程处理后序
@@ -146,7 +153,9 @@ public class BluetoothConnected extends Thread implements Subject {
                 msg.what = StaticVariable.BLUE_COMMUNICATE_ERROR;
                 myHander.sendMessage(msg);
             }catch (Exception e) {
-                Log.e(TAG, "bluetooth read error", e);
+                if(StaticVariable.DEBUG) {
+                    Log.e(TAG, "bluetooth read error", e);
+                }
                 clientBluetooth.connectionLost();
                 Message msg = myHander.obtainMessage();
                 msg.what = StaticVariable.BLUE_COMMUNICATE_ERROR;
@@ -156,7 +165,9 @@ public class BluetoothConnected extends Thread implements Subject {
                 break;
             }
         }
-        Log.i(TAG, "end of mConnectedThread ---->蓝牙读写关闭....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "end of mConnectedThread ---->蓝牙读写关闭....");
+        }
     }
 
     /**
@@ -195,7 +206,9 @@ public class BluetoothConnected extends Thread implements Subject {
 
     public void cancel() {
         try {
-            Log.i(TAG,"连接断开");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "连接断开");
+            }
             input.close();
             mmSocket.close();
         } catch (IOException e) {
@@ -242,7 +255,9 @@ public class BluetoothConnected extends Thread implements Subject {
                      * passive端的处理方式为，将数据 发送给output的另一端
                      */
                     if (msg != null) {
-                        //Log.i(TAG,"sendInfo is_1 :"+msg);
+                        if(StaticVariable.DEBUG) {
+                            Log.i(TAG, "sendInfo is_1 :" + msg);
+                        }
                         outupt.write(msg+"&");
                         outupt.flush();
                         msg =null;

@@ -60,7 +60,9 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         StaticVariable.BONUS_SCALE = ((float)StaticVariable.LOCAL_SCREEN_HEIGHT/10);
         //设置场景的重力 ,即1/1.1.41秒，运动到的屏幕高度的距离
         StaticVariable.GRAVITY= StaticVariable.LOCAL_SCREEN_HEIGHT * 4 ;
-        Log.i(TAG, "Test in company");
+        if(StaticVariable.DEBUG){
+            Log.i(TAG, "Test in company");
+        }
     }
 
     private void initLocalUser() {
@@ -125,17 +127,23 @@ public class MainActivity extends Activity implements ITitleView, View.OnClickLi
         //Log.w(TAG,"TESTBLUE");
         // 蓝牙启动后返回的result
         if (requestCode == StaticVariable.REQUEST_CODE_BLUETOOTH_ON) {
-            Log.i(TAG,"requestCode:"+requestCode);
-            Log.i(TAG,"resultCode:"+resultCode);
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "requestCode:" + requestCode);
+                Log.i(TAG, "resultCode:" + resultCode);
+            }
             switch (resultCode) {
                 // 点击确认按钮 注意这里的值与设备可见时间一致
                 case StaticVariable.VISIBLE_TIME:
-                    Log.i(TAG,"enable RESULT_OK");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "enable RESULT_OK");
+                    }
                     titlePresenter.enableBluetooth();
                     break;
                 // 点击取消按钮或点击返回键
                 case Activity.RESULT_CANCELED:
-                    Log.i(TAG,"enable RESULT_CANCELED");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "enable RESULT_CANCELED");
+                    }
                     break;
                 default:
                     break;

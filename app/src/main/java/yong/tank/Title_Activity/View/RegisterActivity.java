@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import yong.tank.R;
 import yong.tank.Title_Activity.presenter.RegisterPresenter;
+import yong.tank.tool.StaticVariable;
 
 /**
  * Created by hasee on 2016/12/10.
@@ -36,7 +37,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         registerButton.setOnClickListener(this);
         accountText=(TextView)findViewById(R.id.registerAccount_id);
         passwordText=(TextView)findViewById(R.id.registerPassword_id);
-        Log.i(TAG, "Test  RegisterActivity");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "Test  RegisterActivity");
+        }
     }
 
 

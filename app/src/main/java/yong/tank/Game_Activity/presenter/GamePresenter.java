@@ -76,7 +76,9 @@ public class GamePresenter {
                 //蓝牙主动连接成功 但是自身为被动模式
                 case StaticVariable.BLUE_CONNECT_SUCCESS_ACTIVE:
                     //TODO 这里主动连接成功后，为什么为被动模式？？？
-                    Log.i(TAG,"对方蓝牙接入成功,自身为Activity模式");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "对方蓝牙接入成功,自身为Activity模式");
+                    }
                     StaticVariable.BLUE_STATE = 1;
                     gameActivity.showToast("对方蓝牙接入成功,自身为Activity模式");
                     //testDto testDto_1 = new testDto(12,"test");
@@ -89,7 +91,9 @@ public class GamePresenter {
                 case StaticVariable.BLUE_CONNECT_SUCCESS_PASSIVE:
                     gameActivity.showToast("接入对方蓝牙成功，自身为PASSIVE模式");
                     StaticVariable.BLUE_STATE = 1;
-                    Log.i(TAG,"接入对方蓝牙成功，自身为PASSIVE模式");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "接入对方蓝牙成功，自身为PASSIVE模式");
+                    }
                     //TODO 确认连接成功后，开始蓝牙通信的初始化工作
                     gameActivity.initCommunicate();
                     break;
@@ -128,7 +132,9 @@ public class GamePresenter {
                     break;
                 //本地初始化完成.....
                 case StaticVariable.LOCAL_INIT_OVER:
-                    Log.i(TAG,"本地初始化完成。。。。。");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "本地初始化完成。。。。。");
+                    }
                     gameActivity.initCommunicate();
                     break;
             }
@@ -140,7 +146,9 @@ public class GamePresenter {
         //这一部分，在game的地方配置
         //gameActivity.showToast("蓝牙模式开发中..");
         bluetoothadpter = BluetoothAdapter.getDefaultAdapter();
-        Log.i(TAG,"show blue device list");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "show blue device list");
+        }
         Intent intent = new Intent(this.context,BlutToothActivty.class);
         //建立clientBluetooth的对象
         clientCommunicate.setMyHandle(myHandler);

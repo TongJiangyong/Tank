@@ -162,7 +162,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 this.bonusControl();
             }
             //如果当前帧是关键帧，则需要获取服务器的更新数据：
-            Log.i(TAG,"check is key_frame gameCurrentFrame "+gameCurrentFrame);
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "check is key_frame gameCurrentFrame " + gameCurrentFrame);
+            }
             //如果是第0帧，则需要发送一个空包过去,并运行一些只执行一次的方法
             if(gameCurrentFrame == 0){
                 GameSendingData gameFirstData = new GameSendingData(1);
@@ -183,43 +185,62 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     //即，如果本机是Passvie，发送给activity端
                     clientCommunicate.sendInfo(gson.toJson(comFirstDataF));
                 }
-
-                Log.i(TAG,"**************sending first packet****************");
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "**************sending first packet****************");
+                }
                 gameCurrentFrame++;
-                Log.i(TAG,"set 0 frame over : "+gameCurrentFrame);
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "set 0 frame over : " + gameCurrentFrame);
+                }
                 this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
             }else{
-                Log.i(TAG,"**************into recive packet gameCurrentFrame is "+gameCurrentFrame +" StaticVariable.KEY_FRAME is:"+StaticVariable.KEY_FRAME);
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "**************into recive packet gameCurrentFrame is " + gameCurrentFrame + " StaticVariable.KEY_FRAME is:" + StaticVariable.KEY_FRAME);
+                }
                 if(gameCurrentFrame == StaticVariable.KEY_FRAME){
                     //查看是否有服务器的更新包,
                     GameSendingData gameData = null;
-                    Log.i(TAG,"remoteGameData size is :"+remoteGameData.size());
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "remoteGameData size is :" + remoteGameData.size());
+                    }
                     //while(remoteGameData.size()<=0){
                         //等待
                      //   Log.i(TAG,"....wait for data......");
                     //}
                     while(remoteGameData.size()>0&&isGameStartFlag) {
-                        Log.i(TAG,"into remoteGameData polling and gameCurrentFrame is :"+gameCurrentFrame);
+                        if(StaticVariable.DEBUG) {
+                            Log.i(TAG, "into remoteGameData polling and gameCurrentFrame is :" + gameCurrentFrame);
+                        }
                         if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
-                            Log.i(TAG,"***************wait to long********************");
+                            if(StaticVariable.DEBUG) {
+                                Log.i(TAG, "***************wait to long********************");
+                            }
                             remoteWaitTime = 0;
                         }
                         //出列一个数据
                         gameData = remoteGameData.poll();
                         //如果给的数据的帧等于当前的关键帧，则程序向下执行
-                        Log.i(TAG,"if break to deal with key frame gameData.getServerFrame():"+gameData.getServerFrame()+" gameCurrentFrame:"+gameCurrentFrame);
+                        if(StaticVariable.DEBUG) {
+                            Log.i(TAG, "if break to deal with key frame gameData.getServerFrame():" + gameData.getServerFrame() + " gameCurrentFrame:" + gameCurrentFrame);
+                        }
                         if (gameData.getServerFrame()==gameCurrentFrame)
                         {
-                            Log.i(TAG,"into break");
+                            if(StaticVariable.DEBUG) {
+                                Log.i(TAG, "into break");
+                            }
                             break;
                         }
                         remoteWaitTime++;
                     }
                     //TODO  暂时先做不为空处理
-                        Log.i(TAG,"check gameData! = null "+gameData);
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "check gameData! = null " + gameData);
+                    }
                         //更新本地的关键帧序列
                         if (gameData !=null&& (gameData.getServerFrame()==gameCurrentFrame)) {
-                            Log.i(TAG,"reciveData Frame is :" +gameData.getServerFrame() +" gameCurrentFrame is: "+gameCurrentFrame);
+                            if(StaticVariable.DEBUG) {
+                                Log.i(TAG, "reciveData Frame is :" + gameData.getServerFrame() + " gameCurrentFrame is: " + gameCurrentFrame);
+                            }
                             long nextKeyFrame = gameCurrentFrame + StaticVariable.KEY_FRAME_COUNT;
                             //*******************收集准备发送的信息,包括：坦克的移动方向，开火的判断 血条的基本信息***************************
                             //服务器主要负责有：bonus的生成，胜利的判断（血条）   （数据的转发）   击中的判断先将帧同步做好再说，再看怎么处理
@@ -242,10 +263,14 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                             //不断发送信息数据
                             ComDataF comDataF = ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(gameSendingData));
                             if(StaticVariable.CHOSED_RULE==StaticVariable.GAME_RULE.ACTIVITY){
-                                Log.i(TAG,"ACTIVITY sendingData to server");
+                                if(StaticVariable.DEBUG) {
+                                    Log.i(TAG, "ACTIVITY sendingData to server");
+                                }
                                 clientCommunicate.writeToService(gson.toJson(comDataF));
                             }else{
-                                Log.i(TAG,"Passive sendingData to server");
+                                if(StaticVariable.DEBUG) {
+                                    Log.i(TAG, "Passive sendingData to server");
+                                }
                                 clientCommunicate.sendInfo(gson.toJson(comDataF));
                             }
                             //发送完成后，获取服务器得到的数据进行更新：
@@ -271,7 +296,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                         }else{
                             remoteWaitTime++;
                             if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
-                                Log.i(TAG,"***************wait to long********************");
+                                if(StaticVariable.DEBUG) {
+                                    Log.i(TAG, "***************wait to long********************");
+                                }
                                 remoteWaitTime = 0;
                             }
                         }
@@ -279,7 +306,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     //TODO 这里非关键帧的处理方式，,非关键帧，不随大流的变化而变化，可能需要进一步的处理？？？
                     //非关键帧的处理方式：
                     gameCurrentFrame++;
-                    Log.i(TAG,"deal with no key frame "+gameCurrentFrame);
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "deal with no key frame " + gameCurrentFrame);
+                    }
                     this.gameDto.setGameProcessFrameCount(gameCurrentFrame);
                 }
             }
@@ -311,7 +340,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //schedule(TimerTask task, long delay, long period)
         //等待试试10s后开始调度，每隔10s产生一个
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
-            Log.w(TAG, "*********bonus start to maker**************");
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "*********bonus start to maker**************");
+            }
             timerBonus.schedule(bonusMaker, 5000, 9000);
         }
     }
@@ -545,7 +576,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 //TODO 测试，用于重启游戏
                 //在这里进行结束即可.....
                 //gameDto.getEnemyBlood().setBloodNum(1);
-                Log.i(TAG,"result my tank result:over");
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "result my tank result:over");
+                }
                 Message msgResultInfo = gameActivityHandler.obtainMessage();
                 msgResultInfo.what = StaticVariable.GAME_OVER;
                 Bundle bundleResult = new Bundle();
@@ -604,7 +637,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 //测试，用于重启游戏
                 //gameDto.getMyBlood().setBloodNum(1);
                 //gameDto.getEnemyBlood().setBloodNum(1);
-                Log.i(TAG,"result enemy tank result:over");
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "result enemy tank result:over");
+                }
                 Message msgResultInfo = gameActivityHandler.obtainMessage();
                 msgResultInfo.what = StaticVariable.GAME_OVER;
                 Bundle bundleResult = new Bundle();
@@ -656,7 +691,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         @Override
         public void run() {
             //获取bonus的路径
-            Log.w(TAG, "********************************产生一个bonus****************************");
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "********************************产生一个bonus****************************");
+            }
             //随机产生一个bonus，注意这里的bonus和子弹是绑定的
             int bonusType = new Random().nextInt(StaticVariable.BONUSPICTURE.length);
             int bonusDirection =new Random().nextInt(2); //生成随机方向
@@ -664,7 +701,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
 
         public void bonusProductor(int bonusDirection,int bonusType){
-            Log.w(TAG, "********************************产生一个bonus****************************");
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "********************************产生一个bonus****************************");
+            }
             //随机产生一个bonus，注意这里的bonus和子弹是绑定的
             Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(), StaticVariable.BONUSPICTURE[bonusType]);//0~length-1之间的数
             Bonus bonus = new Bonus(bonusPicture, bonusDirection, bonusType);
@@ -802,13 +841,19 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //TODO 完成游戏启动前自身数据的初始化
         this.initLocalDto();
         //TODO 确定通信连接后，完成远程连接工作后其他数据的初始化
-        Log.i(TAG, "game_mode is :" + StaticVariable.CHOSED_MODE);
-        Log.i(TAG, "game_rule is_1:" + StaticVariable.CHOSED_RULE);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "game_mode is :" + StaticVariable.CHOSED_MODE);
+            Log.i(TAG, "game_rule is_1:" + StaticVariable.CHOSED_RULE);
+        }
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL) {
-            Log.i(TAG, "START GAME local。。。。。。");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "START GAME local。。。。。。");
+            }
             this.initLocalActivity();
         } else {
-            Log.i(TAG, "START GAME remote。。。。。。");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "START GAME remote。。。。。。");
+            }
             this.initRemoteActivity();
         }
 
@@ -1030,10 +1075,14 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.INTERNET) {
             Tool.sendSelfIdToServer(this.clientCommunicate);
         }
-        Log.i(TAG, "mode:" + StaticVariable.CHOSED_RULE);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "mode:" + StaticVariable.CHOSED_RULE);
+        }
         if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
             while (!remoteDeviceACKflag&&isGameStartFlag) {
-                Log.i(TAG, "PASSIVE端发起连接.......");
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "PASSIVE端发起连接.......");
+                }
                 if (this.clientCommunicate != null) {
                     Log.i(TAG, "clientCommunicate is ready");
                 } else {
@@ -1049,7 +1098,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
         //在这里等待初始化信息传输完全 ,如果REMOTE_PREPARED_INIT_FLAG不变，则一直在这里等待.....
         while((!REMOTE_PREPARED_INIT_FLAG)&&isGameStartFlag){};
-        Log.i(TAG, "remoteTankType is :" + this.remoteTankType);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "remoteTankType is :" + this.remoteTankType);
+        }
         initLocalEnemyInfo(this.remoteTankType);
     }
 
@@ -1083,7 +1134,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     //主要用来向buffer中填充数据
     @Override
     public void infoRecived(GameSendingData gameData) {
-        Log.i(TAG,"infoRecived"+gameData.getEnemyTankDirection());
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "infoRecived" + gameData.getEnemyTankDirection());
+        }
         remoteGameData.offer(gameData);   //入列
         //下面是与本地模式相关的代码 联网和蓝牙模式，采用在update函数中处理该数据......
         //TODO 一定要在这里强制修改这种模式........
@@ -1145,7 +1198,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
      */
     @Override
     public void commandRecived(ComDataF comDataF) {
-        Log.w(TAG, "reviced cmmand:" + comDataF.getComDataS().getCommad());
+        if(StaticVariable.DEBUG) {
+            Log.w(TAG, "reviced cmmand:" + comDataF.getComDataS().getCommad());
+        }
         String command = comDataF.getComDataS().getCommad();
 /*********************************与游戏初始化相关的命令***************************************************/
         /**activity端接受到passive发送命令,记录远程的Id号码，并发送确认信息**/
@@ -1163,7 +1218,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         } else if (command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT)) {
             this.remoteDeviceACKflag = true;
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
-                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_ACTIVITE_RESPONSE_CONFIRM_CONNECT cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 Tool.sendSelfInfoToActive(this.clientCommunicate,this.gameDto.getMyTank().getTankType());
             } else {
                 Log.i(TAG, "*******************身份错误_2************************");
@@ -1171,7 +1228,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             /** activity接受信息数据，并传输自身的信息数据**/
         } else if (command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_SELFINFO)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
-                Log.w(TAG, "INIT_PASSIVE_RESPONSE_SELFINFO cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_PASSIVE_RESPONSE_SELFINFO cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 //activity接受远程的数据信息
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
                 //Log.i(TAG,"activity recived passive info REMOTE_DENSITY: "+remoteDeviceInfo.screanDesntiy +",REMOTE_SCREEN_HEIGHT:"+remoteDeviceInfo.screanHeight+",REMOTE_SCREEN_WIDTH:"+remoteDeviceInfo.screanWidth);
@@ -1182,7 +1241,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
                 this.remoteTankType = remoteDeviceInfo.tankType;
-                Log.i(TAG, "activity SCALE_SCREEN_WIDTH:"+ SCALE_SCREEN_WIDTH+" and remoteTankType is: "+this.remoteTankType );
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "activity SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH + " and remoteTankType is: " + this.remoteTankType);
+                }
                 Tool.sendSelfInfoToPassive(this.clientCommunicate,this.gameDto.getMyTank().getTankType());
             } else {
                 Log.i(TAG, "*******************身份错误_3************************");
@@ -1190,7 +1251,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             /**  passive接受信息数据，并传输初始化完成命令，等待初始化完成命令，**/
         } else if (command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_SELFINFO)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
-                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_SELFINFO cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_ACTIVITE_RESPONSE_SELFINFO cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 DeviceInfo remoteDeviceInfo = gson.fromJson(comDataF.getComDataS().getObject(), DeviceInfo.class);
                 //Log.i(TAG,"passive recived passive info REMOTE_DENSITY: "+remoteDeviceInfo.screanDesntiy +",REMOTE_SCREEN_HEIGHT:"+remoteDeviceInfo.screanHeight+",REMOTE_SCREEN_WIDTH:"+remoteDeviceInfo.screanWidth);
                 //Log.i(TAG,"passive LOCAL_SCREEN_WIDTH:"+LOCAL_SCREEN_WIDTH);
@@ -1200,7 +1263,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 StaticVariable.SCALE_SCREEN_HEIGHT = (float) StaticVariable.LOCAL_SCREEN_HEIGHT / (float) StaticVariable.REMOTE_SCREEN_HEIGHT;
                 StaticVariable.SCALE_SCREEN_WIDTH = (float) LOCAL_SCREEN_WIDTH / (float) StaticVariable.REMOTE_SCREEN_WIDTH;
                 this.remoteTankType = remoteDeviceInfo.tankType;
-                Log.i(TAG, "activity SCALE_SCREEN_WIDTH:"+ SCALE_SCREEN_WIDTH+" and remoteTankType is: "+this.remoteTankType );
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "activity SCALE_SCREEN_WIDTH:" + SCALE_SCREEN_WIDTH + " and remoteTankType is: " + this.remoteTankType);
+                }
                 Tool.sendInitFinishedToActive(this.clientCommunicate);
             } else {
                 Log.i(TAG, "*******************身份错误_3************************");
@@ -1209,7 +1274,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             /**   activity初始化完成命令，开始进入游戏，并传输初始化完成命令，**/
         } else if (command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_INIT_FINISHED)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
-                Log.w(TAG, "INIT_PASSIVE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_PASSIVE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 Tool.sendInitFinishedToPassive(this.clientCommunicate);
                 //TODO 启动游戏_activity
                 /*****在这里可以启动游戏了._ACTIVITY模式....******/
@@ -1220,7 +1287,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             }
         } else if (command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_INIT_FINISHED)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
-                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_ACTIVITE_RESPONSE_INIT_FINISHED cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 //TODO 启动游戏_passive
                 /*****在这里可以启动游戏了.....PASSIVE模式******/
                 REMOTE_PREPARED_INIT_FLAG = true;
@@ -1230,7 +1299,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             }
         } else if (command.equals(StaticVariable.INIT_PASSIVE_RESPONSE_GAMEOVER)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
-                Log.w(TAG, "INIT_PASSIVE_RESPONSE_GAMEOVER cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_PASSIVE_RESPONSE_GAMEOVER cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 //TODO 结束游戏_ACTIVITY
                 /*****在这里判断游戏是否结束....ACTIVITY模式******/
 
@@ -1239,7 +1310,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             }
         } else if (command.equals(StaticVariable.INIT_ACTIVITE_RESPONSE_GAMEOVER)) {
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
-                Log.w(TAG, "INIT_ACTIVITE_RESPONSE_GAMEOVER cmmand:" + comDataF.getComDataS().getCommad());
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "INIT_ACTIVITE_RESPONSE_GAMEOVER cmmand:" + comDataF.getComDataS().getCommad());
+                }
                 //TODO 结束游戏_passive
                 /*****在这里判断游戏是否结束....passive模式******/
 
@@ -1247,11 +1320,15 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
 
             }
         } else if (command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_DIRECTIRY)) {
-            Log.w(TAG, "RESPONSE_FINISHED_CONNECT_DIRECTIRY cmmand:" + comDataF.getComDataS().getCommad());
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "RESPONSE_FINISHED_CONNECT_DIRECTIRY cmmand:" + comDataF.getComDataS().getCommad());
+            }
             //TODO 中断游戏_direct6
             /*****在这里判断游戏是否主动中断....direction******/
         } else if (command.equals(StaticVariable.RESPONSE_FINISHED_CONNECT_UNDIRECTRIY)) {
-            Log.w(TAG, "RESPONSE_FINISHED_CONNECT_UNDIRECTRIY cmmand:" + comDataF.getComDataS().getCommad());
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "RESPONSE_FINISHED_CONNECT_UNDIRECTRIY cmmand:" + comDataF.getComDataS().getCommad());
+            }
             //TODO 中断游戏_undirect
             /*****在这里判断游戏是否主动中断....direction******/
 
@@ -1259,7 +1336,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             //注意这里是架构有问题，bonus和子弹和爆炸的触发，只能通过这种方式来通知，下面的消息，只有passive能收到
             // 产生新的子弹
         } else if (command.equals(StaticVariable.ACTIVITY_MAKE_EXPLODE)) {
-            Log.i(TAG, "ACTIVITY_MAKE_EXPLODE passive端新建一个explode......");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "ACTIVITY_MAKE_EXPLODE passive端新建一个explode......");
+            }
             Explode explode = gson.fromJson(comDataF.getComDataS().getObject(), Explode.class);
             //TODO 这里的坐标注意变化
             addExplode((int) (explode.getDrawCenter_x() * SCALE_SCREEN_WIDTH),
@@ -1267,7 +1346,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     explode.getExplodeType());
             //bonus的触发，通过这种方式，产生新的bonux
         } else if (command.equals(StaticVariable.ACTIVITY_MAKE_BONUS)) {
-            Log.i(TAG, "passive端新建一个bonus......");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "passive端新建一个bonus......");
+            }
             Bonus bonusTemp = gson.fromJson(comDataF.getComDataS().getObject(), Bonus.class);
             int bonusType = bonusTemp.getBonusType();
             Bitmap bonusPicture = BitmapFactory.decodeResource(context.getResources(), StaticVariable.BONUSPICTURE[bonusType]);//0~length-1之间的数
@@ -1275,7 +1356,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             //设置bonus
             gameDto.setBonus(bonus);
         } else if (command.equals(StaticVariable.MAKE_BULLET)) {
-            Log.i(TAG, "passive端新建一个bullet......");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "passive端新建一个bullet......");
+            }
             //TODO 这里可能有类型转换的错误
             MyBullet bullet = gson.fromJson(comDataF.getComDataS().getObject(), MyBullet.class);
             Bitmap bullet_temp = BitmapFactory.decodeResource(this.context.getResources(), StaticVariable.BUTTLE_BASCINFOS[bullet.getBulletType()].getPicture());

@@ -41,8 +41,10 @@ public class EnemyTank extends Tank implements Serializable{
         //int intervalSpeed = (int)((float)StaticVariable.LOCAL_SCREEN_WIDTH /(float)(2*StaticVariable.LOGICAL_FRAME*tankBascInfo.getSpeed()/10));
         //Log.i(TAG,"intervalSpeed:"+tankBascInfo.getIntervalSpeed());
         this.tankPosition_x=tankPrevPosition_x+tankBascInfo.getIntervalSpeed()*tankDirectrion;
-        Log.i(TAG,"EnemyTank position :"+(float)(this.tankPosition_x+this.tankPicture.getWidth()/2) / (float)StaticVariable.LOCAL_SCREEN_WIDTH+" tankBascInfo.getIntervalSpeed() is:"+tankBascInfo.getIntervalSpeed()+" this.tankPosition_x:"+this.tankPosition_x);
-        //Log.i(TAG,"enermy tankPosition_x ："+tankPosition_x+", tankPrevPosition_x:"+tankPrevPosition_x);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "EnemyTank position :" + (float) (this.tankPosition_x + this.tankPicture.getWidth() / 2) / (float) StaticVariable.LOCAL_SCREEN_WIDTH + " tankBascInfo.getIntervalSpeed() is:" + tankBascInfo.getIntervalSpeed() + " this.tankPosition_x:" + this.tankPosition_x);
+            //Log.i(TAG,"enermy tankPosition_x ："+tankPosition_x+", tankPrevPosition_x:"+tankPrevPosition_x);
+        }
         if(tankPosition_x<StaticVariable.LOCAL_SCREEN_WIDTH /2){
             this.tankPosition_x=this.tankPrevPosition_x;
         }else if((tankPosition_x+this.tankPicture.getWidth())>(StaticVariable.LOCAL_SCREEN_WIDTH )){

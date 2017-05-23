@@ -6,6 +6,8 @@ import android.util.Log;
 
 import java.io.Serializable;
 
+import yong.tank.tool.StaticVariable;
+
 /**
  * Created by hasee on 2016/11/1.
  */
@@ -29,7 +31,9 @@ public class Explode implements Serializable {
         //计算血条的比例
         canvas.drawBitmap(this.explodeFrame[currentFrame], this.getDrawCenter_x(),this.getDrawCenter_y(), null);//绘制子弹
         currentFrame++;
-        Log.w(TAG,"explode draw");
+        if(StaticVariable.DEBUG) {
+            Log.w(TAG, "explode draw");
+        }
     }
 
     public int getCurrentFrame() {

@@ -119,7 +119,7 @@ public class StaticVariable {
     public static int ENTANKEBACK = -1;
 
     //用于JAVA注释的flag
-    public final boolean DEBUG = false;
+    public final static boolean DEBUG = false;
 
     //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)

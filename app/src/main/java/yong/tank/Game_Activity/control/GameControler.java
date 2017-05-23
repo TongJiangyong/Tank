@@ -81,7 +81,9 @@ public class GameControler {
             long currentLogicalTimeCount = gameTimeCount;
             long previousFrameTimeCount = gameTimeCount;
             long currentFrameTimeCount = gameTimeCount;
-            Log.i(TAG,"************************into restart Game*************************");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "************************into restart Game*************************");
+            }
             while (gameStartFlag) {
                 gameLoop = 0;
                 while (getCurrentTimeCount() >= gameTimeCount && gameLoop < StaticVariable.MAX_FRAMESKIP){
@@ -115,8 +117,11 @@ public class GameControler {
                 }
                 viewDraw.drawFrame(interpolation);
                 long after = getCurrentTimeCount();
-                Log.i(TAG,"******************draw Frame："+1000/(after-currentFrameTimeCount)+"******current duration  is "+(currentLogicalTimeCount-previousFrameTimeCount)+"*******************");
-                previousFrameTimeCount = currentFrameTimeCount;
+                if(StaticVariable.DEBUG) {
+                    Log.i(TAG, "******************draw Frame：" + 1000 / (after - currentFrameTimeCount) + "******current duration  is " + (currentLogicalTimeCount - previousFrameTimeCount) + "*******************");
+                    previousFrameTimeCount = currentFrameTimeCount;
+                }
+
             }
 
         }

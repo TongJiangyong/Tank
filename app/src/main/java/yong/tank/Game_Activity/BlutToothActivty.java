@@ -90,7 +90,9 @@ public class BlutToothActivty extends Activity {
 				showToast("等待其他设备接入中.......");
 				Intent intent = new Intent();
 				StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.ACTIVITY;
-				Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
+				if(StaticVariable.DEBUG) {
+					Log.i(TAG, "CHOSED_RULE is :" + StaticVariable.CHOSED_RULE);
+				}
 				setResult(Activity.DEFAULT_KEYS_SHORTCUT, intent);
 				finish();
 			}

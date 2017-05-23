@@ -258,16 +258,22 @@ public class GameActivity extends Activity implements View.OnClickListener {
             {
                 // 点击确认按钮
                 case Activity.RESULT_OK:
-                    Log.i(TAG,"toBlueTankChose");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "toBlueTankChose");
+                    }
                     gamePresenter.toBlueTankChose(resultCode, data);
                     break;
                 case Activity.DEFAULT_KEYS_SHORTCUT:
-                    Log.i(TAG,"等待蓝牙设备连入.....");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "等待蓝牙设备连入.....");
+                    }
                     break;
                 default:
-                    Log.i(TAG,"退出蓝牙选择界面，默认为等待设备连入");
+                    if(StaticVariable.DEBUG) {
+                        Log.i(TAG, "退出蓝牙选择界面，默认为等待设备连入");
+                        Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
+                    }
                     StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.ACTIVITY;
-                    Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
                     //关掉相关的blue tooth
                     //gamePresenter.turnOffCommunicate();
                     break;
@@ -300,7 +306,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
         gameControler.startGame();
         //允许按钮操作
         this.startFlag = true;
-        Log.i(TAG,"开始游戏.....");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "开始游戏.....");
+        }
         this.showToast("开始游戏...");
     }
 
