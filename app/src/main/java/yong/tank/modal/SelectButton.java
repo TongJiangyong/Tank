@@ -31,13 +31,18 @@ public class SelectButton extends LinearLayout{
     private Handler myHandler = new Handler() {
         public void handleMessage (Message msg) {//此方法在ui线程运行
             switch(msg.what){
-                case StaticVariable.MSG_UPDATE:
+                case StaticVariable.MSG_UPDATE_SELECTBUTTON:
                     Integer bullletNum = msg.getData().getInt("bullletNum");//接受msg传递过来的参数
                     Integer bullletPicture = msg.getData().getInt("bullletPicture");//接受msg传递过来的参数
                     Integer bullletType= msg.getData().getInt("bullletType");//接受msg传递过来的参数
                     setBulletType(bullletType);
                     setButtonPic(bullletPicture);
                     setBulletNum(bullletNum);
+                    break;
+                case StaticVariable.MSG_UPDATE_LEFT_BULLET_NUM:
+                    subtractBulletNum();
+                    setBulletNum(bulletNum);
+                    break;
             }
 
         }

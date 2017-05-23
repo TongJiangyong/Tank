@@ -91,6 +91,7 @@ public class ServerService implements Runnable,ServerCommunicate{
                 passiveData.setEnemyTankBulletDistance(activityData.getMyTankBulletDistance());
                 passiveData.setEnemyTankBloodNum(activityData.getMyTankBloodNum());
                 passiveData.setEnemyTankEnableFire(activityData.getMyTankEnableFire());
+                passiveData.setEnemyTankBulletType(activityData.getMyBulletType());
                 passiveData.setServerFrame(serverFrame);
                 //填充activityData数据
                 activityData.setEnemyTankDirection(passiveData.getMyTankDirection());
@@ -98,6 +99,7 @@ public class ServerService implements Runnable,ServerCommunicate{
                 activityData.setEnemyTankBulletDistance(passiveData.getMyTankBulletDistance());
                 activityData.setEnemyTankBloodNum(passiveData.getMyTankBloodNum());
                 activityData.setEnemyTankEnableFire(passiveData.getMyTankEnableFire());
+                activityData.setEnemyTankBulletType(passiveData.getMyBulletType());
                 activityData.setServerFrame(serverFrame);
                 //发送给activivity
                 this.sendDataToActivity(ComDataPackage.packageToF(StaticVariable.REMOTE_DEVICE_ID + "#", StaticVariable.COMMAND_INFO, gson.toJson(activityData)));

@@ -172,6 +172,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 gameFirstData.setMyTankDegree(this.gameDto.getMyTank().getWeaponDegree());
                 gameFirstData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
                 gameFirstData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                gameFirstData.setMyBulletType(this.gameDto.getMyTank().getSelectedBullets());
                 gameFirstData.setMyTankEnableFire(false);
                 gameFirstData.setServerFrame(0);
                 //不断发送信息数据
@@ -232,6 +233,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                             gameSendingData.setMyTankDegree(this.gameDto.getPlayerPain().getTankDegree());
                             gameSendingData.setMyTankBulletDistance(this.gameDto.getMyTank().getFirePower());
                             //gameSendingData.setMyTankBloodNum(this.gameDto.getMyBlood().getBloodNum());
+                            gameSendingData.setMyBulletType(this.gameDto.getMyTank().getSelectedBullets());
                             gameSendingData.setServerFrame(nextKeyFrame);
                             gameSendingData.setMyTankEnableFire(false);
                             //使用tank发送进行判断即可.......
@@ -254,8 +256,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
 
                             //主要是填充自己和对方的坦克两种：
                             //Log.i(TAG, "gameData.getMyTankDegree is:" + gameData.getMyTankDegree());
-                            this.remoteSetMyTank(gameData.getMyTankDegree(), gameData.getMyTankDirection(), gameData.getMyTankEnableFire());
-                            this.remoteSetEnmyTank(gameData.getEnemyTankDegree(), gameData.getEnemyTankDirection(), gameData.getEnemyTankEnableFire(),gameData.getEnemyTankBulletDistance());
+                            this.remoteSetMyTank(gameData.getMyTankDegree(), gameData.getMyTankDirection(), gameData.getMyTankEnableFire(),gameData.getMyBulletType());
+                            this.remoteSetEnmyTank(gameData.getEnemyTankDegree(), gameData.getEnemyTankDirection(), gameData.getEnemyTankEnableFire(),gameData.getEnemyTankBulletDistance(),gameData.getEnemyTankBulletType());
                             //处理bonus的过程,即如果广播有bonus产生，则产生bonus
                             if (gameData.getEnableBonus()) {
                                 bonusMaker.bonusProductor(gameData.getBonusDirction(), gameData.getBonusType());
@@ -427,7 +429,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                 //这里涉及上主线程UI更新的问题，比较麻烦，在android中只能采用message通知的方法
                 // selectView并不是采用实时刷新的方法做的，所以比较麻烦
                 Message msg = new Message();
-                msg.what = StaticVariable.MSG_UPDATE;
+                msg.what = StaticVariable.MSG_UPDATE_SELECTBUTTON;
                 Bundle bundle = new Bundle();
                 bundle.putInt("bullletNum", StaticVariable.BUTTON_NUM_ORIGN);  //设置子弹数量
                 bundle.putInt("bullletType", bulletType);  //设置子弹的种类
@@ -838,9 +840,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     }
 
     //敌方数据发射子弹.....
-    public void enemyTankOnFire(int degree,double distance){
+    public void enemyTankOnFire(int degree,double distance,int enemyBulletType){
         //***************发射子弹*************
-        EnemyBullet enemyBullet = initEnemyBullet(this.gameDto.getMyTank().getSelectedBullets(),degree,distance);
+        EnemyBullet enemyBullet = initEnemyBullet(enemyBulletType,degree,distance);
         //在tank中加入子弹
         //Log.i(TAG,"getFirePath is *************************:"+enemyBullet.getFirePath().size());
 /*        for(int i=0;i<enemyBullet.getFirePath().size();i++){
@@ -872,13 +874,13 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //初始化子弹的角度
         int initDegree = 0;
         double initDistance  = 0;
-        //对本地模式的处理
+        //对本地模式的处理 这里不应该写在这里，不过随便啦，就这样呗......
         if (StaticVariable.CHOSED_MODE == StaticVariable.GAME_MODE.LOCAL){
             initDegree = degree;
             initDistance = distance;
             //给一点随机误差
-            //initDistance = initDistance+Tool.randomDoubleMaker(0,0.2); //射程给0.2的误差
-            //initDegree = initDegree+(int)Tool.randomDoubleMaker(0,10); //角度给10的误差
+            initDistance = initDistance+Tool.randomDoubleMaker(-0.2,0.2); //射程给0.2的误差
+            initDegree = initDegree+(int)Tool.randomDoubleMaker(-10,10); //角度给10的误差
             //TODO 这里将distance做随机处理
             if(initDistance<=0.2||initDistance>=1){
                 //小于0则设定一个固定值
@@ -888,8 +890,8 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             if(initDegree>0){
                 initDegree = initDegree-10;
             }
-            Log.i(TAG,"initDegree is *************************:"+initDegree);
-            Log.i(TAG,"initDistance is *************************:"+initDistance);
+            //Log.i(TAG,"initDegree is *************************:"+initDegree);
+            //Log.i(TAG,"initDistance is *************************:"+initDistance);
             //对remote模式的处理.....
         }else{
             initDegree = degree;
@@ -901,7 +903,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //注意这里，角度为负数
         double bulletV_x=StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getEnemyTank().getSelectedBullets()].getSpeed()*initDistance*Math.cos(Math.toRadians(initDegree));
         double bulletV_y=-StaticVariable.BUTTLE_BASCINFOS[this.gameDto.getEnemyTank().getSelectedBullets()].getSpeed()*initDistance*Math.sin(Math.toRadians(initDegree));
-        Log.i(TAG,"initDistance is "+initDistance+" initDegree:"+initDegree+" bulletV_x:" +bulletV_x+" bulletV_y :"+bulletV_y);
+        //Log.i(TAG,"initDistance is "+initDistance+" initDegree:"+initDegree+" bulletV_x:" +bulletV_x+" bulletV_y :"+bulletV_y);
         EnemyBullet enemyBullet = new EnemyBullet(bulletPicture,bulletType,bulletV_x,bulletV_y,
                 this.gameDto.getEnemyTank().getWeaponPoxition_x(),this.gameDto.getEnemyTank().getWeaponPoxition_y());
         enemyBullet.setBulletDegree(initDegree);
@@ -917,9 +919,9 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     }
 
     //让我的tank发送子弹
-    public void myTankOnFire() {
+    public void myTankOnFire(int myTankBulletType) {
         //***************发射子弹*************
-        MyBullet myBullet = initMyBullet(this.gameDto.getMyTank().getSelectedBullets());
+        MyBullet myBullet = initMyBullet(myTankBulletType);
         //在tank中加入子弹
         this.gameDto.getMyTank().addBuleetFire(myBullet);
         //***************重置装填的时间*************
@@ -935,7 +937,11 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //如果当前的子弹类型不为初始类型，则需要更新计数
         if (gameDto.getMyTank().getSelectedBullets() != StaticVariable.ORIGIN) {
             //子弹计数
-            gameDto.getSelectButtons().get(R.id.selectButton_2).subtractBulletNum();
+            //这里涉及上主线程UI更新的问题，比较麻烦，在android中只能采用message通知的方法
+            // selectView并不是采用实时刷新的方法做的，所以比较麻烦
+            Message msg = new Message();
+            msg.what = StaticVariable.MSG_UPDATE_LEFT_BULLET_NUM;
+            gameDto.getSelectButtons().get(R.id.selectButton_2).getMyHandler().sendMessage(msg);
             this.gameDto.getMyTank().setSelectedBulletsNum(gameDto.getSelectButtons().get(R.id.selectButton_2).getBulletNum());
         }
     }
@@ -1058,28 +1064,23 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                     this.enemyTankOnFire();
                 }*/
                 //注意这里，由于方法和蓝牙的有冲突，默认 给0
-                this.remoteSetEnmyTank(gameData.getEnemyTankDegree(),gameData.getEnemyTankDirection(),gameData.getEnemyTankEnableFire(),0);
+                this.remoteSetEnmyTank(gamedTempData.getEnemyTankDegree(),gamedTempData.getEnemyTankDirection(),gamedTempData.getEnemyTankEnableFire(),gamedTempData.getEnemyTankBulletDistance(),gamedTempData.getEnemyTankBulletType());
 
             }
 
         }
     }
 
-    public void remoteSetEnmyTank(int tankDegree,int tankDirection,boolean tankFireFlag,double distance){
+    public void remoteSetEnmyTank(int tankDegree,int tankDirection,boolean tankFireFlag,double distance,int enemyBulletType){
         this.gameDto.getEnemyTank().setWeaponDegree(-tankDegree);
         this.gameDto.getEnemyTank().setTankDirection(-tankDirection);
         //Log.i(TAG,"gameData.getEnemyTankDirection():"+gameData.getEnemyTankDirection());
         //设置enemy坦克的开火属性
         if(tankFireFlag){
-            if (StaticVariable.CHOSED_MODE==StaticVariable.GAME_MODE.LOCAL){
-                this.enemyTankOnFire(this.gameDto.getMyTank().getWeaponDegree(),this.gameDto.getMyTank().getFirePower());
-            }else{
-                this.enemyTankOnFire(tankDegree,distance);
-            }
-
+            this.enemyTankOnFire(tankDegree,distance,enemyBulletType);
         }
     }
-    public void remoteSetMyTank(int tankDegree,int tankDirection,boolean tankFireFlag){
+    public void remoteSetMyTank(int tankDegree,int tankDirection,boolean tankFireFlag,int myTankBulletType){
         //Log.i(TAG,"is mytank is null ? "+this.gameDto.getMyTank());
         //Log.i(TAG,"is Enertank is null ? "+this.gameDto.getEnemyTank());
         this.gameDto.getMyTank().setWeaponDegree(tankDegree);
@@ -1087,7 +1088,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         //Log.i(TAG,"gameData.getEnemyTankDirection():"+gameData.getEnemyTankDirection());
         //设置enemy坦克的开火属性
         if(tankFireFlag){
-            this.myTankOnFire();
+            this.myTankOnFire(myTankBulletType);
         }
     }
 

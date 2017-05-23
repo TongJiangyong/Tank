@@ -221,7 +221,7 @@ public class PlayControler {
                 //对非远程模式来说，则需要做如下处理：
                 //1、发射子弹，2、并重置装填的时间，3、更新bullet的计数
             }else{
-                this.gameControler.getGameService().myTankOnFire();
+                this.gameControler.getGameService().myTankOnFire(this.gameDto.getMyTank().getSelectedBullets());
             }
         }
 

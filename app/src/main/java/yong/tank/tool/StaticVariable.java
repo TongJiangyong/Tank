@@ -189,7 +189,9 @@ public class StaticVariable {
     //gameservice中toast更新
     public final static int MSG_TOAST = 0;
     //button中message更新
-    public final static int MSG_UPDATE = 1;
+    public final static int MSG_UPDATE_SELECTBUTTON = 1;
+    //button中更新剩余数量
+    public final static int MSG_UPDATE_LEFT_BULLET_NUM = 6;
     //网络连接成功
     public final static int MSG_CONNECT_SUCCESS = 2;
     //网络连接失败
