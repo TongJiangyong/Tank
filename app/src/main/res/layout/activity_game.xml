@@ -100,7 +100,7 @@
         android:layout_marginTop="30dp"
         android:ellipsize="end"
         android:maxLines="8"
-        android:text="测试 sdf \n  sdfsdf \n 是否水电费 sdfsdf  \n  \n  \n "
+        android:text=""
         android:layout_alignTop="@+id/msgView"
         android:layout_alignLeft="@+id/msgView"
         android:layout_alignStart="@+id/msgView" /> <!--invisible /visibale-->

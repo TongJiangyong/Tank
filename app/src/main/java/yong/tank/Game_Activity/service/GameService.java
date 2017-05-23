@@ -1252,10 +1252,15 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     @Override
     public void msgRecived(String msg) {
         Log.w(TAG, "reviced msg:" + msg);
+        //这里可能需要设置，不能再主线程中更新UI
         String orginText = this.gameDto.getMsgText().getText().toString();
         orginText = orginText + "\n" + REMOTE_DEVICE_ID + ": " + msg;
-        this.gameDto.getMsgText().setText(orginText);
-
+        Message msgInfo = gameActivityHandler.obtainMessage();
+        msgInfo.what = StaticVariable.UPDATE_MSG_INFO;
+        Bundle bundleMsg = new Bundle();
+        bundleMsg.putString("MSG", orginText);  //设置子弹数量
+        msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
+        gameActivityHandler.sendMessage(msgInfo);
     }
 
     public boolean isLocalTankOnfire() {

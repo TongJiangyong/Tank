@@ -201,7 +201,8 @@ public class ClientBluetooth implements ClientCommunicate {
      */
     public synchronized void stop() {
         if (D) Log.i(TAG, "stop");
-
+        //停止已经连接的蓝牙读写线程.....
+        this.mConnectedThread.stopBluetoothConnected();
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;

@@ -67,6 +67,14 @@ public class BluetoothConnected extends Thread implements Subject {
             this.serverService= serverService;
         }
     }
+    public void stopBluetoothConnected(){
+        //停止读的线程
+        this.readFlag = false;
+        //停止写的线程
+        this.blueOutputThread.stopBlueOutputThread();
+        //停止thread
+        this.cancel();
+    }
 
     public void run() {
         //主线程开始前，先给serverService配置蓝牙适配器
@@ -209,8 +217,8 @@ public class BluetoothConnected extends Thread implements Subject {
             }
         }
 
-        public void setStart(boolean isStart) {
-            this.isStart = isStart;
+        public void stopBlueOutputThread() {
+            this.isStart = false;
         }
 
         // 这里处理跟服务器是一样的

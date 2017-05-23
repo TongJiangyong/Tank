@@ -65,6 +65,10 @@ public class GameActivity extends Activity implements View.OnClickListener {
                     Log.i(TAG,"接受两次....");
                     startGame();
                     break;
+                case StaticVariable.UPDATE_MSG_INFO:
+                    String msgInfo = msg.getData().getString("MSG");//接受msg传递过来的参数
+                    msgText.setText(msgInfo);
+                    break;
             }
 
         }

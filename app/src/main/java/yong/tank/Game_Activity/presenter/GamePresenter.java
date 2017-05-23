@@ -162,14 +162,15 @@ public class GamePresenter {
             if(sendInfo.length()==0){
                 gameActivity.showToast("发送的信息不能为空....");
             }else{
-                //发送消息s
-                Tool.sendMsg(this.clientCommunicate,sendInfo);
                 //增加显示消息
                 String orginText = gameActivity.msgText.getText().toString();
                 orginText=orginText+ "\n"+LOCAL_USER_INFO.getUsername()+": "+sendInfo;
+                Log.i(TAG,"send msg:is :"+sendInfo);
                 gameActivity.msgText.setText(orginText);
                 //消除input中的信息
                 gameActivity.msg_input.setText("");
+                //发送消息s
+                Tool.sendMsg(this.clientCommunicate,sendInfo);
             }
         }
 

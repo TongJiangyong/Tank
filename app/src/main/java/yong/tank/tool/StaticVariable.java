@@ -231,6 +231,9 @@ public class StaticVariable {
     //开始游戏
     public final static int GAME_STARTED = 12;
 
+    //在UI线程更新msg显示：
+    public final static int  UPDATE_MSG_INFO = 13;
+
     /* 信息交互coomand相关的代码 */
     public final static String INIT_SEND_ID_SERVER ="1"; //发送数据到server端
     public final static String INIT_PASSIVE_REQUEST_CONNECT ="2"; //passive发送连接命令到activity端，并传递自身的ID号、确认信息
