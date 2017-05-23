@@ -35,14 +35,15 @@ public class ExplodeFrame {
                 //每一个爆炸点需要的属性： 位置（x,y）,爆炸图像等....
                     //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色 这句话不能缺，缺了好像就不能将原画删除
                     //gameDto.getBlood().drawSelf(canvas);
+                if(flag){
                     explodes = this.gameDto.getExplodes();
                 //TODO 这里很容易出问题，因为逻辑不应该在这里完成....
                     if (explodes.size() != 0) {
-                        for (int i = (explodes.size()-1); i >=0; i--) {
+                        for (int i = (explodes.size() - 1); i >= 0; i--) {
                             if ((explodes.get(i).getExplodeType() == StaticVariable.EXPLODE_TYPE_GROUND &&
-                                    explodes.get(i).getCurrentFrame() == (StaticVariable.EXPLODESPICTURE_GROUND.length))||
-                                     (explodes.get(i).getExplodeType() == StaticVariable.EXPLODE_TYPE_TANK &&
-                                     explodes.get(i).getCurrentFrame() == (StaticVariable.EXPLODESPICTURE_TANKE.length))) {
+                                    explodes.get(i).getCurrentFrame() == (StaticVariable.EXPLODESPICTURE_GROUND.length)) ||
+                                    (explodes.get(i).getExplodeType() == StaticVariable.EXPLODE_TYPE_TANK &&
+                                            explodes.get(i).getCurrentFrame() == (StaticVariable.EXPLODESPICTURE_TANKE.length))) {
                                 //绘制完成
                                 explodes.remove(i);
                             } else {
@@ -50,6 +51,7 @@ public class ExplodeFrame {
                                 explodes.get(i).drawSelf(canvas);
                             }
                         }
+                    }
                     }
             }
             catch (Exception e) {

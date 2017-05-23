@@ -21,6 +21,7 @@ import yong.tank.Communicate.InterfaceGroup.ClientCommunicate;
 import yong.tank.Dto.testDto;
 import yong.tank.Game_Activity.BlutToothActivty;
 import yong.tank.Game_Activity.GameActivity;
+import yong.tank.Result_Activity.view.ResultActivity;
 import yong.tank.tool.StaticVariable;
 import yong.tank.tool.Tool;
 
@@ -42,6 +43,19 @@ public class GamePresenter {
         this.context=context;
         this.gameActivity = gameActivity;
     }
+
+    //游戏正常结束，跳转到胜负处理界面
+    public void toResultActivity(int gameResult){
+        //titleView.showToast("开始人机大战");
+        //1表示人机，2表示蓝牙，3表示普通
+        Intent intent = new Intent(context,ResultActivity.class);
+        intent.putExtra("gameResult", gameResult);
+        context.startActivity(intent);
+    }
+
+
+
+
     //处理Internet、蓝牙连接的一些反馈信息
     private Handler myHandler = new Handler() {
         public void handleMessage (Message msg) {//此方法在ui线程运行

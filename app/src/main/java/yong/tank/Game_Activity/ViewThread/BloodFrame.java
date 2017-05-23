@@ -26,9 +26,11 @@ public class BloodFrame {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
             try {
                     //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                    gameDto.getMyBlood().drawSelf(canvas);
-                    if(gameDto.getEnemyBlood()!=null){
-                        gameDto.getEnemyBlood().drawSelf(canvas);
+                if(flag){
+                        gameDto.getMyBlood().drawSelf(canvas);
+                        if(gameDto.getEnemyBlood()!=null){
+                            gameDto.getEnemyBlood().drawSelf(canvas);
+                        }
                     }
                 }
             catch (Exception e) {

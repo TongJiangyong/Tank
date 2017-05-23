@@ -8,9 +8,11 @@
     tools:context="yong.tank.Title_Activity.View.MainActivity">
 
     <ImageView
+        android:src="@mipmap/callboard"
         android:id="@+id/help_bg"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:adjustViewBounds="true"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true">
     </ImageView>
@@ -54,5 +56,19 @@
         android:layout_alignEnd="@+id/help_bg">
         android:layout_alignStart="@+id/help_backTitle">
     </Button>
+
+    <ImageView
+        android:src="@mipmap/help_tank"
+        android:id="@+id/help_tank"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:adjustViewBounds="true"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/arrowLeftButton"
+        android:layout_toLeftOf="@+id/arrowRightButton"
+        android:layout_toEndOf="@+id/arrowLeftButton"
+        android:layout_toStartOf="@+id/arrowRightButton">
+    </ImageView>
+
 
 </RelativeLayout>

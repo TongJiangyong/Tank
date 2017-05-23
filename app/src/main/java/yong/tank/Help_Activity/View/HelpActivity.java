@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -28,6 +26,7 @@ import yong.tank.tool.Tool;
 
 public class HelpActivity extends Activity implements View.OnClickListener{
     private Bitmap help_bg;    //帮助背景
+    private ImageView help_tank;    //帮助背景
     private Button directionButton_right;  //方向右按钮
     private Button directionButton_left;  //方向左按钮
     private Button backButton;   //返回标题按钮
@@ -42,16 +41,17 @@ public class HelpActivity extends Activity implements View.OnClickListener{
         setContentView(R.layout.help_layout);
         RelativeLayout help_layout = (RelativeLayout) findViewById(R.id.help_layout);
         //这里是设置图片的部分
-        ImageView helpBg = (ImageView) findViewById(R.id.help_bg);
+        help_tank = (ImageView) findViewById(R.id.help_tank);
         //设置背景图片，因为要进行拉伸没办法，必须要这么做.....
-        Bitmap help_bg_temp  = BitmapFactory.decodeResource(getResources(),R.mipmap.callboard);
+        //Bitmap help_bg_temp  = BitmapFactory.decodeResource(getResources(),R.mipmap.callboard);
         //TODO 将图像放大N倍的硬编码,不知道为啥，这里的图片设置，很怪异,大概是这个浮动的影响，而且经常报错误out of memery
         //float size = (float) ((float)(StaticVariable.LOCAL_SCREEN_WIDTH)/(float)help_bg_temp.getWidth()*2.5);
         //Log.w(TAG,"LOCAL_SCREEN_WIDTH:"+StaticVariable.LOCAL_SCREEN_WIDTH +"  help_bg_temp:"+help_bg_temp.getWidth()+"  size:"+size +"  help_bg_temp_h:"+help_bg_temp.getHeight());
-        help_bg = Tool.reBuildImg(help_bg_temp,0,7,7,false,false);
+        //help_bg = Tool.reBuildImg(help_bg_temp,0,7,7,false,false);
+        //help_tank =  Tool.reBuildImg(help_bg_temp,0,7,7,false,false);
         //Log.w(TAG,"help_bg_temp:"+help_bg.getWidth());
-        Tool.releaseBitmap(help_bg_temp);
-        helpBg.setBackgroundDrawable(new BitmapDrawable(help_bg));
+        //Tool.releaseBitmap(help_bg_temp);
+        //helpBg.setBackgroundDrawable(new BitmapDrawable(help_bg));*/
         //设置两个箭头按钮
         directionButton_right = (Button)findViewById(R.id.arrowRightButton);
         directionButton_left = (Button)findViewById(R.id.arrowLeftButton);
@@ -78,11 +78,14 @@ public class HelpActivity extends Activity implements View.OnClickListener{
                 directionButton_right.setVisibility(View.INVISIBLE);
                 directionButton_left.setVisibility(View.VISIBLE);
                 textView.setText(StaticVariable.STATEMENTINFO);
+                help_tank.setVisibility(View.INVISIBLE);
                 break;
             case R.id.arrowLeftButton:
                 directionButton_left.setVisibility(View.INVISIBLE);
                 directionButton_right.setVisibility(View.VISIBLE);
-                textView.setText(StaticVariable.HELPINFO);
+                //TODO 这里可以放一幅截图
+                //textView.setText(StaticVariable.HELPINFO);
+                help_tank.setVisibility(View.VISIBLE);
                 break;
         }
 

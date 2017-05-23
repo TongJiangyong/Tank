@@ -37,8 +37,10 @@ public class BonusFrame {
             //TODO 这里以后想想，交互的话，该怎么办？
             //Log.d(TAG,gameDto.getMyTank().getTankBascInfo().getTankName());
             //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-            if (this.gameDto.getBonus() != null) {
-                this.gameDto.getBonus().drawSelf(canvas);
+            if(flag) {
+                if (this.gameDto.getBonus() != null) {
+                    this.gameDto.getBonus().drawSelf(canvas);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

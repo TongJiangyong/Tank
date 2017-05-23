@@ -6,29 +6,31 @@
     android:layout_height="match_parent"
     android:id="@+id/re_1"
   >
-    
+
 		<Button
 		    android:layout_alignParentTop="true"
-		    android:layout_alignParentLeft="true"
-		    android:id="@+id/can_discovered"
-		    android:layout_width="150dp"
+			android:id="@+id/can_discovered"
+		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:text="等待设备接入"
-		/>
-		    <Button
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentStart="true" />
+<!--		    <Button
 		    android:layout_toRightOf="@id/can_discovered"
 		    android:layout_alignBaseline="@id/can_discovered"
 		    android:id="@+id/scan_bluetooth"
 		    android:layout_width="150dp"
 		    android:layout_height="wrap_content"
 		    android:text="接入其他设备"
-		    />
+		    />-->
 
 <TextView
     android:id="@+id/al"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@id/scan_bluetooth"
+    android:layout_below="@id/can_discovered"
     android:text="已配对设备"
     />
 <ListView

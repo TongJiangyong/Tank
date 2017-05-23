@@ -24,6 +24,7 @@ public class StaticVariable {
     //设置游戏的关键帧增长率
     public static int KEY_FRAME_COUNT = 3;
     //设置关键帧的帧为： ----3-6-9-12-15-18-----
+    //TODO 这里处理的不是很好，最好不要随便写这种会改变的全局变量
     public static long KEY_FRAME = 3;
     //设置 游戏的最大跳过帧数为5：
     public static int  MAX_FRAMESKIP = 5;
@@ -97,10 +98,12 @@ public class StaticVariable {
     public static int TANK_LOADING_TIME = 1;
     public static String HELPINFO = "这里加一些帮助信息";
     public static String STATEMENTINFO =
-            "   这个程序是自己为了熟悉android studio和apk开发流程所编写的学习程序,\n" +
+            "   这个程序是自己为了熟悉android studio和apk开发流程所写的学习程序,\n" +
             "   程序中代码和程序中所用到图片等资源都来源于网络\n" +
             "   代码和参考的用例程序均托管在github中，地址为：\n" +
-            "   https://github.com/TongJiangyong/Tank";
+            "   https://github.com/TongJiangyong/Tank \n"+
+            "   上述开放的资料中如有不合适开放的内容，请联系以下邮箱，提醒我及时删除，谢谢。\n"+
+            "    tongjiangyong2009@163.com";
     public static int SELECT_WORD_SIZE =13;
     public static int SELECT_DECRIBE_SIZE =15;
     //设置程序画笔的统一宽度
@@ -115,7 +118,10 @@ public class StaticVariable {
     public static int ENTANKEFORWARD = 1;
     public static int ENTANKEBACK = -1;
 
-//初始化子弹的变量
+    //用于JAVA注释的flag
+    public final boolean DEBUG = false;
+
+    //初始化子弹的变量
 //public BulletBascInfo(int type, int speed, int power, int picture, String bulletName)
     //speed的设定为子弹如果平射，1s走过的距离是屏幕宽度的多少倍
     public static BulletBascInfo[] BUTTLE_BASCINFOS = {
@@ -202,7 +208,6 @@ public class StaticVariable {
     public final static int MSG_COMMUNICATE_OUT=5;
 
 
-
     //定义蓝牙相关的量：
     public static final String BLUE_DEVICE_NAME = "YONG";
     public static final String BLUE_FAILED_MESSAGE = "BLUE_FAILED_MESSAGE";
@@ -231,6 +236,10 @@ public class StaticVariable {
     //开始游戏
     public final static int GAME_STARTED = 12;
 
+    //游戏正常分胜负结束
+    public final static int GAME_OVER = 14;
+    public final static int GAME_WIN = 0;
+    public final static int GAME_LOST = 1;
     //在UI线程更新msg显示：
     public final static int  UPDATE_MSG_INFO = 13;
 
@@ -257,8 +266,9 @@ public class StaticVariable {
     public final static String SERVER_READY = "17";
 
 
-//定义网络中双方是否初始化完全，DTO未初始化
+    //定义网络中双方是否初始化完全，DTO未初始化
     //TODO 注意在断开时，要结束这个变量
+    //这种会改变的全局变量.....最好不要随便乱写
     public static boolean REMOTE_PREPARED_INIT_FLAG =false;
 
 

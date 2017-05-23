@@ -30,7 +30,7 @@ public class BlutToothActivty extends Activity {
 	private static final String TAG = "BlutToothActivty";
 	private ListView ListOld = null;
 	private ListView ListNew = null;
-	private Button bu_scan = null;
+	//private Button bu_scan = null;
 	private Button bu_can_check= null;
 	private BluetoothAdapter bluetoothadapter=null;
 	private ArrayAdapter<String> arraybluetoothdevice=null,NewAdapterdevice=null;
@@ -44,7 +44,7 @@ public class BlutToothActivty extends Activity {
 		bu_can_check = (Button)findViewById(R.id.can_discovered);
 		ListOld = (ListView)findViewById(R.id.list_old_device);
 		ListNew = (ListView)findViewById(R.id.list_new_device);
-		bu_scan = (Button)findViewById(R.id.scan_bluetooth);
+		//bu_scan = (Button)findViewById(R.id.scan_bluetooth);
 		bluetoothadapter = BluetoothAdapter.getDefaultAdapter();
 		arraybluetoothdevice = new ArrayAdapter<String>(this,R.layout.device_name);
 		NewAdapterdevice = new ArrayAdapter<String>(this,R.layout.device_name);
@@ -62,7 +62,7 @@ public class BlutToothActivty extends Activity {
 		//*********************************************************************************************************************
 
 		//查找设备按钮，预备接入其他设备
-		bu_scan.setOnClickListener(new OnClickListener(){
+/*		bu_scan.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View arg0) {
@@ -73,7 +73,7 @@ public class BlutToothActivty extends Activity {
 				bu_can_check.setClickable(false);
 			}
 
-		});
+		});*/
 		//*********************************************************************************************************************
 
 		//本地设备可被扫描，等待设备接入，设置本设备可以被扫描即可
@@ -85,7 +85,7 @@ public class BlutToothActivty extends Activity {
 				Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 				discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 				startActivity(discoverableIntent);
-				bu_scan.setClickable(false);
+				//bu_scan.setClickable(false);
 				bu_can_check.setClickable(false);
 				showToast("等待其他设备接入中.......");
 				Intent intent = new Intent();

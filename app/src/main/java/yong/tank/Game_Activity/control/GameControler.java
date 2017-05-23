@@ -50,17 +50,21 @@ public class GameControler {
         new Thread(gameThread).start();
     }
 
-    //TODO 不用线程控制，采用其他的停止方式
+    //TODO 这里注意，stopGame只停止游戏画面，并不停止通信，通信在另一个stopcommuicate方法中
     public void stopGame(){
+
+        //停止循环:
+        this.gameStartFlag = false;
         //启动关闭程序的界面
-        for(ViewBase v: this.views){
-            //以后再开启
-            v.stopDrawFrame();
-        }
+        viewDraw.stopDrawFrame();
         //停止程序的逻辑
         this.gameService.gameStop();
-        //恢复初始化变量
+
         StaticVariable.REMOTE_PREPARED_INIT_FLAG =false;
+    }
+
+    public void stopCommunicate(){
+        this.gameService.getClientCommunicate().stopCommunicate();
     }
 
     public GameService getGameService() {

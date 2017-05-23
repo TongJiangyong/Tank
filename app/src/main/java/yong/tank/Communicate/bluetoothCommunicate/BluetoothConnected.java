@@ -68,6 +68,8 @@ public class BluetoothConnected extends Thread implements Subject {
         }
     }
     public void stopBluetoothConnected(){
+        //停止servrvice的部分
+        this.serverService.serverStop();
         //停止读的线程
         this.readFlag = false;
         //停止写的线程

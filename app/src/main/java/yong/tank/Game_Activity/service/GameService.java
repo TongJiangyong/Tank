@@ -56,9 +56,9 @@ import static yong.tank.tool.StaticVariable.SCALE_SCREEN_WIDTH;
 
 public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     private GameDto gameDto;
-    private boolean gameStateFlag = false;
     private static String TAG = "GameService";
     private LocalGameProcess localGameProcess;
+    private boolean isGameStartFlag = true;
     private long gameCurrentFrame = 0;
     private int remoteWaitTime = 0;
     //TODO 完成蓝牙相关的线程.....
@@ -82,8 +82,6 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
     private ClientCommunicate clientCommunicate;
     private Gson gson = new Gson();
 
-    //发送第一个包
-    private boolean isFirstPacket = true;
 
     //这是一个专门用于启动程序的handler......，因为架构设计出错，导致service和actiactivity层之间要建立联系，非常不对.....
     private Handler gameActivityHandler;
@@ -95,7 +93,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         this.gameDto = gameDto;
         this.context = context;
         this.gameActivityHandler = gameActivityHandler;
-
+        this.isGameStartFlag = true;
     }
 
 
@@ -200,7 +198,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
                         //等待
                      //   Log.i(TAG,"....wait for data......");
                     //}
-                    while(remoteGameData.size()>0) {
+                    while(remoteGameData.size()>0&&isGameStartFlag) {
                         Log.i(TAG,"into remoteGameData polling and gameCurrentFrame is :"+gameCurrentFrame);
                         if(remoteWaitTime >= StaticVariable.LOGICAL_FRAME){
                             Log.i(TAG,"***************wait to long********************");
@@ -327,14 +325,49 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             //关闭bonus线程
             if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.ACTIVITY) {
                 this.stopMakeBonus();
+                this.bonusMaker = null;
             }
+            //停止initRemoteActivity函数的循环
+            this.isGameStartFlag = false;
 
-            //TODO 这里设置一个游戏结束标识符，进行判断,然后置为null
-            //关闭网络
-            clientCommunicate.stopCommunicate();
+
+            //还原各种初始化的变量：
+            resetAllInitParam();
+            resetAllObject();
+            //设置逻辑部分为0
+            localGameProcess = null;
+            //还原所有动态创建的对象：坦克，子弹， 血条，爆炸等
+
         } else {
             Log.w(TAG, "gameThread is  null");
         }
+    }
+    public void resetAllInitParam(){
+        //还原帧数:
+        this.gameCurrentFrame = 0;
+        StaticVariable.KEY_FRAME = 3;
+        this.gameDto.setGameProcessFrameCount(this.gameCurrentFrame);
+        //还原等待时间
+        this.remoteWaitTime = 0;
+        //还原初始化是否完全的变量
+        StaticVariable.REMOTE_PREPARED_INIT_FLAG = false;
+        //还原蓝牙状态
+        StaticVariable.BLUE_STATE = 0;
+        //还原确认状态
+        this.remoteDataInitFlag = false;
+        //初始化远程交换完成，但是远程DTO等变量还未初始化
+        this.remoteDeviceACKflag = false;
+        //用于判断自己的tanke是否fire的标志位，主要方便发送数据的时候进行检测
+        this.isLocalTankOnfire = false;
+    }
+
+    public void resetAllObject(){
+        this.gameDto.setMyTank(null);
+        this.gameDto.setBonus(null);
+        this.gameDto.setExplodes(null);
+        this.gameDto.setEnemyTank(null);
+        this.gameDto.setMyBlood(null);
+        this.gameDto.setEnemyBlood(null);
     }
 
 
@@ -503,15 +536,22 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             //***************提示地方坦克的血量,并检查游戏是否结束***************
             if (gameDto.getEnemyBlood().getBloodNum() < 0) {
                 //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
-                Message msgInfo = myHandler.obtainMessage();
+/*                Message msgInfo = myHandler.obtainMessage();
                 msgInfo.what = StaticVariable.MSG_TOAST;
                 Bundle bundleMsg = new Bundle();
                 bundleMsg.putString("message", "敌方坦克血条已空，我方胜利");  //设置子弹数量
                 msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
-                myHandler.sendMessage(msgInfo);
+                myHandler.sendMessage(msgInfo);*/
                 //TODO 测试，用于重启游戏
                 //在这里进行结束即可.....
-                gameDto.getEnemyBlood().setBloodNum(1);
+                //gameDto.getEnemyBlood().setBloodNum(1);
+                Log.i(TAG,"result my tank result:over");
+                Message msgResultInfo = gameActivityHandler.obtainMessage();
+                msgResultInfo.what = StaticVariable.GAME_OVER;
+                Bundle bundleResult = new Bundle();
+                bundleResult.putInt("gameResult",StaticVariable.GAME_WIN);  //传递游戏胜利的消息
+                msgResultInfo.setData(bundleResult);//mes利用Bundle传递数据
+                gameActivityHandler.sendMessage(msgResultInfo);
             }
             return true;
         }
@@ -555,14 +595,22 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             //***************提示敌方坦克的血量,并检查游戏是否结束***************
             if (gameDto.getMyBlood().getBloodNum() < 0) {
                 //不知道为啥要加这一条Looper.prepare();Looper.loop();可能是TOAST在其他thread中运行的机制？
-                Message msgInfo = myHandler.obtainMessage();
+/*                Message msgInfo = myHandler.obtainMessage();
                 msgInfo.what = StaticVariable.MSG_TOAST;
                 Bundle bundleMsg = new Bundle();
                 bundleMsg.putString("message", "我方坦克血条已空，敌方胜利");  //设置子弹数量
                 msgInfo.setData(bundleMsg);//mes利用Bundle传递数据
-                myHandler.sendMessage(msgInfo);
+                myHandler.sendMessage(msgInfo);*/
                 //测试，用于重启游戏
-                gameDto.getMyBlood().setBloodNum(1);
+                //gameDto.getMyBlood().setBloodNum(1);
+                //gameDto.getEnemyBlood().setBloodNum(1);
+                Log.i(TAG,"result enemy tank result:over");
+                Message msgResultInfo = gameActivityHandler.obtainMessage();
+                msgResultInfo.what = StaticVariable.GAME_OVER;
+                Bundle bundleResult = new Bundle();
+                bundleResult.putInt("gameResult",StaticVariable.GAME_LOST);  //传递游戏胜利的消息
+                msgResultInfo.setData(bundleResult);//mes利用Bundle传递数据
+                gameActivityHandler.sendMessage(msgResultInfo);
             }
             return true;
         }
@@ -984,7 +1032,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
         }
         Log.i(TAG, "mode:" + StaticVariable.CHOSED_RULE);
         if (StaticVariable.CHOSED_RULE == StaticVariable.GAME_RULE.PASSIVE) {
-            while (!remoteDeviceACKflag) {
+            while (!remoteDeviceACKflag&&isGameStartFlag) {
                 Log.i(TAG, "PASSIVE端发起连接.......");
                 if (this.clientCommunicate != null) {
                     Log.i(TAG, "clientCommunicate is ready");
@@ -1000,7 +1048,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
             }
         }
         //在这里等待初始化信息传输完全 ,如果REMOTE_PREPARED_INIT_FLAG不变，则一直在这里等待.....
-        while(!REMOTE_PREPARED_INIT_FLAG){};
+        while((!REMOTE_PREPARED_INIT_FLAG)&&isGameStartFlag){};
         Log.i(TAG, "remoteTankType is :" + this.remoteTankType);
         initLocalEnemyInfo(this.remoteTankType);
     }
@@ -1251,7 +1299,7 @@ public class GameService implements ObserverInfo, ObserverMsg, ObserverCommand {
      */
     @Override
     public void msgRecived(String msg) {
-        Log.w(TAG, "reviced msg:" + msg);
+        //Log.w(TAG, "reviced msg:" + msg);
         //这里可能需要设置，不能再主线程中更新UI
         String orginText = this.gameDto.getMsgText().getText().toString();
         orginText = orginText + "\n" + REMOTE_DEVICE_ID + ": " + msg;

@@ -44,7 +44,9 @@ public class PlayerFrame {
         //Log.i(TAG,"PlayerThread START_1");
             try {
                 //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
-                this.gameDto.getPlayerPain().drawSelf(canvas);
+                if(flag) {
+                    this.gameDto.getPlayerPain().drawSelf(canvas);
+                }
             } catch (Exception e) {
                 // TODO: handle exception
             } finally {

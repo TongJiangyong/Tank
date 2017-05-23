@@ -25,14 +25,16 @@ public class GameFrame {
     public void drawFrame(float interpolation,Canvas canvas) {
         //TODO 这里对canvas的使用有误,不能让所有的线程都使用canvas
             try {
+                if (flag) {
                     //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);//绘制透明色
                     //canvas.drawBitmap(gameDto.getMyTank().getTankPicture(),0,0,null);
                     //TODO 设计为同时绘制两个坦克
                     gameDto.getMyTank().drawSelf(canvas);
-                    if(gameDto.getEnemyTank()!=null){
+                    if (gameDto.getEnemyTank() != null) {
                         gameDto.getEnemyTank().drawSelf(canvas);
                     }
                 }
+            }
             catch (Exception e) {
                 e.printStackTrace();
             }

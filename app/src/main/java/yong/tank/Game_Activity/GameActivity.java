@@ -50,12 +50,15 @@ public class GameActivity extends Activity implements View.OnClickListener {
     private RelativeLayout relativeLayout;
     private Button msgSend;
     private ImageView msgView;
+    private SelectView selectView;
     public TextView msgText;
     public TextView msg_input;
     private GameService gameService;
     private ClientCommunicate clientCommunicate;
     private GamePresenter gamePresenter;
     private boolean startFlag =false;
+
+
 
     //启动游戏正式开始的handler
     private  Handler gameActivityHandler = new Handler() {
@@ -64,6 +67,13 @@ public class GameActivity extends Activity implements View.OnClickListener {
                 case StaticVariable.GAME_STARTED:
                     Log.i(TAG,"接受两次....");
                     startGame();
+                    break;
+                case StaticVariable.GAME_OVER:
+                    Log.i(TAG,"result:over_2");
+                    int gameResult = msg.getData().getInt("gameResult");//接受msg传递过来的参数
+                    stopGame();
+                    gamePresenter.toResultActivity(gameResult);
+                    //结束游戏的操作
                     break;
                 case StaticVariable.UPDATE_MSG_INFO:
                     String msgInfo = msg.getData().getString("MSG");//接受msg传递过来的参数
@@ -89,7 +99,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         gameDto.setMapType(this.getIntent().getIntExtra("mapType", 0));
 
         //绘制selectView   这里添加selectView之前，还要设置view的基本位置信息，主要在layout中处理位置
-        SelectView selectView = (SelectView)findViewById(R.id.selectView);
+        selectView = (SelectView)findViewById(R.id.selectView);
         //与msg相关的layout
         msgButton = (Button)findViewById(R.id.msgButton);
         msgView = (ImageView)findViewById(R.id.msgView);
@@ -98,14 +108,17 @@ public class GameActivity extends Activity implements View.OnClickListener {
         msg_input = (TextView)findViewById(R.id.msg_input);
         //以后改变一下.....
         relativeLayout = (RelativeLayout)findViewById(R.id.msgLayout);
-       if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
-            msgButton.setVisibility(View.GONE);
-        }
+        //这里需要将发送信息的button和selectview隐藏起来，直到蓝牙连接成功才开始显示
+       //if(StaticVariable.CHOSED_MODE ==StaticVariable.GAME_MODE.LOCAL){
+        msgButton.setVisibility(View.GONE);
+        selectView.setVisibility(View.GONE);
+        //}
         selectView.initButton();
         selectView.getSelectButton_1().setOnClickListener(this);
         selectView.getSelectButton_2().setOnClickListener(this);
         msgButton.setOnClickListener(this);
         msgSend.setOnClickListener(this);
+
         //给gameDto设置按钮
         gameDto.setSelectButtons(selectView.getSelectButtons());
         //给gameDto设置msg显示
@@ -252,9 +265,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
                     Log.i(TAG,"等待蓝牙设备连入.....");
                     break;
                 default:
-                    Log.i(TAG,"return error");
+                    Log.i(TAG,"退出蓝牙选择界面，默认为等待设备连入");
+                    StaticVariable.CHOSED_RULE=StaticVariable.GAME_RULE.ACTIVITY;
+                    Log.i(TAG,"CHOSED_RULE is :"+StaticVariable.CHOSED_RULE);
                     //关掉相关的blue tooth
-                    gamePresenter.turnOffCommunicate();
+                    //gamePresenter.turnOffCommunicate();
                     break;
             }
 
@@ -276,6 +291,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
     //开始游戏
     public void startGame(){
+        //显示该显示的界面
+        if(StaticVariable.CHOSED_MODE != StaticVariable.GAME_MODE.LOCAL){
+            msgButton.setVisibility(View.VISIBLE);
+            selectView.setVisibility(View.VISIBLE);
+        }
         //允许游戏操作...
         gameControler.startGame();
         //允许按钮操作
@@ -285,13 +305,20 @@ public class GameActivity extends Activity implements View.OnClickListener {
     }
 
     //关闭游戏
+    //TODO 因为通讯相关的方法，没有写成service的模式，所以这里出现很麻烦的情况，只能在游戏结束后，返回标题画面即可......
     public void stopGame(){
-        //允许游戏操作...
+        //退出游戏
         gameControler.stopGame();
+        //退出蓝牙通讯
+        gameControler.stopCommunicate();
         //允许按钮操作
         this.startFlag = false;
         Log.i(TAG,"结束游戏.....");
     }
+
+
+
+
 
 
     @Override
