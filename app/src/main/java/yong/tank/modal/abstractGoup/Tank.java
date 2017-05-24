@@ -159,14 +159,18 @@ public abstract class Tank implements Serializable {
 
 
     public boolean isInCircle(float x, float y) {
-        Log.i(TAG,"isInCircle x:"+x+" y:"+y+" this.tankPosition_x:"+this.tankPosition_x+" this.tankPosition_y"+this.tankPosition_y
-                +" (this.tankPosition_x + this.tankPicture.getWidth()):"+(this.tankPosition_x + this.tankPicture.getWidth()) +
-                " (this.tankPosition_y + this.tankPicture.getHeight())" +(this.tankPosition_y + this.tankPicture.getHeight()));
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "isInCircle x:" + x + " y:" + y + " this.tankPosition_x:" + this.tankPosition_x + " this.tankPosition_y" + this.tankPosition_y
+                    + " (this.tankPosition_x + this.tankPicture.getWidth()):" + (this.tankPosition_x + this.tankPicture.getWidth()) +
+                    " (this.tankPosition_y + this.tankPicture.getHeight())" + (this.tankPosition_y + this.tankPicture.getHeight()));
+        }
         if (this.tankPosition_x <= x &&
                 x <= (this.tankPosition_x + this.tankPicture.getWidth()) &&
                 this.tankPosition_y <= y &&
                 y <= (this.tankPosition_y + this.tankPicture.getHeight())) {
-            Log.i(TAG,"*****************isInCircle******************");
+            if(StaticVariable.DEBUG) {
+                Log.i(TAG, "*****************isInCircle******************");
+            }
             return true;
         } else {
             return false;

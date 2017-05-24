@@ -168,7 +168,9 @@ public class PlayControler {
         //distance计算的是与最大圈的比例
         distance=Math.sqrt((dy-tankCenter.getY())*(dy-tankCenter.getY())+(dx-tankCenter.getX())*(dx-tankCenter.getX()))/
                 (this.gameDto.getMyTank().getTankPicture().getWidth()*StaticVariable.TANK_SHOT_CIRCLE);
-        Log.i(TAG,"tankDegree:"+tankDegree+" distance:"+distance);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "tankDegree:" + tankDegree + " distance:" + distance);
+        }
     }
 
 
@@ -238,7 +240,9 @@ public class PlayControler {
             //***************更换selectView的外观***************
             //这种配置方法并不好，不过设置一下也是可以的.....
             case R.id.selectButton_2:
-                Log.w(TAG,"selectButton_2");
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "selectButton_2");
+                }
                 //当选择时，如果为空则不能选上，如果不为空，则选上，并设置tank的子弹为选上的子弹
                 if(this.gameDto.getSelectButtons().get(R.id.selectButton_2).isFilled()){
                     this.gameDto.getSelectButtons().get(R.id.selectButton_2).setButtonSelected();
@@ -249,7 +253,9 @@ public class PlayControler {
                 }
                 break;
             case R.id.selectButton_1:
-                Log.w(TAG,"selectButton_1");
+                if(StaticVariable.DEBUG) {
+                    Log.w(TAG, "selectButton_1");
+                }
                 if(this.gameDto.getSelectButtons().get(R.id.selectButton_1).isFilled()){
                     this.gameDto.getSelectButtons().get(R.id.selectButton_1).setButtonSelected();
                     this.gameDto.getSelectButtons().get(R.id.selectButton_2).setButtonNoSelected();

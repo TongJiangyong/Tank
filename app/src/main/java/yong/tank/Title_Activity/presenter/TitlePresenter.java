@@ -147,9 +147,10 @@ public class TitlePresenter implements ITitlePresenter {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //TODO 测试服务器连接情况，默认服务器
+                        titleView.showToast("测试服务器...该版本不可使用.....");
                         //API_SERVER = API_SERVER;
-                        serviceConnectTest();
-                        toLoginOrRegister();
+                        //serviceConnectTest();
+                        //toLoginOrRegister();
                     }
                 });
         // 显示

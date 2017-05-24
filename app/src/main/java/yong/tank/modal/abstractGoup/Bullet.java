@@ -57,9 +57,10 @@ public abstract class Bullet implements Serializable{
         //System.out.println( "bulletV_x:" + init_x + " bulletV_y:" + init_y);
         bulletPosition_x=newPosition_x;
         bulletPosition_y=newPosition_y;
-        Log.w(TAG, "isInCircle**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x );
-        Log.w(TAG, "isInCircle bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + bulletPosition_x + " bulletPosition_y:" + bulletPosition_y);
-        //time = time + StaticVariable.INTERVAL;
+        if(StaticVariable.DEBUG) {
+            Log.w(TAG, "isInCircle**************bulletDegree:" + bulletDegree + " bulletV_y:" + bulletV_y + " bulletV_x:" + bulletV_x);
+            Log.w(TAG, "isInCircle bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + bulletPosition_x + " bulletPosition_y:" + bulletPosition_y);
+        }//time = time + StaticVariable.INTERVAL;
     }
 
 

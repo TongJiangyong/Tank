@@ -291,9 +291,9 @@ public class StaticVariable {
 
     /* 服务器初始化相关的ip */
     //服务器路径
-    public static  String API_SERVER = "http://192.168.1.122:8080/webService";
+    //public static  String API_SERVER = "http://192.168.1.3:8080/webService";
     //public static  String API_SERVER = "http://192.168.191.1:8080/webService";
-    public static  String API_SERVER_XIAN = "http://115.154.191.5:8080/webService";
+    public static  String API_SERVER = "http://115.154.191.5:8080/webService";
     //设置通讯相关的部分 String ip, int port
     public static String SERVER_IP = "192.168.1.122";
     //public static String SERVER_IP = "192.168.191.1";
