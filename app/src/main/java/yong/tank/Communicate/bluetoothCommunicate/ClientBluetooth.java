@@ -53,6 +53,8 @@ public class ClientBluetooth implements ClientCommunicate {
     //TODO 改为private 测试
     private BluetoothConnected mConnectedThread;
     private int mState;
+    //蓝牙的初始状态
+    private boolean iSblueToothStarted;
 
     private ServerService serverService;
     // Constants that indicate the current connection state
@@ -69,6 +71,7 @@ public class ClientBluetooth implements ClientCommunicate {
     public ClientBluetooth() {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
+        iSblueToothStarted = true;
     }
 
 
@@ -202,7 +205,7 @@ public class ClientBluetooth implements ClientCommunicate {
     public synchronized void stop() {
         if (D) Log.i(TAG, "stop");
         //停止已经连接的蓝牙读写线程.....
-
+        iSblueToothStarted = false;
 
         if (mConnectThread != null) {
             Log.i(TAG,"mConnectedThread end_4");
@@ -349,7 +352,7 @@ public class ClientBluetooth implements ClientCommunicate {
             BluetoothSocket socket = null;
 
             // Listen to the server socket if we're not connected
-            while (mState != STATE_CONNECTED) {
+            while (mState != STATE_CONNECTED&&iSblueToothStarted) {
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception

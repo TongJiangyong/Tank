@@ -131,7 +131,7 @@ public class TitlePresenter implements ITitlePresenter {
                 new AlertDialog.Builder(this.context);
         //normalDialog.setIcon(R.drawable.icon_dialog);
         normalDialog.setTitle("服务器选择");
-        normalDialog.setMessage("请选择要接入的服务器：\n（由于没有合适的服务器联网对战仅仅支持在线登录，注册，查看房间等内容）");
+        normalDialog.setMessage("请选择要接入的服务器：\n    由于没有合适的服务器,联网对战模式仅仅支持登录、注册、查看房间等内容");
         normalDialog.setPositiveButton("西安服务器",
                 new DialogInterface.OnClickListener() {
                     @Override

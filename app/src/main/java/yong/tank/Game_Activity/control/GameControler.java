@@ -64,7 +64,10 @@ public class GameControler {
     }
 
     public void stopCommunicate(){
-        this.gameService.getClientCommunicate().stopCommunicate();
+        if(this.gameService.getClientCommunicate()!=null){
+            this.gameService.getClientCommunicate().stopCommunicate();
+        }
+
     }
 
     public GameService getGameService() {

@@ -306,8 +306,9 @@ public class Tool {
             bulletPath.add(point);
             init_x=newPosition_x;
             init_y=newPosition_y;
-            Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
-            //time = time + StaticVariable.INTERVAL;
+            if(StaticVariable.DEBUG) {
+                Log.w(TAG, "bulletDegree:" + bulletDegree + "bulletDistance:" + bulletDistance + " bulletPosition_x:" + init_x + " bulletPosition_y:" + init_y);
+            }//time = time + StaticVariable.INTERVAL;
         }
         return bulletPath;
     }
@@ -428,12 +429,18 @@ public class Tool {
      * @param clientCommunicate
      */
     public static void  sendSelfIdToActive(ClientCommunicate clientCommunicate){
-        Log.i(TAG,"send self to active");
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "send self to active");
+        }
         User user = localUser.readInfoLocal(StaticVariable.USER_FILE);
         String remoteId = StaticVariable.REMOTE_DEVICE_ID;
-        Log.i(TAG,"remoteId is :"+remoteId);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "remoteId is :" + remoteId);
+        }
         ComDataF comDataF = ComDataPackage.packageToF((remoteId+"#"), INIT_PASSIVE_REQUEST_CONNECT,String.valueOf(user.getId()));
-        Log.i(TAG,"sendInfoTo Active and command is :"+INIT_PASSIVE_REQUEST_CONNECT);
+        if(StaticVariable.DEBUG) {
+            Log.i(TAG, "sendInfoTo Active and command is :" + INIT_PASSIVE_REQUEST_CONNECT);
+        }
         clientCommunicate.sendInfo(gson.toJson(comDataF));
     }
     /**

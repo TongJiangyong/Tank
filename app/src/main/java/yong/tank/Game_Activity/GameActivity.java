@@ -300,8 +300,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
         //显示该显示的界面
         if(StaticVariable.CHOSED_MODE != StaticVariable.GAME_MODE.LOCAL){
             msgButton.setVisibility(View.VISIBLE);
-            selectView.setVisibility(View.VISIBLE);
         }
+        selectView.setVisibility(View.VISIBLE);
         //允许游戏操作...
         gameControler.startGame();
         //允许按钮操作
@@ -321,6 +321,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
         gameControler.stopCommunicate();
         //允许按钮操作
         this.startFlag = false;
+        this.finish();
         Log.i(TAG,"结束游戏.....");
     }
 
@@ -332,6 +333,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        //this.stopGame();
         Log.d(TAG, "onPause()");
     }
 

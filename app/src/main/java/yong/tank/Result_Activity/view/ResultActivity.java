@@ -55,6 +55,7 @@ public class ResultActivity extends Activity implements View.OnClickListener{
             case R.id.returnTitleButton:
                 Intent intent = new Intent(this, MainActivity.class);
                 this.startActivity(intent);
+                this.finish();
                 break;
         }
     }

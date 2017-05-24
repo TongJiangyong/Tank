@@ -16,7 +16,6 @@ import android.widget.TextView;
 import yong.tank.R;
 import yong.tank.Title_Activity.View.MainActivity;
 import yong.tank.tool.StaticVariable;
-import yong.tank.tool.Tool;
 
 /**
  * Created by hasee on 2016/10/28.
@@ -93,12 +92,13 @@ public class HelpActivity extends Activity implements View.OnClickListener{
     @Override
     public void onPause(){
         super.onPause();
-        Tool.releaseBitmap(help_bg);
+        this.finish();
+        //Tool.releaseBitmap(help_bg);
     }
     @Override
     public void onDestroy(){
         super.onDestroy();
-        Tool.releaseBitmap(help_bg);
+        //Tool.releaseBitmap(help_bg);
     }
 
 }
